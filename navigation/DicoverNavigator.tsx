@@ -1,14 +1,14 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AppSetting from '../screens/AppSetting';
 import DiscoverScreen from '../screens/DiscoverScreen';
 import EventDetail from '../screens/EventDetail';
 import EventScreen from '../screens/EventScreen';
 import FighterProfileScreen from '../screens/FighterProfileScreen';
 import FighterScreen from '../screens/FighterScreen';
-import OrganizerScreen from '../screens/OrganizerScreen';
-import Menu from '../screens/Menu';
-import AppSetting from '../screens/AppSetting';
-import MedicalPaper from '../screens/MedicalPaper';
 import GiveFeedback from '../screens/GiveFeedback';
+import MedicalPaper from '../screens/MedicalPaper';
+import Menu from '../screens/Menu';
+import OrganizerScreen from '../screens/OrganizerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +22,7 @@ const DiscoverNavigator = () => {
       <Stack.Screen name="Event" component={EventScreen} />
       <Stack.Screen name="EventDetail" component={EventDetail} />
       <Stack.Screen name="FighterScreen" component={FighterScreen} />
-      <Stack.Screen name="ManagerScreen" component={OrganizerScreen} />
+      <Stack.Screen name="OrganizerScreen" component={OrganizerScreen} />
       <Stack.Screen name="FighterProfileScreen" component={FighterProfileScreen} />
       <Stack.Screen name="Menu" component={Menu} />
       <Stack.Screen name="AppSetting" component={AppSetting} />

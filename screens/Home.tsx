@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Dimensions, Platform, StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
+import EmptyState from '../components/EmptyState';
+import AppText from '../components/common/AppText';
+import CustomBottomSheet from '../components/common/CustomBottomSheet';
 import Header from '../components/common/Header';
 import MeshGradientBackground from '../components/common/MeshGradientBackground';
 import { Colors } from '../constant';
-import EmptyState from '../components/EmptyState';
-import CustomBottomSheet from '../components/common/CustomBottomSheet';
-import AppText from '../components/common/AppText';
 
 const Home = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
@@ -17,7 +17,7 @@ const Home = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <MeshGradientBackground />
       <Header title='Home' />
       <EmptyState
@@ -60,6 +60,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    paddingTop: Platform.OS === 'ios' ? 0 : 20
+    paddingBottom: 0
   },
 });

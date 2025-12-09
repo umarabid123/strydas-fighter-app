@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     linkButton: {
         backgroundColor: Colors.white,
         width: '100%',
-        marginTop: 0, // Override default margin
+        marginTop: 0,
         borderRadius: 100
     },
     linkButtonText: {

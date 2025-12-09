@@ -27,7 +27,7 @@ export default function Header({
   showNotificationDot = true,
   isBack = false
 }: HeaderProps) {
-  const navigation = useNavigation()
+  const navigation = useNavigation<any>()
   const route = useRoute();
   return (
     <View style={styles.container}>
@@ -69,7 +69,7 @@ export default function Header({
         {/* Hamburger Menu */}
         <TouchableOpacity style={styles.iconButton} onPress={() => {
           if (route.name === 'Menu') {
-            navigation.navigate('Home'); // already on Menu → go to Home
+            navigation.goBack(); // already on Menu → go to Home
           } else {
             navigation.navigate('Menu'); // go to Menu
           }

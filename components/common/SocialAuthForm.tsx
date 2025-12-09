@@ -6,8 +6,9 @@ import {
   ScrollView,
   StyleSheet,
   TextInput,
-  View
+  View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import AppButton from './AppButton';
 import AppText from './AppText';
@@ -57,6 +58,7 @@ export default function SocialAuthForm({
   titleContainerMarginBottom = Spacing.xxl,
   titleContainerMarginTop = 0,
 }: SocialAuthFormProps) {
+  const insets = useSafeAreaInsets();
   const handleGoogleAuth = () => {
     console.log('Google auth');
   };
@@ -79,14 +81,14 @@ export default function SocialAuthForm({
       >
         {/* Progress Bar - Optional */}
         {showProgressBar && (
-          <View style={styles.progressContainer}>
+          <View style={[styles.progressContainer, { top: (60 / DESIGN_HEIGHT) * SCREEN_HEIGHT + insets.top }]}>
             <View style={styles.progressBackground} />
             <View style={[styles.progressFill, { width: `${progressPercentage}%` }]} />
           </View>
         )}
 
         <ScrollView
-          style={styles.scrollView}
+          style={[styles.scrollView, { marginTop: (70 / DESIGN_HEIGHT) * SCREEN_HEIGHT + insets.top }]}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >

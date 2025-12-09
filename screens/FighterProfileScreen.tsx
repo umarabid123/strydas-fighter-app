@@ -1,21 +1,18 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
-    View,
-    StyleSheet,
-    ScrollView,
     Image,
-    Dimensions,
-    Touchable,
-    TouchableOpacity,
     Platform,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import Header from '../components/common/Header';
-import AppText from '../components/common/AppText';
 import AppButton from '../components/common/AppButton';
-import InfoRow from '../components/common/InfoRow';
+import AppText from '../components/common/AppText';
+import Header from '../components/common/Header';
 import NextFightCard from '../components/NextFightCard';
 import { Colors } from '../constant';
-import { useNavigation } from '@react-navigation/native';
 
 
 const Tag = ({ text, icon }: { text: string; icon?: any }) => (
@@ -104,7 +101,7 @@ export default function FighterProfileScreen() {
                 <View style={styles.divider} />
 
                 {/* Manager Section */}
-                <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('ManagerScreen')}>
+                <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('OrganizerScreen')}>
                     <AppText text="Manager" fontSize={18} color={Colors.white} style={styles.sectionTitle} />
                     <View style={styles.managerCard}>
                         <Image source={require('../assets/images/profile-img.png')} style={styles.managerAvatar} />
