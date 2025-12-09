@@ -1,4 +1,5 @@
 # Expo / React Native
+.npm-cache/
 .expo/
 .expo-shared/
 .expo/packager-info.json
