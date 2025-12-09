@@ -29,7 +29,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const scaleW = (value: number) => (value / DESIGN_WIDTH) * SCREEN_WIDTH;
 const scaleH = (value: number) => (value / DESIGN_HEIGHT) * SCREEN_HEIGHT;
 
-export default function Intro({ onSignUp, onLogIn }: IntroProps) {
+export default function Intro() {
   const navigation = useNavigation<NavigationProp<any>>();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();

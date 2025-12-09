@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: (16 / DESIGN_WIDTH) * SCREEN_WIDTH,
-    paddingVertical: 20,
+    paddingVertical: 20
   },
   rightSection: {
     flexDirection: 'row',
