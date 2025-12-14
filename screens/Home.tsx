@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, Platform, StyleSheet, View } from 'react-native';
 import EmptyState from '../components/EmptyState';
 import AppText from '../components/common/AppText';
 import CustomBottomSheet from '../components/common/CustomBottomSheet';
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
+    paddingTop: Platform.OS === 'ios' ? 0 : 20,
     paddingBottom: 0
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Dimensions,
-  StatusBar,
+  Platform,
   StyleSheet,
   TextInput,
   TextStyle,
@@ -11,9 +11,6 @@ import AppButton from '../components/common/AppButton';
 import AppText from '../components/common/AppText';
 import Header from '../components/common/Header';
 import { Colors } from '../constant';
-import SearchSection from '../components/common/SearchSection';
-import FighterCard from '../components/FighterCard';
-import CarouselItem from '../components/CarouselItem';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const GiveFeedback = ({
@@ -64,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
-    // paddingTop: 60,
+    paddingTop: Platform.OS === 'ios' ? 0 : 20,
   },
   content: {
     paddingHorizontal: 20,

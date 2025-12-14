@@ -47,7 +47,7 @@ export default function Intro() {
       <MeshGradientBackground />
 
       {/* Top Content: Logo + Tagline */}
-      <View style={[styles.headerContainer]}>
+      <View style={[styles.headerContainer, { marginTop: scaleH(20) }]}>
         <View style={styles.logoContainer}>
           <Image source={logoImage} style={styles.logo} resizeMode="contain" />
         </View>

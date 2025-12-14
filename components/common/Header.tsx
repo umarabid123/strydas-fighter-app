@@ -3,9 +3,11 @@ import {
   Dimensions,
   Image,
   Pressable,
+  StyleProp,
   StyleSheet,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import { Colors, DESIGN_WIDTH } from '../../constant';
 import AppText from './AppText';
@@ -17,6 +19,7 @@ interface HeaderProps {
   onNotificationPress?: () => void;
   onMenuPress?: () => void;
   showNotificationDot?: boolean;
+  headerContainerStyle?: StyleProp<ViewStyle>;
   isBack?: boolean
 }
 
@@ -25,12 +28,13 @@ export default function Header({
   onNotificationPress,
   onMenuPress,
   showNotificationDot = true,
+  headerContainerStyle,
   isBack = false
 }: HeaderProps) {
   const navigation = useNavigation<any>()
   const route = useRoute();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, headerContainerStyle]}>
 
       <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
         {isBack &&

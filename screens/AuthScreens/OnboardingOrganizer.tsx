@@ -232,17 +232,20 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
               </TouchableOpacity>
             </View>
           </View>
+
+          {/* Complete Button */}
+          <View style={styles.completeButtonContainer}>
+            <AppButton
+              text="That's it, complete"
+              onPress={handleComplete}
+              btnStyle={styles.completeButton}
+              textStyle={styles.completeButtonText}
+            />
+          </View>
         </ScrollView>
 
-        {/* Complete Button */}
-        <View style={styles.completeButtonContainer}>
-          <AppButton
-            text="That's it, complete"
-            onPress={handleComplete}
-            btnStyle={styles.completeButton}
-            textStyle={styles.completeButtonText}
-          />
-        </View>
+
+
       </KeyboardAvoidingView>
     </View>
   );
@@ -390,10 +393,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   completeButtonContainer: {
-    position: 'absolute',
-    bottom: (34 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
-    left: 0,
-    right: 0,
     alignItems: 'center',
     paddingHorizontal: (32 / DESIGN_WIDTH) * SCREEN_WIDTH,
     zIndex: 10,
