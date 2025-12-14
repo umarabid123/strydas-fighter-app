@@ -2,7 +2,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import BottomTabs from '../components/common/BottomTabs';
-import FighterProfileScreen from '../screens/FighterProfileScreen';
+import MyProfile from '../screens/MyProfile';
 import DiscoverNavigator from './DicoverNavigator';
 import HomeNavigator from './HomeNavigator';
 
@@ -50,7 +50,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeNavigator} />
       <Tab.Screen name="Discover" component={DiscoverNavigator} />
-      <Tab.Screen name="Account" component={FighterProfileScreen} />
+      <Tab.Screen name="My Profile" component={MyProfile} />
     </Tab.Navigator>
   );
 };
