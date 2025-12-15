@@ -1,3 +1,5 @@
+import type { NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -11,13 +13,13 @@ import {
   useColorScheme,
   View
 } from 'react-native';
-// Using a simple custom slider implementation
-import type { NavigationProp } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
+import Slider from 'react-native-sticky-range-slider';
 import AppButton from '../../components/common/AppButton';
 import AppText from '../../components/common/AppText';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
+import { ContactSheet, MatchSheet } from '../../components/common/OnboardingSheets';
 import ProfileInput from '../../components/common/ProfileInput';
+import { Rail, RailSelected, Thumb } from '../../components/common/SliderComponents';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
 
@@ -38,6 +40,8 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [weightRange, setWeightRange] = useState('2.0');
   const [height, setHeight] = useState('230');
   const [gym, setGym] = useState('Keddles Gym');
+  const [showContactSheet, setShowContactSheet] = useState(false);
+  const [showMatchSheet, setShowMatchSheet] = useState(false);
 
   const handleProfileImagePress = () => {
     // TODO: Open image picker
@@ -187,17 +191,17 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
               />
               <View style={styles.weightValueContainer}>
                 <TextInput
-                  value={weightDivision}
+                  // value={weightDivision}
                   onChangeText={setWeightDivision}
                   keyboardType="decimal-pad"
                   style={{
                     fontFamily: 'CircularStd-Book',
                     fontSize: Typography.fontSize.xl,
-                    color: colors.textTertiary,
+                    color: colors.white,
                     flex: 1,
                     paddingVertical: 4,
                   }}
-                  placeholder="0.0"
+                  placeholder="63.5"
                   placeholderTextColor={Colors.whiteOpacity20}
                 />
                 <AppText
@@ -220,36 +224,30 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
               />
               <View style={styles.sliderContainer}>
                 <View style={styles.sliderWrapper}>
-                  <View style={styles.sliderTrack}>
-                    <View
-                      style={[
-                        styles.sliderFill,
-                        { width: `${(parseFloat(weightRange || '0') / 10) * 100}%` },
-                      ]}
-                    />
-                    <TouchableOpacity
-                      style={[
-                        styles.sliderThumb,
-                        { left: `${(parseFloat(weightRange || '0') / 10) * 100}%` },
-                      ]}
-                      onPress={() => { }}
-                    />
-                  </View>
+                  <Slider
+                    min={0}
+                    max={10}
+                    step={0.1}
+                    disableRange={true}
+                    low={parseFloat(weightRange || '0')}
+                    onValueChanged={(low: number) => {
+                      setWeightRange(low.toFixed(1));
+                    }}
+                    renderThumb={() => <Thumb />}
+                    renderRail={() => <Rail />}
+                    renderRailSelected={() => <RailSelected />}
+                  />
                 </View>
                 <View style={styles.sliderValueContainer}>
                   <TextInput
-                    value={weightRange}
                     onChangeText={setWeightRange}
                     keyboardType="decimal-pad"
                     style={{
                       fontFamily: 'CircularStd-Book',
-                      fontSize: Typography.fontSize.lg,
+                      fontSize: Typography.fontSize.xl,
                       color: colors.white,
-                      minWidth: 60,
+                      minWidth: 40,
                       textAlign: 'right',
-                      padding: 8,
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      borderRadius: 4
                     }}
                     placeholder="0.0"
                     placeholderTextColor="rgba(255,255,255,0.3)"
@@ -275,17 +273,16 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
               />
               <View style={styles.heightValueContainer}>
                 <TextInput
-                  value={height}
                   onChangeText={setHeight}
                   keyboardType="decimal-pad"
                   style={{
                     fontFamily: 'CircularStd-Book',
                     fontSize: Typography.fontSize.xl,
-                    color: colors.textTertiary,
+                    color: colors.white,
                     flex: 1,
                     paddingVertical: 4,
                   }}
-                  placeholder="0"
+                  placeholder="170"
                   placeholderTextColor={Colors.whiteOpacity20}
                 />
                 <AppText
@@ -300,7 +297,6 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             {/* Gym / Club */}
             <ProfileInput
               label="Gym / Club"
-              // value={gym}
               onChangeText={setGym}
               placeholder="Keddles Gym"
             />
@@ -314,7 +310,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 color={colors.white}
                 style={styles.sectionLabel}
               />
-              <TouchableOpacity style={styles.addButton}>
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -341,7 +337,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                   color="rgba(255, 255, 255, 0.8)"
                 />
               </View>
-              <TouchableOpacity style={styles.addButton}>
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowMatchSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -360,7 +356,8 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             />
           </View>
         </ScrollView>
-
+        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
+        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
       </KeyboardAvoidingView>
     </View>
   );

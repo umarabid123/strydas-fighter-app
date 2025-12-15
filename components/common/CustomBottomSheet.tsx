@@ -1,17 +1,18 @@
+import { X } from 'lucide-react-native';
 import React from 'react';
-import { View, StyleSheet, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Colors } from '../../constant';
 import AppText from './AppText';
-import { X } from 'lucide-react-native';
 
 interface CustomBottomSheetProps {
     visible: boolean;
     onClose: () => void;
     title: string;
     children: React.ReactNode;
+    contentStyle?: any;
 }
 
-const CustomBottomSheet = ({ visible, onClose, title, children }: CustomBottomSheetProps) => {
+const CustomBottomSheet = ({ visible, onClose, title, children, contentStyle }: CustomBottomSheetProps) => {
     return (
         <Modal
             transparent
@@ -43,7 +44,7 @@ const CustomBottomSheet = ({ visible, onClose, title, children }: CustomBottomSh
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.content}>
+                    <View style={[styles.content, contentStyle]}>
                         {children}
                     </View>
                 </View>
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
     },
     title: {
         flex: 1,
+        fontWeight: 600
     },
     closeButton: {
         padding: 5,

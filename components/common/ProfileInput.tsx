@@ -1,5 +1,5 @@
 import React from "react"
-import { View, StyleSheet, TextInput, useColorScheme } from "react-native"
+import { StyleSheet, TextInput, useColorScheme, View } from "react-native"
 import { Colors, Spacing, Typography } from "../../constant"
 import AppText from "./AppText"
 
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   },
   label: {
     letterSpacing: 0.28,
+    fontWeight: 500
   },
   input: {
     fontSize: Typography.fontSize.xl,

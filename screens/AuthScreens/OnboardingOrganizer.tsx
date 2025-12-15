@@ -1,5 +1,6 @@
 import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -34,9 +35,17 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
   const [jobTitle, setJobTitle] = useState('IFMA President');
   const [organisation, setOrganisation] = useState('Keddles Gym');
 
-  const handleProfileImagePress = () => {
-    // TODO: Open image picker
-    console.log('Select profile image');
+  const handleProfileImagePress = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+      base64: false,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setProfileImage(result.assets[0].uri);
+    }
   };
 
   const handleComplete = () => {
