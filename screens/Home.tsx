@@ -4,7 +4,6 @@ import EmptyState from '../components/EmptyState';
 import AppText from '../components/common/AppText';
 import CustomBottomSheet from '../components/common/CustomBottomSheet';
 import Header from '../components/common/Header';
-import MeshGradientBackground from '../components/common/MeshGradientBackground';
 import { Colors } from '../constant';
 
 const Home = () => {
@@ -18,7 +17,6 @@ const Home = () => {
 
   return (
     <View style={[styles.container]}>
-      <MeshGradientBackground />
       <Header title='Home' />
       <EmptyState
         title="My matches"
