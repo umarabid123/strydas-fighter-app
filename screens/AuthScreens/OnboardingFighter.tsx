@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   useColorScheme,
   View
@@ -34,7 +35,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const { setIsAuthenticated } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [weightDivision, setWeightDivision] = useState('63.5');
-  const [weightRange, setWeightRange] = useState(2.0);
+  const [weightRange, setWeightRange] = useState('2.0');
   const [height, setHeight] = useState('230');
   const [gym, setGym] = useState('Keddles Gym');
 
@@ -185,11 +186,19 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 style={styles.sectionLabel}
               />
               <View style={styles.weightValueContainer}>
-                <AppText
-                  text={weightDivision}
-                  fontSize={Typography.fontSize.xl}
-                  fontName="CircularStd-Book"
-                  color={colors.textTertiary}
+                <TextInput
+                  value={weightDivision}
+                  onChangeText={setWeightDivision}
+                  keyboardType="decimal-pad"
+                  style={{
+                    fontFamily: 'CircularStd-Book',
+                    fontSize: Typography.fontSize.xl,
+                    color: colors.textTertiary,
+                    flex: 1,
+                    paddingVertical: 4,
+                  }}
+                  placeholder="0.0"
+                  placeholderTextColor={Colors.whiteOpacity20}
                 />
                 <AppText
                   text="kg"
@@ -215,24 +224,35 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                     <View
                       style={[
                         styles.sliderFill,
-                        { width: `${(weightRange / 10) * 100}%` },
+                        { width: `${(parseFloat(weightRange || '0') / 10) * 100}%` },
                       ]}
                     />
                     <TouchableOpacity
                       style={[
                         styles.sliderThumb,
-                        { left: `${(weightRange / 10) * 100}%` },
+                        { left: `${(parseFloat(weightRange || '0') / 10) * 100}%` },
                       ]}
                       onPress={() => { }}
                     />
                   </View>
                 </View>
                 <View style={styles.sliderValueContainer}>
-                  <AppText
-                    text={weightRange.toFixed(1)}
-                    fontSize={Typography.fontSize.lg}
-                    fontName="CircularStd-Book"
-                    color={colors.white}
+                  <TextInput
+                    value={weightRange}
+                    onChangeText={setWeightRange}
+                    keyboardType="decimal-pad"
+                    style={{
+                      fontFamily: 'CircularStd-Book',
+                      fontSize: Typography.fontSize.lg,
+                      color: colors.white,
+                      minWidth: 60,
+                      textAlign: 'right',
+                      padding: 8,
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      borderRadius: 4
+                    }}
+                    placeholder="0.0"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
                   />
                   <AppText
                     text="kg"
@@ -254,11 +274,19 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 style={styles.sectionLabel}
               />
               <View style={styles.heightValueContainer}>
-                <AppText
-                  text={height}
-                  fontSize={Typography.fontSize.xl}
-                  fontName="CircularStd-Book"
-                  color={colors.textTertiary}
+                <TextInput
+                  value={height}
+                  onChangeText={setHeight}
+                  keyboardType="decimal-pad"
+                  style={{
+                    fontFamily: 'CircularStd-Book',
+                    fontSize: Typography.fontSize.xl,
+                    color: colors.textTertiary,
+                    flex: 1,
+                    paddingVertical: 4,
+                  }}
+                  placeholder="0"
+                  placeholderTextColor={Colors.whiteOpacity20}
                 />
                 <AppText
                   text="cm"
@@ -272,7 +300,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             {/* Gym / Club */}
             <ProfileInput
               label="Gym / Club"
-              value={gym}
+              // value={gym}
               onChangeText={setGym}
               placeholder="Keddles Gym"
             />

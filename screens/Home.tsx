@@ -55,7 +55,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    backgroundColor: 'transparent',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     paddingTop: Platform.OS === 'ios' ? 0 : 20,

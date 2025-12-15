@@ -3,7 +3,6 @@ import { Dimensions, Platform, ScrollView, StyleSheet, TouchableOpacity, View } 
 import AppText from '../components/common/AppText'
 import EventCard, { MatchItem } from '../components/common/EventCard'
 import Header from '../components/common/Header'
-import MeshGradientBackground from '../components/common/MeshGradientBackground'
 import SearchSection from '../components/common/SearchSection'
 import { Colors } from '../constant'
 
@@ -57,7 +56,6 @@ const EVENTS = [
 export default function EventScreen() {
   return (
     <View style={styles.container}>
-      <MeshGradientBackground />
       <Header
         isBack={true}
         onNotificationPress={() => { }}
@@ -127,7 +125,7 @@ export default function EventScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    backgroundColor: 'transparent',
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     paddingTop: Platform.OS === 'ios' ? 0 : 20

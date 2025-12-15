@@ -182,26 +182,26 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
           <View style={styles.formContainer}>
             <ProfileInput
               label="First Name *"
-              value={firstName}
+              // value={firstName}
               onChangeText={setFirstName}
               placeholder="Jonathan"
             />
             <ProfileInput
               label="Last Name *"
-              value={lastName}
+              // value={lastName}
               onChangeText={setLastName}
               placeholder="Haggerty"
             />
             <ProfileInput
               label="Date of birth *"
-              value={dateOfBirth}
+              // value={dateOfBirth}
               placeholder="Mar 03, 2000"
               editable={false}
               onPress={handleDatePickerPress}
             />
             <ProfileInput
               label="Gender *"
-              value={gender}
+              // value={gender}
               placeholder="-"
               editable={false}
               onPress={() => setShowGenderPicker(true)}
