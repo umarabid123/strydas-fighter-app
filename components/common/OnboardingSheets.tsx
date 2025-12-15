@@ -1,10 +1,20 @@
+import { Search, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Colors, Spacing } from '../../constant';
+import { FlatList, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { BorderRadius, Colors, Spacing, Typography } from '../../constant';
 import AppButton from './AppButton';
+import AppText from './AppText';
 import CustomBottomSheet from './CustomBottomSheet';
 import ProfileInput from './ProfileInput';
 import SelectPicker from './SelectPicker';
+
+// Mock data for Fighters
+const AVAILABLE_FIGHTERS = [
+    { id: '1', name: 'Jaspar Landal', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '2', name: 'Niclas R. Larsen', record: '24-8-1', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'MMA', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '3', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '4', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
+];
 
 export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
     const [fullName, setFullName] = useState('');
@@ -68,7 +78,6 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
     const [date, setDate] = useState('Aug 04, 2025');
     const [opponent, setOpponent] = useState('+45 12 34 56 78');
     const [event, setEvent] = useState('+45 12 34 56 78');
-    // Using simple inputs for selects for now, or ProfileInput with non-editable + value to adhere to design "Select" look
 
     const [division, setDivision] = useState('');
     const [sport, setSport] = useState('');
@@ -171,19 +180,152 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
     );
 };
 
+export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedFighters, setSelectedFighters] = useState<string[]>([]);
+    const colorScheme = useColorScheme();
+    const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
+
+    const handleAddFighter = (id: string) => {
+        if (!selectedFighters.includes(id)) {
+            setSelectedFighters([...selectedFighters, id]);
+        }
+    };
+
+    const handleRemoveFighter = (id: string) => {
+        setSelectedFighters(selectedFighters.filter(fighterId => fighterId !== id));
+    };
+
+    // Filter available fighters excluding already selected ones
+    const availableList = AVAILABLE_FIGHTERS.filter(f => !selectedFighters.includes(f.id));
+    const selectedList = AVAILABLE_FIGHTERS.filter(f => selectedFighters.includes(f.id));
+
+    return (
+        <CustomBottomSheet
+            visible={visible}
+            onClose={onClose}
+            title="Add fighters"
+            contentStyle={styles.sheetContentFull}
+        >
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <Search color={Colors.textTertiary} size={20} />
+                <TextInput
+                    style={[styles.searchInput, { color: colors.white }]}
+                    placeholder="Search"
+                    placeholderTextColor={Colors.textTertiary}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                />
+            </View>
+
+            {/* Available Fighters List (Flex 1 to take remaining space) */}
+            <ScrollView style={styles.listContainer} contentContainerStyle={styles.listContent}>
+                {availableList.map(fighter => (
+                    <View key={fighter.id} style={styles.fighterRow}>
+                        <View style={styles.fighterInfoLeft}>
+                            <TouchableOpacity style={styles.addButtonList} onPress={() => handleAddFighter(fighter.id)}>
+                                <AppText text="Add" fontSize={Typography.fontSize.sm} fontName="CircularStd-Bold" color={Colors.black} />
+                            </TouchableOpacity>
+                            <Image source={fighter.avatar} style={styles.fighterAvatar} />
+                            <View>
+                                <AppText text={fighter.name} fontSize={Typography.fontSize.md} fontName="CircularStd-Bold" color={colors.white} />
+                                <View style={styles.fighterMetaRow}>
+                                    <View style={styles.tag}>
+                                        <AppText text={fighter.record} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                    </View>
+                                    <View style={styles.tag}>
+                                        <AppText text={fighter.country} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                        <Image source={fighter.flag} style={styles.flagIcon} />
+                                    </View>
+                                    <View style={styles.tag}>
+                                        <AppText text={fighter.sport} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                ))}
+            </ScrollView>
+
+            {/* Selected Fighters Section (Bottom) */}
+            {selectedList.length > 0 && (
+                <View>
+                    <View style={styles.separator} />
+                    <View>
+                        <FlatList
+                            data={selectedList}
+                            keyExtractor={(item: { id: string }) => item.id}
+                            contentContainerStyle={{
+                                paddingHorizontal: 20,
+                                paddingVertical: 10,
+                                gap: 20
+                            }}
+                            renderItem={({ item: fighter }: { item: typeof AVAILABLE_FIGHTERS[0] }) => (
+                                <View style={styles.fighterRow}>
+                                    <View style={styles.fighterInfoLeft}>
+                                        <TouchableOpacity style={styles.removeButtonList} onPress={() => handleRemoveFighter(fighter.id)}>
+                                            <X color={Colors.white} size={12} />
+                                        </TouchableOpacity>
+                                        <Image source={fighter.avatar} style={styles.fighterAvatar} />
+                                        <View>
+                                            <AppText text={fighter.name} fontSize={Typography.fontSize.md} fontName="CircularStd-Bold" color={colors.white} />
+                                            <View style={styles.fighterMetaRow}>
+                                                <View style={styles.tag}>
+                                                    <AppText text={fighter.record} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                                </View>
+                                                <View style={styles.tag}>
+                                                    <AppText text={fighter.country} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                                    <Image source={fighter.flag} style={styles.flagIcon} />
+                                                </View>
+                                                <View style={styles.tag}>
+                                                    <AppText text={fighter.sport} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
+                        />
+                    </View>
+                </View>
+            )}
+
+            <View style={styles.footer}>
+                <AppButton
+                    text="Save & close"
+                    onPress={onClose}
+                    btnStyle={styles.saveButton}
+                    textStyle={styles.saveButtonText}
+                />
+            </View>
+        </CustomBottomSheet>
+    );
+};
+
 const styles = StyleSheet.create({
     sheetContent: {
         justifyContent: 'flex-start',
-        alignItems: 'stretch', // Align items to stretch to fill width
+        alignItems: 'stretch',
         paddingTop: 20,
+    },
+    sheetContentFull: {
+        flex: 1,
+        paddingTop: 20,
+        height: '100%',
+        paddingHorizontal: 0,
+        alignItems: 'stretch',
+        justifyContent: 'flex-start',
     },
     form: {
         gap: Spacing.lg,
         paddingBottom: 40,
+        paddingHorizontal: 20 // Added padding back since contentStyle removed it
     },
     footer: {
         alignItems: 'center',
-        paddingBottom: 20
+        paddingBottom: 20,
+        paddingTop: 20,
     },
     saveButton: {
         backgroundColor: Colors.white,
@@ -194,5 +336,90 @@ const styles = StyleSheet.create({
     saveButtonText: {
         color: Colors.black,
         fontWeight: '600',
+    },
+    // Add Fighter Sheet Styles
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.white,
+        borderRadius: BorderRadius.md,
+        paddingHorizontal: Spacing.md,
+        paddingVertical: Spacing.sm,
+        marginHorizontal: 20,
+        marginBottom: 20,
+        height: 50,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: Spacing.sm,
+        fontSize: Typography.fontSize.md,
+        fontFamily: 'CircularStd-Book',
+        color: Colors.black,
+    },
+    listContainer: {
+        flex: 1,
+        maxHeight: 288,
+        height: 'auto'
+    },
+    listContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        gap: 20,
+    },
+    fighterRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    fighterInfoLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.md,
+        flex: 1,
+    },
+    fighterAvatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+    },
+    fighterMetaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.xs,
+        marginTop: 4,
+    },
+    tag: {
+        backgroundColor: '#303030',
+        borderRadius: 99,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4
+    },
+    flagIcon: {
+        width: 12,
+        height: 8,
+    },
+    addButtonList: {
+        backgroundColor: Colors.white,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+    },
+    removeButtonList: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#391515', // Dark red background
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#592222'
+    },
+    separator: {
+        height: 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        // marginVertical: 10,
     }
 });

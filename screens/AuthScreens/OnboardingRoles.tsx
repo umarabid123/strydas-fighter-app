@@ -10,7 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
-  View,
+  View
 } from 'react-native';
 import AppButton from '../../components/common/AppButton';
 import AppText from '../../components/common/AppText';

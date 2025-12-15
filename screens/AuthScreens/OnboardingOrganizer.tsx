@@ -16,6 +16,7 @@ import {
 import AppButton from '../../components/common/AppButton';
 import AppText from '../../components/common/AppText';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
+import { AddFighterSheet, ContactSheet } from '../../components/common/OnboardingSheets';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
 
@@ -34,6 +35,8 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState('IFMA President');
   const [organisation, setOrganisation] = useState('Keddles Gym');
+  const [showContactSheet, setShowContactSheet] = useState(false);
+  const [showAddFighterSheet, setShowAddFighterSheet] = useState(false);
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -231,7 +234,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                   color={Colors.whiteOpacity80}
                 />
               </View>
-              <TouchableOpacity style={styles.addButton}>
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowAddFighterSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -252,11 +255,10 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
             />
           </View>
         </ScrollView>
-
-
-
+        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
+        <AddFighterSheet visible={showAddFighterSheet} onClose={() => setShowAddFighterSheet(false)} />
       </KeyboardAvoidingView>
-    </View>
+    </View >
   );
 }
 
@@ -422,6 +424,26 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.md,
     fontWeight: Typography.fontWeight.semibold,
     color: Colors.black,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 20,
+    zIndex: 100,
+    padding: 8,
+  },
+  backButtonIconContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    padding: 8,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backIcon: {
+    width: 20,
+    height: 20,
+    tintColor: Colors.white,
   },
 });
 

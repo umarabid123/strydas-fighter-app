@@ -1,5 +1,5 @@
 import React from "react"
-import { StyleSheet, TextInput, useColorScheme, View } from "react-native"
+import { StyleSheet, TextInput, TouchableOpacity, useColorScheme, View } from "react-native"
 import { Colors, Spacing, Typography } from "../../constant"
 import AppText from "./AppText"
 
@@ -44,14 +44,14 @@ export default function ProfileInput({
           onChangeText={onChangeText}
         />
       ) : (
-        <View style={styles.inputContainer} onTouchEnd={onPress}>
+        <TouchableOpacity style={styles.inputContainer} onPress={onPress}>
           <AppText
             text={value || placeholder || "-"}
             fontSize={Typography.fontSize.xl}
             fontName="CircularStd-Book"
             color={value ? colors.textTertiary : "rgba(255, 255, 255, 0.5)"}
           />
-        </View>
+        </TouchableOpacity>
       )}
     </View>
   )
