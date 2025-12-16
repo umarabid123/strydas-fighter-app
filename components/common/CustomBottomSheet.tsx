@@ -1,6 +1,7 @@
 import { X } from 'lucide-react-native';
 import React from 'react';
-import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import Modal from 'react-native-modal';
 import { Colors } from '../../constant';
 import AppText from './AppText';
 
@@ -15,38 +16,44 @@ interface CustomBottomSheetProps {
 const CustomBottomSheet = ({ visible, onClose, title, children, contentStyle }: CustomBottomSheetProps) => {
     return (
         <Modal
-            transparent
-            visible={visible}
-            animationType="slide"
-            onRequestClose={onClose}
+            isVisible={visible}
+            onBackdropPress={onClose}
+            onBackButtonPress={onClose}
+            backdropOpacity={0.5}
+            backdropColor="black"
+            style={styles.modal}
+            useNativeDriver
+            swipeDirection={['down']}
+            onSwipeComplete={onClose}
+            coverScreen
+            propagateSwipe={true}
+            swipeThreshold={50}
+            avoidKeyboard
         >
-            <View style={styles.container}>
-                <TouchableOpacity style={styles.backdrop} onPress={onClose} activeOpacity={1} />
-                <View style={styles.sheet}>
-                    <View style={styles.handleContainer}>
-                        <View style={styles.handle} />
-                    </View>
+            <View style={styles.sheet}>
+                <View style={styles.handleContainer}>
+                    <View style={styles.handle} />
+                </View>
 
-                    <View style={styles.header}>
-                        <View style={styles.headerSpacer} />
-                        <AppText
-                            text={title}
-                            color={Colors.white}
-                            fontSize={18}
-                            fontName="CircularStd-Bold"
-                            style={styles.title}
-                            textAlign="center"
-                        />
-                        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                            <View style={styles.closeIconContainer}>
-                                <X color={Colors.white} size={20} />
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                <View style={styles.header}>
+                    <View style={styles.headerSpacer} />
+                    <AppText
+                        text={title}
+                        color={Colors.white}
+                        fontSize={18}
+                        fontName="CircularStd-Bold"
+                        style={styles.title}
+                        textAlign="center"
+                    />
+                    <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                        <View style={styles.closeIconContainer}>
+                            <X color={Colors.white} size={20} />
+                        </View>
+                    </TouchableOpacity>
+                </View>
 
-                    <View style={[styles.content, contentStyle]}>
-                        {children}
-                    </View>
+                <View style={[styles.content, contentStyle]}>
+                    {children}
                 </View>
             </View>
         </Modal>
@@ -54,13 +61,9 @@ const CustomBottomSheet = ({ visible, onClose, title, children, contentStyle }: 
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
+    modal: {
+        margin: 0,
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    backdrop: {
-        ...StyleSheet.absoluteFillObject,
     },
     sheet: {
         backgroundColor: '#1A1A1A',
@@ -94,7 +97,7 @@ const styles = StyleSheet.create({
     },
     title: {
         flex: 1,
-        fontWeight: 600
+        fontWeight: '600'
     },
     closeButton: {
         padding: 5,

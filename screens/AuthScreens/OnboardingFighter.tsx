@@ -292,7 +292,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                     paddingVertical: 4,
                   }}
                   placeholder="170"
-                  placeholderTextColor={Colors.whiteOpacity20}
+                  placeholderTextColor={'rgba(255,255,255,0.3)'}
                 />
                 <AppText
                   text="cm"
