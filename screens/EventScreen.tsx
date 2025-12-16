@@ -1,5 +1,6 @@
+import CarouselItem from '@/components/CarouselItem'
 import React from 'react'
-import { Dimensions, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Dimensions, FlatList, Platform, ScrollView, StyleSheet, View } from 'react-native'
 import AppText from '../components/common/AppText'
 import EventCard, { MatchItem } from '../components/common/EventCard'
 import Header from '../components/common/Header'
@@ -53,6 +54,37 @@ const EVENTS = [
   }
 ];
 
+const carouselData = [ // Renamed from 'data' to 'carouselData'
+  {
+    id: '1',
+    title: 'Events',
+    image: require('../assets/images/event-card-img.png'),
+    avatars: [
+      require('../assets/images/profile-image-icon.png'),
+      require('../assets/images/flag-icon.png'), // Using available small icons as placeholder for avatars
+    ]
+  },
+  {
+    id: '2',
+    title: 'Fighters',
+    image: require('../assets/images/event-card-img.png'),
+    avatars: [
+      require('../assets/images/profile-image-icon.png'),
+    ]
+  },
+  {
+    id: '3',
+    title: 'Gyms',
+    image: require('../assets/images/event-card-img.png'),
+    avatars: [
+      require('../assets/images/profile-image-icon.png'),
+      require('../assets/images/flag-icon.png'),
+    ]
+  },
+];
+
+
+
 export default function EventScreen() {
   return (
     <View style={styles.container}>
@@ -82,18 +114,21 @@ export default function EventScreen() {
           style={styles.categoriesContainer}
           contentContainerStyle={styles.categoriesContent}
         >
-          {CATEGORIES.map((cat) => (
-            <TouchableOpacity key={cat.id} style={[styles.categoryCard, { backgroundColor: cat.color }]}>
-              <View style={styles.categoryOverlay} />
-              <AppText
-                text={cat.title}
-                fontSize={16}
-                fontName="CircularStd-Bold"
-                color={Colors.white}
-                style={styles.categoryTitle}
-              />
-            </TouchableOpacity>
-          ))}
+
+          <View style={{ height: 220 }}>
+            <FlatList
+              data={carouselData}
+              horizontal
+              scrollEnabled={true}
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={item => item.id}
+              contentContainerStyle={{ paddingHorizontal: 20, marginTop: 40 }}
+              ItemSeparatorComponent={() => <View style={{ width: 12 }} />} // Changed width from 8 to 12
+              renderItem={({ item }) => (
+                <CarouselItem item={item} />
+              )}
+            />
+          </View>
         </ScrollView>
 
         {/* Browse All */}
@@ -158,5 +193,6 @@ const styles = StyleSheet.create({
   },
   browseAllContainer: {
     marginTop: 8,
-  }
+  },
+
 })

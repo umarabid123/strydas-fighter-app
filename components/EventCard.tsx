@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Image, StyleSheet, ViewStyle, ImageSourcePropType, TouchableOpacity } from "react-native";
+import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View, ViewStyle } from "react-native";
+import { Colors } from "../constant";
 import AppText from "./common/AppText";
-import { Colors, wp } from "../constant";
 
 interface EventCardProps {
   image: ImageSourcePropType;
@@ -43,7 +43,7 @@ export default function EventCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#262a2b",
-    padding: 10,
+    padding: 8,
     borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",

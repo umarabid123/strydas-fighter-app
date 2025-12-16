@@ -1,3 +1,5 @@
+import ProfileRow from '@/components/common/ProfileRow';
+import Tag from '@/components/common/Tag';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
@@ -15,32 +17,8 @@ import NextFightCard from '../components/NextFightCard';
 import { Colors } from '../constant';
 
 
-const Tag = ({ text, icon }: { text: string; icon?: any }) => (
-    <View style={styles.tag}>
-        <AppText text={text} fontSize={16} color={Colors.white} />
-        {icon && <Image source={icon} style={styles.tagIcon} />}
-    </View>
-);
 
-const ProfileRow = ({ label, value, children, labelStyle }: any) => (
-    <View style={styles.profileRow}>
-        <View style={styles.labelContainer}>
-            <AppText
-                text={label}
-                fontSize={14}
-                color={Colors.white}
-                style={[styles.rowLabel, labelStyle]}
-            />
-        </View>
-        <View style={styles.valueContainer}>
-            {value ? (
-                <AppText text={value} fontSize={16} color={Colors.white} style={{ fontWeight: '300' }} />
-            ) : (
-                children
-            )}
-        </View>
-    </View>
-);
+
 
 export default function MyProfile() {
     const navigation = useNavigation<any>()

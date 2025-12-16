@@ -1,3 +1,4 @@
+import CarouselItem from '@/components/CarouselItem';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
@@ -6,9 +7,8 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  View,
+  View
 } from 'react-native';
-import CarouselItem from '../components/CarouselItem';
 import AppButton from '../components/common/AppButton';
 import AppLoader from '../components/common/AppLoader';
 import AppText from '../components/common/AppText';
@@ -31,18 +31,34 @@ export default function DiscoverScreen() {
     return () => clearTimeout(timer);
   }, []);
 
-  const data = [
-    { id: '1', image: require('../assets/images/caraousal-icon.png') },
-    { id: '2', image: require('../assets/images/caraousal-icon.png') },
-    { id: '3', image: require('../assets/images/caraousal-icon.png') },
-    { id: '4', image: require('../assets/images/caraousal-icon.png') },
+  const carouselData = [ // Renamed from 'data' to 'carouselData'
+    {
+      id: '1',
+      title: 'Events',
+      image: require('../assets/images/event-card-img.png'),
+      avatars: [
+        require('../assets/images/profile-image-icon.png'),
+        require('../assets/images/flag-icon.png'), // Using available small icons as placeholder for avatars
+      ]
+    },
+    {
+      id: '2',
+      title: 'Fighters',
+      image: require('../assets/images/event-card-img.png'),
+      avatars: [
+        require('../assets/images/profile-image-icon.png'),
+      ]
+    },
+    {
+      id: '3',
+      title: 'Gyms',
+      image: require('../assets/images/event-card-img.png'),
+      avatars: [
+        require('../assets/images/profile-image-icon.png'),
+        require('../assets/images/flag-icon.png'),
+      ]
+    },
   ];
-  //... (data arrays omitted for brevity here, but replace_file_content needs context)
-  // Because I'm replacing the top part, I need to match carefully or just inject state.
-
-  // Actually I can use ReplaceChunks if I want to be surgical.
-  // But replace_file_content is Single Contiguous block.
-  // I will just replace from imports to start of component.
 
 
   const events = [
@@ -109,23 +125,19 @@ export default function DiscoverScreen() {
     <View style={styles.container}>
       <Header />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <SearchSection />
+        <SearchSection title='Discover' subtitle='Browser fighters and events world wide.' />
 
         <View style={{ height: 220 }}>
           <FlatList
-            data={data}
+            data={carouselData} // Changed to carouselData
             horizontal
-            scrollEnabled={true} // 👈 important (ScrollView handles scrolling)
+            scrollEnabled={true}
             showsHorizontalScrollIndicator={false}
             keyExtractor={item => item.id}
             contentContainerStyle={{ paddingHorizontal: 20, marginTop: 40 }}
-            ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+            ItemSeparatorComponent={() => <View style={{ width: 12 }} />} // Changed width from 8 to 12
             renderItem={({ item }) => (
-              <CarouselItem
-                imageSource={item.image}
-                size={173}
-                borderRadius={16}
-              />
+              <CarouselItem item={item} />
             )}
           />
         </View>
@@ -204,5 +216,18 @@ const styles = StyleSheet.create({
   },
   cardSpacing: {
     marginBottom: 0,
+  },
+  avatarGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4, // Align with text baseline visually
+  },
+  avatarMini: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#C20027', // Match the gradient bottom roughly or just white/transparent? Design shows white border. Actually maybe orange/red border to blend? Design shows white border on avatars. Let's use white for now.
+    backgroundColor: '#ccc',
   },
 });

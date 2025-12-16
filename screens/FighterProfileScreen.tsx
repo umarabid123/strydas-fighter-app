@@ -17,7 +17,7 @@ import { Colors } from '../constant';
 
 const Tag = ({ text, icon }: { text: string; icon?: any }) => (
     <View style={styles.tag}>
-        <AppText text={text} fontSize={14} color={Colors.white} />
+        <AppText text={text} fontSize={16} color={Colors.white} />
         {icon && <Image source={icon} style={styles.tagIcon} />}
     </View>
 );
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#333',
-        paddingHorizontal: 12,
+        paddingHorizontal: 8,
         paddingVertical: 6,
         borderRadius: 20,
         gap: 6,
@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         width: '100%',
         borderRadius: 100,
+        paddingVertical: 16
     },
     contactButtonText: {
         color: Colors.black,
@@ -259,6 +260,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 100,
         marginTop: 0,
+        paddingVertical: 16
     },
     linkButtonText: {
         color: Colors.black,
@@ -271,8 +273,8 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
     },
     labelContainer: {
-        width: 120, // Fixed width for alignment
-        marginRight: 24, // Gap between label and value
+        width: 120,
+        marginRight: 24,
         alignItems: 'flex-start',
     },
     rowLabel: {

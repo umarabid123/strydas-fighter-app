@@ -5,8 +5,8 @@ import AppText from "./AppText";
 import CustomIconButton from "./CustomIconButton";
 
 export default function SearchSection({
-  title = "Discover",
-  subtitle = "Browse fighters and events worldwide.",
+  title = "",
+  subtitle = "",
   placeholder = "Search",
   searchValue = "",
   onSearchChange = () => { },

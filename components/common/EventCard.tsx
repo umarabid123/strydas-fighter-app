@@ -49,9 +49,9 @@ export default function EventCard({
 
             {/* Matches List */}
             <View style={styles.matchesContainer}>
-                {matches.map((match, index) => (
+                {matches.map((match) => (
                     <View key={match.id}>
-                        {index > 0 && <View style={styles.separator} />}
+                        <View style={styles.separator} />
                         <View style={styles.matchRow}>
                             {/* Avatar */}
                             <View style={styles.avatarContainer}>

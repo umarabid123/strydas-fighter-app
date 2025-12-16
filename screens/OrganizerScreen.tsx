@@ -83,11 +83,11 @@ export default function OrganizerScreen() {
                         />
                     </View>
                     <AppText text="Organizor" fontSize={14} color={Colors.light.success} style={styles.roleText} />
-                    <AppText text="Youssef Assouik" fontSize={24} color={Colors.white} style={styles.nameText} />
-                    <AppText text="XFC Management" fontSize={16} color={Colors.textSecondary} style={styles.orgText} />
+                    <AppText text="Youssef Assouik" fontSize={32} color={Colors.white} style={styles.nameText} />
+                    <AppText text="XFC Management" fontSize={16} color={Colors.white} style={styles.orgText} />
 
                     <View style={styles.badgeContainer}>
-                        <AppText text="DEN" fontSize={14} color={Colors.white} />
+                        <AppText text="DEN" fontSize={16} color={Colors.white} />
                         <Image source={require('../assets/images/flag-icon.png')} style={styles.flagIcon} />
                     </View>
 
@@ -115,7 +115,7 @@ export default function OrganizerScreen() {
                     </InfoRow>
                 </View>
 
-                <View style={styles.divider} />
+                <View style={styles.dividerBottom} />
 
                 {/* Fighters Section */}
                 <View style={styles.fightersSection}>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
         borderRadius: 60,
         overflow: 'hidden',
         borderWidth: 2,
-        borderColor: '#333', // Or some other border color if needed
+        borderColor: '#333'
     },
     avatar: {
         width: 120,
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         width: '100%',
         borderRadius: 100,
+        paddingVertical: 16,
     },
     contactButtonText: {
         color: Colors.black,
@@ -221,6 +222,13 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: '#333',
         marginVertical: 32,
+    },
+    dividerBottom: {
+        height: 1,
+        backgroundColor: '#333',
+        marginBottom: 32,
+        marginTop: 75,
+
     },
     infoSection: {
         paddingHorizontal: 20,
@@ -262,6 +270,7 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 100,
         marginTop: 0,
+        paddingVertical: 16,
     },
     linkButtonText: {
         color: Colors.black,

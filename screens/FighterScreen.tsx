@@ -76,6 +76,23 @@ export default function FighterScreen() {
             weightClass: "63,5 kg",
         },
     ];
+    const categories = [
+        {
+            id: "1",
+            title: "Muay Thai",
+            image: require("../assets/images/event-card-img.png"),
+        },
+        {
+            id: "2",
+            title: "Boxing",
+            image: require("../assets/images/event-card-img.png"),
+        },
+        {
+            id: "3",
+            title: "Kickboxing",
+            image: require("../assets/images/event-card-img.png"),
+        },
+    ];
 
     return (
         <View style={styles.container}>
@@ -89,8 +106,7 @@ export default function FighterScreen() {
 
                 <View style={styles.categoriesContainer}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScroll}>
-                        <CarouselItem />
-                        <CarouselItem />
+                        {categories.map((item) => <CarouselItem item={item} />)}
                     </ScrollView>
                 </View>
 

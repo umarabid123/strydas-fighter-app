@@ -1,15 +1,35 @@
+import { Colors } from '@/constant';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import AppText from './common/AppText';
 
 export default function CarouselItem({
-  imageSource = require('../assets/images/caraousal-icon.png'),
+  item,
   size = 173,
   borderRadius = 16,
   style = {},
 }) {
   return (
-    <View style={[styles.container, { width: size, height: size, borderRadius }, style]}>
-      <Image source={imageSource} resizeMode="contain" style={styles.image} />
+    <View style={styles.carouselItem}>
+      <Image
+        source={item.image}
+        style={styles.carouselImage}
+        resizeMode="cover"
+      />
+      <LinearGradient
+        colors={['transparent', '#AC1746']}
+        style={styles.gradientOverlay}
+      />
+      <View style={styles.carouselContent}>
+        <AppText
+          text={item.title}
+          fontSize={17}
+          color={Colors.white}
+          fontName="CircularStd-Bold"
+          style={styles.carouselTitle}
+        />
+      </View>
     </View>
   );
 }
@@ -21,5 +41,36 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+  },
+  carouselItem: {
+    width: 173,
+    height: 173,
+    borderRadius: 16,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  carouselImage: {
+    width: '100%',
+    height: '100%',
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '60%',
+  },
+  carouselContent: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  carouselTitle: {
+    flex: 1,
+    fontWeight: 600
   },
 });

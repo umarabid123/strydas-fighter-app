@@ -5,7 +5,7 @@ import AppText from './common/AppText';
 
 const InfoTag = ({ label, icon }: any) => (
   <View style={styles.infoTag}>
-    <AppText text={label} fontSize={14} color={Colors.white} />
+    <AppText text={label} fontSize={16} color={Colors.white} />
     {icon && <Image source={icon} style={styles.tagIcon} resizeMode="contain" />}
   </View>
 );
