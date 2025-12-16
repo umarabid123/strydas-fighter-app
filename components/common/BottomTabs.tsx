@@ -1,11 +1,11 @@
 import {
-  View,
-  StyleSheet,
   Dimensions,
-  TouchableOpacity,
   Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Colors, Typography, DESIGN_WIDTH } from '../../constant';
+import { Colors, DESIGN_WIDTH, Typography } from '../../constant';
 import AppText from './AppText';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -29,7 +29,7 @@ export default function BottomTabs({
 }: BottomTabsProps) {
   return (
     <View style={styles.container}>
-      {tabs.map(tab => {
+      {tabs.map((tab, i) => {
         const isActive = activeTab === tab.id;
         return (
           <TouchableOpacity
@@ -40,9 +40,9 @@ export default function BottomTabs({
             <View style={styles.tabContent}>
               <Image
                 source={tab.icon}
-                style={{ width: 32, height: 32,  tintColor: activeTab === tab.id ? Colors.successGreen : Colors.white }}
+                style={{ width: 32, height: 32, tintColor: activeTab === tab.id ? Colors.successGreen : Colors.white }}
                 resizeMode="contain"
-              />
+              />s
 
               <AppText
                 text={tab.label}
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     gap: (4 / DESIGN_WIDTH) * SCREEN_WIDTH,
   },
   tabLabel: {
-    lineHeight:16,
-  
+    lineHeight: 16,
+
   },
 });
