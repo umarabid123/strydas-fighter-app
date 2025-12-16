@@ -206,14 +206,15 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
             onClose={onClose}
             title="Add fighters"
             contentStyle={styles.sheetContentFull}
+            sheetStyle={{ minHeight: 'auto', maxHeight: '90%' }}
         >
             {/* Search Bar */}
             <View style={styles.searchContainer}>
-                <Search color={Colors.textTertiary} size={20} />
+                <Search color={"#00000099"} size={24} />
                 <TextInput
                     style={[styles.searchInput, { color: colors.white }]}
                     placeholder="Search"
-                    placeholderTextColor={Colors.textTertiary}
+                    placeholderTextColor={"#00000099"}
                     value={searchQuery}
                     onChangeText={setSearchQuery}
                 />
@@ -225,21 +226,21 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
                     <View key={fighter.id} style={styles.fighterRow}>
                         <View style={styles.fighterInfoLeft}>
                             <TouchableOpacity style={styles.addButtonList} onPress={() => handleAddFighter(fighter.id)}>
-                                <AppText text="Add" fontSize={Typography.fontSize.sm} fontName="CircularStd-Bold" color={Colors.black} />
+                                <AppText text="Add" style={{ fontWeight: 600 }} fontSize={Typography.fontSize.sm} fontName="CircularStd-Bold" color={Colors.black} />
                             </TouchableOpacity>
                             <Image source={fighter.avatar} style={styles.fighterAvatar} />
                             <View>
-                                <AppText text={fighter.name} fontSize={Typography.fontSize.md} fontName="CircularStd-Bold" color={colors.white} />
+                                <AppText text={fighter.name} style={{ fontWeight: 600 }} fontSize={Typography.fontSize.xl} fontName="CircularStd-Bold" color={colors.white} />
                                 <View style={styles.fighterMetaRow}>
                                     <View style={styles.tag}>
-                                        <AppText text={fighter.record} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                        <AppText text={fighter.record} fontSize={Typography.fontSize.lg} color={colors.white} />
                                     </View>
                                     <View style={styles.tag}>
-                                        <AppText text={fighter.country} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                        <AppText text={fighter.country} fontSize={Typography.fontSize.lg} color={colors.white} />
                                         <Image source={fighter.flag} style={styles.flagIcon} />
                                     </View>
                                     <View style={styles.tag}>
-                                        <AppText text={fighter.sport} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                        <AppText text={fighter.sport} fontSize={Typography.fontSize.lg} color={colors.white} />
                                     </View>
                                 </View>
                             </View>
@@ -258,28 +259,29 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
                             keyExtractor={(item: { id: string }) => item.id}
                             contentContainerStyle={{
                                 paddingHorizontal: 20,
-                                paddingVertical: 10,
-                                gap: 20
+                                paddingTop: 24,
+                                paddingBottom: 10,
+                                gap: 16
                             }}
                             renderItem={({ item: fighter }: { item: typeof AVAILABLE_FIGHTERS[0] }) => (
                                 <View style={styles.fighterRow}>
                                     <View style={styles.fighterInfoLeft}>
                                         <TouchableOpacity style={styles.removeButtonList} onPress={() => handleRemoveFighter(fighter.id)}>
-                                            <X color={Colors.white} size={12} />
+                                            <X color={"#E05D58"} size={12} />
                                         </TouchableOpacity>
                                         <Image source={fighter.avatar} style={styles.fighterAvatar} />
                                         <View>
-                                            <AppText text={fighter.name} fontSize={Typography.fontSize.md} fontName="CircularStd-Bold" color={colors.white} />
+                                            <AppText text={fighter.name} style={{ fontWeight: 600 }} fontSize={Typography.fontSize.xl} fontName="CircularStd-Bold" color={colors.white} />
                                             <View style={styles.fighterMetaRow}>
                                                 <View style={styles.tag}>
-                                                    <AppText text={fighter.record} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                                    <AppText text={fighter.record} fontSize={Typography.fontSize.lg} color={colors.white} />
                                                 </View>
                                                 <View style={styles.tag}>
-                                                    <AppText text={fighter.country} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                                    <AppText text={fighter.country} fontSize={Typography.fontSize.lg} color={colors.white} />
                                                     <Image source={fighter.flag} style={styles.flagIcon} />
                                                 </View>
                                                 <View style={styles.tag}>
-                                                    <AppText text={fighter.sport} fontSize={Typography.fontSize.xs} color={colors.white} />
+                                                    <AppText text={fighter.sport} fontSize={Typography.fontSize.lg} color={colors.white} />
                                                 </View>
                                             </View>
                                         </View>
@@ -310,9 +312,7 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
     sheetContentFull: {
-        flex: 1,
         paddingTop: 20,
-        height: '100%',
         paddingHorizontal: 0,
         alignItems: 'stretch',
         justifyContent: 'flex-start',
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: Spacing.md,
         paddingVertical: Spacing.sm,
         marginHorizontal: 20,
-        marginBottom: 20,
+        marginBottom: 24,
         height: 50,
     },
     searchInput: {
@@ -357,14 +357,13 @@ const styles = StyleSheet.create({
         color: Colors.black,
     },
     listContainer: {
-        flex: 1,
         maxHeight: 288,
-        height: 'auto'
+        flexGrow: 0,
     },
     listContent: {
         paddingHorizontal: 20,
-        paddingBottom: 20,
-        gap: 20,
+        paddingBottom: 24,
+        gap: 16,
     },
     fighterRow: {
         flexDirection: 'row',
@@ -378,8 +377,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     fighterAvatar: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
         borderRadius: 25,
     },
     fighterMetaRow: {
@@ -404,22 +403,20 @@ const styles = StyleSheet.create({
     addButtonList: {
         backgroundColor: Colors.white,
         paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
+        paddingVertical: 7.5,
+        borderRadius: 50,
     },
     removeButtonList: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: '#391515', // Dark red background
+        width: 32,
+        height: 32,
+        borderRadius: 99,
+        backgroundColor: '#302324', // Dark red background
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#592222'
     },
     separator: {
         height: 1,
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        // marginVertical: 10,
+        marginHorizontal: 25
     }
 });

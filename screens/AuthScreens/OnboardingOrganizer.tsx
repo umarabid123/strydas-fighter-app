@@ -1,5 +1,3 @@
-import type { NavigationProp } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import {
@@ -9,6 +7,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   useColorScheme,
   View,
@@ -31,7 +30,6 @@ interface OnboardingOrganizerProps {
 
 // ... (in component)
 export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerProps) {
-  const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const { setIsAuthenticated } = useAuth()
@@ -165,11 +163,17 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                   color={Colors.whiteOpacity80}
                 />
               </View>
-              <AppText
-                text={jobTitle}
-                fontSize={Typography.fontSize.xl}
-                fontName="CircularStd-Book"
-                color={colors.textTertiary}
+              <TextInput
+                // value={jobTitle}
+                onChangeText={setJobTitle}
+                style={{
+                  fontFamily: 'CircularStd-Book',
+                  fontSize: Typography.fontSize.xl,
+                  color: colors.textTertiary,
+                  padding: 0
+                }}
+                placeholder="Highlight your position"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
               />
             </View>
 
@@ -190,11 +194,17 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                   color={Colors.whiteOpacity80}
                 />
               </View>
-              <AppText
-                text={organisation}
-                fontSize={Typography.fontSize.xl}
-                fontName="CircularStd-Book"
-                color={colors.textTertiary}
+              <TextInput
+                // value={organisation}
+                onChangeText={setOrganisation}
+                style={{
+                  fontFamily: 'CircularStd-Book',
+                  fontSize: Typography.fontSize.xl,
+                  color: colors.textTertiary,
+                  padding: 0
+                }}
+                placeholder="Which organisation are you from?"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
               />
             </View>
 
@@ -215,7 +225,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                   color={Colors.whiteOpacity80}
                 />
               </View>
-              <TouchableOpacity style={styles.addButton}>
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -316,8 +326,9 @@ const styles = StyleSheet.create({
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     alignItems: 'center',
     gap: Spacing.xs,
-    marginBottom: Spacing.xl,
+    marginBottom: 31,
     alignSelf: 'center',
+
   },
   title: {
     width: '100%',
@@ -328,7 +339,7 @@ const styles = StyleSheet.create({
   },
   profilePictureContainer: {
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: 55,
   },
   profilePictureWrapper: {
     position: 'relative',
