@@ -42,6 +42,28 @@ export default function Intro() {
   const handleSignUp = () => navigation.navigate("SignUp");
   const handleLogIn = () => navigation.navigate("Login");
 
+  /* Data for slides */
+  const introSlides = [
+    {
+      id: "1",
+      title: "For Organizers",
+      description: "Create and manage\nfight cards easily.",
+      image: cardImage,
+    },
+    {
+      id: "2",
+      title: "For Fighters",
+      description: "Browse competitions\nlooking for fighters.",
+      image: featuredCardImage,
+    },
+    {
+      id: "3",
+      title: "For Fans",
+      description: "Follow your favorite\nfighters and events.",
+      image: cardImage,
+    },
+  ];
+
   return (
     <View style={styles.container}>
       <MeshGradientBackground />
@@ -71,37 +93,28 @@ export default function Intro() {
           snapToInterval={scaleW(305) + Spacing.lg}
           decelerationRate="fast"
         >
-          {/* LEFT CARD */}
-          <View style={styles.card}>
-            <ImageBackground source={cardImage} style={styles.cardImage} />
-          </View>
-
-          {/* FEATURED CARD */}
-          <View style={[styles.card, styles.featuredCard]}>
-            <ImageBackground source={featuredCardImage} style={styles.cardImage}>
-              <View style={styles.gradientOverlay}>
-                <View style={styles.gradientBottom} />
-                <View style={styles.cardContent}>
-                  <AppText
-                    text="For Fighters"
-                    fontSize={Typography.fontSize.sm}
-                    color={Colors.successGreen}
-                  />
-                  <AppText
-                    text={`Browse competitions\nlooking for fighters.`}
-                    fontSize={Typography.fontSize.xl}
-                    fontName="CircularStd-Medium"
-                    color={colors.white}
-                  />
+          {introSlides.map((slide) => (
+            <View key={slide.id} style={styles.card}>
+              <ImageBackground source={slide.image} style={styles.cardImage} resizeMode="cover">
+                <View style={styles.gradientOverlay}>
+                  <View style={styles.gradientBottom} />
+                  <View style={styles.cardContent}>
+                    <AppText
+                      text={slide.title}
+                      fontSize={Typography.fontSize.sm}
+                      color={Colors.successGreen}
+                    />
+                    <AppText
+                      text={slide.description}
+                      fontSize={Typography.fontSize.xl}
+                      fontName="CircularStd-Medium"
+                      color={colors.white}
+                    />
+                  </View>
                 </View>
-              </View>
-            </ImageBackground>
-          </View>
-
-          {/* RIGHT CARD */}
-          <View style={styles.card}>
-            <ImageBackground source={cardImage} style={styles.cardImage} />
-          </View>
+              </ImageBackground>
+            </View>
+          ))}
         </ScrollView>
       </View>
 
@@ -124,8 +137,6 @@ export default function Intro() {
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -171,18 +182,13 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: scaleW(300),
+    width: scaleW(305),
     height: "100%",
-    aspectRatio: 300 / 480, // Maintain aspect ratio
+    aspectRatio: 305 / 480,
     maxHeight: scaleH(480),
     borderRadius: BorderRadius.lg,
     overflow: "hidden",
     backgroundColor: Colors.lightGrey,
-  },
-
-  featuredCard: {
-    width: scaleW(305),
-    aspectRatio: 305 / 480,
   },
 
   cardImage: {
