@@ -259,6 +259,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 <View style={styles.sliderValueContainer}>
                   <TextInput
                     onChangeText={setWeightRange}
+                    value={weightRange}
                     keyboardType="decimal-pad"
                     style={{
                       fontFamily: 'CircularStd-Book',
