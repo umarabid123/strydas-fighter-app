@@ -35,6 +35,8 @@ export default function SignUp({ onNext }: SignUpProps) {
         email={email}
         onEmailChange={setEmail}
         onNext={handleNext}
+        showProgressBar
+        titleContainerMarginBottom={60}
       />
       <AppLoader isLoading={isLoading} />
     </>

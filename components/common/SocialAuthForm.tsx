@@ -81,19 +81,19 @@ export default function SocialAuthForm({
       >
         {/* Progress Bar - Optional */}
         {showProgressBar && (
-          <View style={[styles.progressContainer, { top: (60 / DESIGN_HEIGHT) * SCREEN_HEIGHT + insets.top }]}>
+          <View style={styles.progressContainer}>
             <View style={styles.progressBackground} />
             <View style={[styles.progressFill, { width: `${progressPercentage}%` }]} />
           </View>
         )}
 
         <ScrollView
-          style={[styles.scrollView, { marginTop: (70 / DESIGN_HEIGHT) * SCREEN_HEIGHT + insets.top }]}
+          style={[styles.scrollView, {}]}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           {/* Title and Description */}
-          <View style={[styles.titleContainer, { marginBottom: titleContainerMarginBottom, marginTop: titleContainerMarginTop }]}>
+          <View style={[styles.titleContainer, { marginBottom: titleContainerMarginBottom }]}>
             <AppText
               text={title}
               fontSize={Typography.fontSize.xxl}
@@ -214,24 +214,27 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    marginTop: (70 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
   },
   scrollContent: {
     paddingHorizontal: (20 / DESIGN_WIDTH) * SCREEN_WIDTH,
     paddingBottom: (200 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
+    paddingTop: (100 / DESIGN_HEIGHT) * SCREEN_HEIGHT, // Added padding for top spacing
   },
   titleContainer: {
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: Spacing.sm, // Increased gap slightly
     alignSelf: 'center',
   },
   title: {
     width: '100%',
     letterSpacing: -0.48,
+    lineHeight: 32, // Added line height
   },
   subtitle: {
     width: '100%',
+    opacity: 0.8, // Slight opacity adjustment
+    lineHeight: 22,
   },
   socialButtonsContainer: {
     gap: Spacing.md,
@@ -243,7 +246,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: BorderRadius.sm,
+    borderRadius: BorderRadius.md, // Increased border radius
     backgroundColor: 'transparent',
   },
   socialButtonText: {
@@ -258,21 +261,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    gap: Spacing.xs,
-    minHeight: 51, // Match button height
+    paddingVertical: 12, // Fixed padding
+    gap: 4, // Smaller gap between label and input
+    height: 64, // Taller input container
+    justifyContent: 'center',
   },
   inputLabel: {
     letterSpacing: 0.24,
+    opacity: 0.8,
   },
   input: {
     fontWeight: Typography.fontWeight.light,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: 'rgba(255, 255, 255, 0.8)', // Brighter text
     padding: 0,
+    height: 24, // Fixed height for input text
   },
   nextButton: {
     position: 'absolute',
-    bottom: (83 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
+    bottom: (50 / DESIGN_HEIGHT) * SCREEN_HEIGHT, // Adjusted bottom position
     left: (SCREEN_WIDTH - (120 / DESIGN_WIDTH) * SCREEN_WIDTH) / 2,
     width: (120 / DESIGN_WIDTH) * SCREEN_WIDTH,
     minWidth: 120,

@@ -253,6 +253,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                     renderThumb={() => <Thumb />}
                     renderRail={() => <Rail />}
                     renderRailSelected={() => <RailSelected />}
+
                   />
                 </View>
                 <View style={styles.sliderValueContainer}>
@@ -426,7 +427,7 @@ const styles = StyleSheet.create({
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     alignItems: 'center',
     gap: Spacing.xs,
-    marginBottom: Spacing.xl,
+    marginBottom: 60,
     alignSelf: 'center',
   },
   title: {

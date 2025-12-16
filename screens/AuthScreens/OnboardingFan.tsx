@@ -160,17 +160,17 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
               onToggle={setLocationEnabled}
             />
           </View>
+          <View style={styles.completeButtonContainer}>
+            <AppButton
+              text="That's it, complete"
+              onPress={handleComplete}
+              btnStyle={styles.completeButton}
+              textStyle={styles.completeButtonText}
+            />
+          </View>
         </ScrollView>
 
         {/* Complete Button */}
-        <View style={styles.completeButtonContainer}>
-          <AppButton
-            text="That's it, complete"
-            onPress={handleComplete}
-            btnStyle={styles.completeButton}
-            textStyle={styles.completeButtonText}
-          />
-        </View>
       </KeyboardAvoidingView >
       <AppLoader isLoading={isLoading} />
     </View >
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.xs,
     marginTop: (96 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
-    marginBottom: Spacing.xl,
+    marginBottom: 60,
     alignSelf: 'center',
   },
   title: {

@@ -94,11 +94,12 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
       return (
         <View style={styles.radioButtonSelected}>
           <View style={styles.radioButtonCheckmark}>
-            <AppText
-              text="✓"
-              fontSize={Typography.fontSize.lg}
-              fontName="CircularStd-Bold"
-              color={Colors.black}
+            <Image
+              source={require('../../assets/images/tick-icon.png')}
+              width={10}
+              height={7}
+              style={{ width: 10, height: 7 }}
+
             />
           </View>
         </View>
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     alignItems: 'center',
     gap: Spacing.xs,
-    marginBottom: Spacing.xl,
+    marginBottom: 60,
     alignSelf: 'center',
   },
   title: {

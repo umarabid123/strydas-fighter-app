@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   profilePictureContainer: {
     alignItems: 'center',
     marginBottom: Spacing.xxl,
-    marginTop: Spacing.xl,
+    marginTop: 60,
   },
   profilePictureWrapper: {
     position: 'relative',
