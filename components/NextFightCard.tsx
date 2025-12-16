@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, Image, ViewStyle } from 'react-native';
-import AppText from './common/AppText';
+import { Image, StyleSheet, View, ViewStyle } from 'react-native';
 import { Colors } from '../constant';
+import AppText from './common/AppText';
 
 interface NextFightCardProps {
     title: string;
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#262a2b',
-        padding: 12,
+        padding: 8,
         borderRadius: 12,
         gap: 16,
     },

@@ -112,8 +112,10 @@ export default function MyProfile() {
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                 <AppText text="Assouik Gym" fontSize={14} color={Colors.textSecondary} style={styles.managerTag} />
-                                <Image source={require('../assets/images/whatsapp-icon.png')} style={styles.socialIcon} />
-                                <Image source={require('../assets/images/email-icon.png')} style={styles.socialIcon} />
+                                <View style={{ backgroundColor: "#FFFFFF26", borderRadius: 99, overflow: 'hidden', paddingHorizontal: 8, paddingVertical: 4 }}>
+                                    <Image source={require('../assets/images/whatsapp-icon.png')} style={styles.socialIcon} resizeMode='contain' />
+                                </View>
+                                <AppText text='@' fontSize={16} color={Colors.white} style={{ backgroundColor: "#FFFFFF26", borderRadius: 99, overflow: 'hidden', paddingHorizontal: 8, paddingVertical: 4, fontWeight: '600' }} />
                             </View>
                         </View>
                     </View>
@@ -155,7 +157,7 @@ const styles = StyleSheet.create({
         paddingTop: Platform.OS === 'ios' ? 0 : 20
     },
     scrollContent: {
-        paddingBottom: 40,
+        paddingBottom: 100,
     },
     profileSection: {
         alignItems: 'center',
@@ -258,13 +260,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#333',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 99,
         overflow: 'hidden',
     },
     socialIcon: {
-        width: 24,
-        height: 24,
-        marginLeft: 8,
+        width: 16,
+        height: 16
     },
     linksContainer: {
         gap: 12,
@@ -272,6 +273,7 @@ const styles = StyleSheet.create({
     linkButton: {
         backgroundColor: Colors.white,
         width: '100%',
+        paddingVertical: 16,
         borderRadius: 100,
         marginTop: 0,
     },
@@ -286,8 +288,8 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
     },
     labelContainer: {
-        width: 120, // Fixed width for alignment
-        marginRight: 24, // Gap between label and value
+        width: 120,
+        marginRight: 24,
         alignItems: 'flex-start',
     },
     rowLabel: {
