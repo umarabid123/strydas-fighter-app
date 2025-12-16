@@ -37,11 +37,11 @@ export default function LookingForListItem({
                 <View style={styles.tagsRow}>
                     {tags.map((tag, index) => (
                         <View key={index} style={styles.tag}>
-                            <AppText text={tag} fontSize={12} color={Colors.white} />
+                            <AppText text={tag} fontSize={14} color={Colors.white} />
                         </View>
                     ))}
                     <View style={styles.tag}>
-                        <AppText text={weight} fontSize={12} color={Colors.white} />
+                        <AppText text={weight} fontSize={14} color={Colors.white} />
                     </View>
                 </View>
 
@@ -55,7 +55,7 @@ export default function LookingForListItem({
                     )}
                     <AppText
                         text={isCanApply ? 'You can apply' : "You can't apply"}
-                        fontSize={12}
+                        fontSize={14}
                         color={isCanApply ? Colors.successGreen : Colors.errorRed}
                     />
                 </View>
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         gap: 6,
     },
     statusIcon: {
-        width: 12,
-        height: 12,
+        width: 14,
+        height: 14,
     },
 });

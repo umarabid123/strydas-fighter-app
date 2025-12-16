@@ -33,16 +33,15 @@ export default function EventDetail() {
                     <View style={styles.headerOverlay}>
                         <Header isBack={true} />
                     </View>
-                    {/* Gradient Overlay (Simulated with background color opacity) */}
-                    <View style={styles.heroOverlay} />
+                    <View />
                 </ImageBackground>
 
                 <View style={styles.contentContainer}>
                     {/* Tags */}
                     <View style={styles.tagsRow}>
-                        <AppText text="Muay Thai" color={Colors.light.success} fontSize={12} />
-                        <AppText text=" • " color={Colors.textSecondary} fontSize={12} />
-                        <AppText text="MMA" color={Colors.light.success} fontSize={12} />
+                        <AppText text="Muay Thai" color={Colors.light.success} fontSize={14} />
+                        <AppText text=" • " color={Colors.textSecondary} fontSize={14} />
+                        <AppText text="MMA" color={Colors.light.success} fontSize={14} />
                     </View>
 
                     {/* Title */}
@@ -173,16 +172,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     headerOverlay: {
-        paddingTop: 0, // Header handles its own padding
-    },
-    heroOverlay: {
-        height: 100,
-        backgroundColor: Colors.black, // Note: linear-gradient won't work in RN without a library, using solid color
-        // fallback
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        paddingTop: 0,
     },
     contentContainer: {
         paddingHorizontal: 16,
@@ -241,6 +231,7 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 32,
         borderRadius: 100,
+        paddingVertical: 16
     },
     applyButtonText: {
         color: Colors.black,
@@ -254,7 +245,8 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         width: '100%',
         marginTop: 0,
-        borderRadius: 100
+        borderRadius: 100,
+        paddingVertical: 16
     },
     linkButtonText: {
         color: Colors.black,
