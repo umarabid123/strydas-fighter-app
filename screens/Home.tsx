@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dimensions, Platform, StyleSheet, View } from 'react-native';
 import EmptyState from '../components/EmptyState';
+import AppLoader from '../components/common/AppLoader';
 import AppText from '../components/common/AppText';
 import CustomBottomSheet from '../components/common/CustomBottomSheet';
 import Header from '../components/common/Header';
@@ -9,6 +10,14 @@ import { Colors } from '../constant';
 const Home = () => {
   const [sheetVisible, setSheetVisible] = useState(false);
   const [sheetType, setSheetType] = useState<'match' | 'event' | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const openSheet = (type: 'match' | 'event') => {
     setSheetType(type);
@@ -46,6 +55,7 @@ const Home = () => {
           style={{ marginTop: 50 }}
         />
       </CustomBottomSheet>
+      <AppLoader isLoading={isLoading} />
     </View>
   );
 };

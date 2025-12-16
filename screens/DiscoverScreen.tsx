@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import CarouselItem from '../components/CarouselItem';
 import AppButton from '../components/common/AppButton';
+import AppLoader from '../components/common/AppLoader';
 import AppText from '../components/common/AppText';
 import Header from '../components/common/Header';
 import SearchSection from '../components/common/SearchSection';
@@ -20,12 +21,29 @@ import { Colors } from '../constant';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function DiscoverScreen() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate initial data fetching
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const data = [
     { id: '1', image: require('../assets/images/caraousal-icon.png') },
     { id: '2', image: require('../assets/images/caraousal-icon.png') },
     { id: '3', image: require('../assets/images/caraousal-icon.png') },
     { id: '4', image: require('../assets/images/caraousal-icon.png') },
   ];
+  //... (data arrays omitted for brevity here, but replace_file_content needs context)
+  // Because I'm replacing the top part, I need to match carefully or just inject state.
+
+  // Actually I can use ReplaceChunks if I want to be surgical.
+  // But replace_file_content is Single Contiguous block.
+  // I will just replace from imports to start of component.
+
 
   const events = [
     {
@@ -172,6 +190,7 @@ export default function DiscoverScreen() {
             onPress={() => navigation.navigate('FighterScreen')} />
         </View>
       </ScrollView>
+      <AppLoader isLoading={isLoading} />
     </View>
   );
 }

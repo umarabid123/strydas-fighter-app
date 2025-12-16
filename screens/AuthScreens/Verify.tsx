@@ -1,24 +1,23 @@
-import React, { useState, useRef } from 'react';
+import type { NavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import React, { useRef, useState } from 'react';
 import {
-  View,
-  StyleSheet,
   Dimensions,
-  TextInput,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
-  useColorScheme,
+  ScrollView,
+  StyleSheet,
+  TextInput,
   TouchableOpacity,
+  useColorScheme,
+  View
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import type { NavigationProp } from '@react-navigation/native';
-import { Colors, Spacing, Typography, BorderRadius, DESIGN_WIDTH, DESIGN_HEIGHT } from '../../constant';
+import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
-import AppButton from '../../components/common/AppButton';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
+import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 
 interface VerifyProps {
   onVerifyComplete?: () => void;
@@ -29,6 +28,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const [code, setCode] = useState(['', '', '', '']);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleCodeChange = (text: string, index: number) => {
@@ -52,7 +52,9 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
     if (text && index === 3) {
       const fullCode = newCode.join('');
       if (fullCode.length === 4) {
+        setIsLoading(true);
         setTimeout(() => {
+          setIsLoading(false);
           // Handle verification logic
           console.log('Verify code:', fullCode);
           // Navigate to CompleteProfile after verification
@@ -60,7 +62,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
           if (onVerifyComplete) {
             onVerifyComplete();
           }
-        }, 300);
+        }, 1500);
       }
     }
   };
@@ -125,7 +127,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                     styles.codeInputWrapper,
                     digit && styles.codeInputFilled,
                     index === code.findIndex(c => c === '') &&
-                      styles.codeInputActive,
+                    styles.codeInputActive,
                   ]}
                 >
                   <TextInput
@@ -172,6 +174,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <AppLoader isLoading={isLoading} />
     </View>
   );
 }
@@ -213,9 +216,9 @@ const styles = StyleSheet.create({
     flexGrow: 0.9,
   },
   scrollContent: {
-    flex:1,
+    flex: 1,
     paddingHorizontal: (32 / DESIGN_WIDTH) * SCREEN_WIDTH,
-    marginTop:62,
+    marginTop: 62,
     justifyContent: 'space-between',
     alignItems: 'center',
   },

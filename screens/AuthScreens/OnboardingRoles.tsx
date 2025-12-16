@@ -13,13 +13,13 @@ import {
   View
 } from 'react-native';
 import AppButton from '../../components/common/AppButton';
+import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 
 interface OnboardingRolesProps {
   onComplete?: () => void;
@@ -40,6 +40,7 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const { setIsAuthenticated } = useAuth()
   const [selectedRole, setSelectedRole] = useState<RoleType>('fan');
+  const [isLoading, setIsLoading] = useState(false);
 
   const roles: RoleOption[] = [
     {
@@ -63,25 +64,29 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
   ];
 
   const handleNext = () => {
-    console.log('Selected role:', selectedRole);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log('Selected role:', selectedRole);
 
-    // Navigate to appropriate screen based on selected role
-    switch (selectedRole) {
-      case 'fan':
-        navigation.navigate('OnboardingFan');
-        break;
-      case 'fighter':
-        navigation.navigate('OnboardingFighter');
-        break;
-      case 'organizer':
-        navigation.navigate('OnboardingOrganizer');
-        break;
-      default:
-        if (onComplete) {
-          onComplete();
-        }
-        setIsAuthenticated(true)
-    }
+      // Navigate to appropriate screen based on selected role
+      switch (selectedRole) {
+        case 'fan':
+          navigation.navigate('OnboardingFan');
+          break;
+        case 'fighter':
+          navigation.navigate('OnboardingFighter');
+          break;
+        case 'organizer':
+          navigation.navigate('OnboardingOrganizer');
+          break;
+        default:
+          if (onComplete) {
+            onComplete();
+          }
+          setIsAuthenticated(true)
+      }
+    }, 500); // Shorter delay for roles
   };
 
   const renderRadioButton = (isSelected: boolean) => {
@@ -196,6 +201,7 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
           />
         </View>
       </KeyboardAvoidingView>
+      <AppLoader isLoading={isLoading} />
     </View>
   );
 }

@@ -14,6 +14,7 @@ import {
   View
 } from 'react-native';
 import AppButton from '../../components/common/AppButton';
+import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import DatePickerModal from '../../components/common/DatePickerModal';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
@@ -28,7 +29,6 @@ const TOTAL_STEPS = 2;
 interface CompleteProfileProps {
   onComplete?: () => void;
 }
-
 export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
@@ -48,6 +48,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [socialLinks, setSocialLinks] = useState([
     { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
   ]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Calculate progress: Step 1 = 25%, Step 2 = 50%
   const progressPercentage = currentStep === 1 ? 25 : 50;
@@ -93,25 +94,30 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
     setShowDatePicker(true);
   };
 
+
   const handleNext = () => {
     if (currentStep < TOTAL_STEPS) {
       // Advance to next step
       setCurrentStep(currentStep + 1);
     } else {
-      // Complete profile and navigate
-      console.log('Complete profile:', {
-        profileImage,
-        firstName,
-        lastName,
-        dateOfBirth,
-        gender,
-        country,
-        socialLinks,
-      });
-      if (onComplete) {
-        onComplete();
-      }
-      navigation.navigate('Home');
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+        // Complete profile and navigate
+        console.log('Complete profile:', {
+          profileImage,
+          firstName,
+          lastName,
+          dateOfBirth,
+          gender,
+          country,
+          socialLinks,
+        });
+        if (onComplete) {
+          onComplete();
+        }
+        navigation.navigate('Home');
+      }, 1500);
     }
   };
 
@@ -374,6 +380,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
               />
             </TouchableOpacity>
           </View>
+          <AppLoader isLoading={isLoading} />
         </View>
       );
     }
@@ -690,3 +697,5 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
 });
+
+

@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import Slider from 'react-native-sticky-range-slider';
 import AppButton from '../../components/common/AppButton';
+import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
 import { ContactSheet, MatchSheet } from '../../components/common/OnboardingSheets';
@@ -31,6 +32,8 @@ interface OnboardingFighterProps {
   onComplete?: () => void;
 }
 
+
+// ... (inside component)
 export default function OnboardingFighter({ onComplete }: OnboardingFighterProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
@@ -43,6 +46,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [gym, setGym] = useState('Keddles Gym');
   const [showContactSheet, setShowContactSheet] = useState(false);
   const [showMatchSheet, setShowMatchSheet] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -58,17 +62,21 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   };
 
   const handleComplete = () => {
-    console.log('Complete fighter profile:', {
-      profileImage,
-      weightDivision,
-      weightRange,
-      height,
-      gym,
-    });
-    if (onComplete) {
-      onComplete();
-    }
-    setIsAuthenticated(true)
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log('Complete fighter profile:', {
+        profileImage,
+        weightDivision,
+        weightRange,
+        height,
+        gym,
+      });
+      if (onComplete) {
+        onComplete();
+      }
+      setIsAuthenticated(true);
+    }, 1500);
   };
 
   return (
@@ -368,6 +376,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
         <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
         <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
       </KeyboardAvoidingView>
+      <AppLoader isLoading={isLoading} />
     </View>
   );
 }

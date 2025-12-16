@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import AppButton from '../../components/common/AppButton';
+import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import MeshGradientBackground from '../../components/common/MeshGradientBackground';
 import { AddFighterSheet, ContactSheet } from '../../components/common/OnboardingSheets';
@@ -27,6 +28,8 @@ interface OnboardingOrganizerProps {
   onComplete?: () => void;
 }
 
+
+// ... (in component)
 export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
@@ -37,6 +40,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
   const [organisation, setOrganisation] = useState('Keddles Gym');
   const [showContactSheet, setShowContactSheet] = useState(false);
   const [showAddFighterSheet, setShowAddFighterSheet] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -52,15 +56,19 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
   };
 
   const handleComplete = () => {
-    console.log('Complete organizer profile:', {
-      profileImage,
-      jobTitle,
-      organisation,
-    });
-    if (onComplete) {
-      onComplete();
-    }
-    setIsAuthenticated(true)
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      console.log('Complete organizer profile:', {
+        profileImage,
+        jobTitle,
+        organisation,
+      });
+      if (onComplete) {
+        onComplete();
+      }
+      setIsAuthenticated(true)
+    }, 1500);
   };
 
   return (
@@ -258,6 +266,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
         <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
         <AddFighterSheet visible={showAddFighterSheet} onClose={() => setShowAddFighterSheet(false)} />
       </KeyboardAvoidingView>
+      <AppLoader isLoading={isLoading} />
     </View >
   );
 }
