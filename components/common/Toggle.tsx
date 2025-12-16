@@ -1,13 +1,13 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
-  View,
+  Animated,
   StyleSheet,
   TouchableOpacity,
-  Animated,
   useColorScheme,
+  View,
   type ViewStyle,
 } from 'react-native';
-import { Colors, Spacing, Typography, BorderRadius } from '../../constant';
+import { BorderRadius, Colors, Spacing, Typography } from '../../constant';
 import AppText from './AppText';
 
 interface ToggleProps {
@@ -70,7 +70,7 @@ export default function Toggle({
               text={subtitle}
               fontSize={Typography.fontSize.md}
               fontName="CircularStd-Book"
-              color="rgba(255, 255, 255, 0.8)"
+              color="#FFFFFFCC"
               style={[styles.subtitle, subtitleStyle]}
             />
           )}
@@ -115,6 +115,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     letterSpacing: 0.28,
+    fontWeight: 300
   },
   toggleSwitch: {
     width: 80,

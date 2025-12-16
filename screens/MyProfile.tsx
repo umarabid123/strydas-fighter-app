@@ -17,7 +17,7 @@ import { Colors } from '../constant';
 
 const Tag = ({ text, icon }: { text: string; icon?: any }) => (
     <View style={styles.tag}>
-        <AppText text={text} fontSize={14} color={Colors.white} />
+        <AppText text={text} fontSize={16} color={Colors.white} />
         {icon && <Image source={icon} style={styles.tagIcon} />}
     </View>
 );
@@ -27,14 +27,14 @@ const ProfileRow = ({ label, value, children, labelStyle }: any) => (
         <View style={styles.labelContainer}>
             <AppText
                 text={label}
-                fontSize={16}
+                fontSize={14}
                 color={Colors.white}
                 style={[styles.rowLabel, labelStyle]}
             />
         </View>
         <View style={styles.valueContainer}>
             {value ? (
-                <AppText text={value} fontSize={16} color={Colors.textSecondary} style={{ fontWeight: '400' }} />
+                <AppText text={value} fontSize={16} color={Colors.white} style={{ fontWeight: '300' }} />
             ) : (
                 children
             )}
@@ -80,7 +80,7 @@ export default function MyProfile() {
                 {/* Info Section */}
                 <View style={styles.infoSection}>
                     <ProfileRow label="Age" value="20 years" />
-                    <ProfileRow label="Weight" value="59,0 kg  ± 2,0 kg" />
+                    <ProfileRow label="Weight" value="59,0 kg                  ± 2,0 kg" />
                     <ProfileRow label="Division" value="Pro" />
                     <ProfileRow label="Height" value="172 cm" />
 
@@ -106,14 +106,14 @@ export default function MyProfile() {
                     <View style={styles.managerCard}>
                         <Image source={require('../assets/images/profile-img.png')} style={styles.managerAvatar} />
                         <View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingBottom: 8 }}>
                                 <AppText text="Youssef Assouik" fontSize={18} color={Colors.white} style={{ fontWeight: '600' }} />
                                 <Image source={require('../assets/images/flag-icon.png')} style={styles.flagIconSmall} />
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                 <AppText text="Assouik Gym" fontSize={14} color={Colors.textSecondary} style={styles.managerTag} />
-                                {/* <Image source={require('../assets/images/whatsapp-icon.png')} style={styles.socialIcon} />
-                                <Image source={require('../assets/images/email-icon.png')} style={styles.socialIcon} /> */}
+                                <Image source={require('../assets/images/whatsapp-icon.png')} style={styles.socialIcon} />
+                                <Image source={require('../assets/images/email-icon.png')} style={styles.socialIcon} />
                             </View>
                         </View>
                     </View>
@@ -174,7 +174,6 @@ const styles = StyleSheet.create({
     },
     roleText: {
         marginBottom: 8,
-        fontWeight: '500',
     },
     nameText: {
         marginBottom: 4,
@@ -195,8 +194,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#333',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingHorizontal: 8,
+        paddingVertical: 3,
         borderRadius: 20,
         gap: 6,
     },
