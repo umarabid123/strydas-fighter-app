@@ -1,3 +1,6 @@
+import AppSetting from '@/screens/AppSetting';
+import GiveFeedback from '@/screens/GiveFeedback';
+import MedicalPaper from '@/screens/MedicalPaper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
@@ -6,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MenuItem from '../components/MenuItem';
 import AppText from '../components/common/AppText';
 import { Colors } from '../constant';
+import DiscoverNavigator from './DicoverNavigator';
 import TabNavigator from './TabNavigator';
 
 const Drawer = createDrawerNavigator();
@@ -57,6 +61,11 @@ const DrawerNavigator = () => {
             drawerContent={() => <CustomDrawerContent />}
         >
             <Drawer.Screen name="Tabs" component={TabNavigator} />
+            <Drawer.Screen name="Discover" component={DiscoverNavigator} />
+            <Drawer.Screen name="AppSetting" component={AppSetting} />
+            <Drawer.Screen name="MedicalPaper" component={MedicalPaper} />
+            <Drawer.Screen name="Feedback" component={GiveFeedback} />
+
         </Drawer.Navigator>
     );
 };
