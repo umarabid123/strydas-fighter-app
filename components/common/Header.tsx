@@ -72,10 +72,10 @@ export default function Header({
 
         {/* Hamburger Menu */}
         <TouchableOpacity style={styles.iconButton} onPress={() => {
-          if (route.name === 'Menu') {
-            navigation.goBack(); // already on Menu → go to Home
+          if (onMenuPress) {
+            onMenuPress();
           } else {
-            navigation.navigate('Menu'); // go to Menu
+            navigation.openDrawer();
           }
         }}>
           <View style={styles.hamburgerIcon}>
