@@ -15,7 +15,6 @@ import {
 import AppButton from '../../components/common/AppButton';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
-import MeshGradientBackground from '../../components/common/MeshGradientBackground';
 import { AddFighterSheet, ContactSheet } from '../../components/common/OnboardingSheets';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
@@ -71,8 +70,6 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
 
   return (
     <View style={styles.container}>
-      <MeshGradientBackground />
-
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -284,7 +281,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   },

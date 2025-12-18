@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
-import MeshGradientBackground from '../../components/common/MeshGradientBackground';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -80,8 +79,6 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
 
   return (
     <View style={styles.container}>
-      <MeshGradientBackground />
-
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -182,7 +179,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   },

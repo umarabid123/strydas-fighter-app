@@ -17,7 +17,6 @@ import AppButton from '../../components/common/AppButton';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import DatePickerModal from '../../components/common/DatePickerModal';
-import MeshGradientBackground from '../../components/common/MeshGradientBackground';
 import ProfileInput from '../../components/common/ProfileInput';
 import SelectPicker from '../../components/common/SelectPicker';
 import { BorderRadius, Colors, CountryOptions, DESIGN_HEIGHT, DESIGN_WIDTH, GenderOptions, MonthNames, Spacing, Typography } from '../../constant';
@@ -388,8 +387,6 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
   return (
     <View style={styles.container}>
-      <MeshGradientBackground />
-
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -455,7 +452,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   },

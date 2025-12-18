@@ -8,13 +8,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import AppButton from './AppButton';
 import AppText from './AppText';
 import CustomIconButton from './CustomIconButton';
 import Divider from './Divider';
-import MeshGradientBackground from './MeshGradientBackground';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -56,9 +54,7 @@ export default function SocialAuthForm({
   socialButtonPadding = Spacing.lg,
   socialButtonTextSize = Typography.fontSize.md,
   titleContainerMarginBottom = Spacing.xxl,
-  titleContainerMarginTop = 0,
 }: SocialAuthFormProps) {
-  const insets = useSafeAreaInsets();
   const handleGoogleAuth = () => {
     console.log('Google auth');
   };
@@ -73,8 +69,6 @@ export default function SocialAuthForm({
 
   return (
     <View style={styles.container}>
-      <MeshGradientBackground />
-
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -182,7 +176,7 @@ export default function SocialAuthForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   },

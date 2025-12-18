@@ -14,7 +14,6 @@ import {
 import { useNavigation } from "@react-navigation/native"
 import type { NavigationProp } from "@react-navigation/native"
 import { Colors, Spacing, Typography, BorderRadius, DESIGN_WIDTH, DESIGN_HEIGHT } from "../../constant"
-import MeshGradientBackground from "../../components/common/MeshGradientBackground"
 import AppText from "../../components/common/AppText"
 import AppButton from "../../components/common/AppButton"
 
@@ -49,8 +48,6 @@ export default function Welcome({ onContinue, onSkip }: WelcomeProps) {
 
   return (
     <View style={styles.container}>
-      <MeshGradientBackground />
-
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -116,7 +113,7 @@ export default function Welcome({ onContinue, onSkip }: WelcomeProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
   },
