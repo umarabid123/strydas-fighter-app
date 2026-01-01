@@ -54,7 +54,7 @@ const EVENTS = [
   }
 ];
 
-const carouselData = [ // Renamed from 'data' to 'carouselData'
+const carouselData = [
   {
     id: '1',
     title: 'Events',
@@ -160,8 +160,8 @@ export default function EventScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
     width: SCREEN_WIDTH,
+    backgroundColor: Colors.black,
     height: SCREEN_HEIGHT,
     paddingTop: Platform.OS === 'ios' ? 0 : 20
   },
