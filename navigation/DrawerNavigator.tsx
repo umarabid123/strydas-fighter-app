@@ -2,7 +2,6 @@ import AppSetting from '@/screens/AppSetting';
 import GiveFeedback from '@/screens/GiveFeedback';
 import MedicalPaper from '@/screens/MedicalPaper';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,8 +14,8 @@ import TabNavigator from './TabNavigator';
 const Drawer = createDrawerNavigator();
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const CustomDrawerContent = () => {
-    const navigation = useNavigation<any>();
+const CustomDrawerContent = (props: any) => {
+    const { navigation } = props;
 
     return (
         <View style={styles.container}>
@@ -58,7 +57,7 @@ const DrawerNavigator = () => {
                 drawerType: 'front',
                 overlayColor: 'rgba(0,0,0,0.7)',
             }}
-            drawerContent={() => <CustomDrawerContent />}
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
         >
             <Drawer.Screen name="Tabs" component={TabNavigator} />
             <Drawer.Screen name="Discover" component={DiscoverNavigator} />

@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { DrawerActions, useNavigation, useRoute } from '@react-navigation/native';
 import {
   Dimensions,
   Image,
@@ -75,7 +75,7 @@ export default function Header({
           if (onMenuPress) {
             onMenuPress();
           } else {
-            navigation.openDrawer();
+            navigation.dispatch(DrawerActions.openDrawer());
           }
         }}>
           <View style={styles.hamburgerIcon}>

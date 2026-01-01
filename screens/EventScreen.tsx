@@ -91,7 +91,6 @@ export default function EventScreen() {
       <Header
         isBack={true}
         onNotificationPress={() => { }}
-        onMenuPress={() => { }}
       />
 
       <ScrollView
