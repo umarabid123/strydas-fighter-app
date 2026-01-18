@@ -107,28 +107,20 @@ export default function EventScreen() {
         />
 
         {/* Categories */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.categoriesContainer}
-          contentContainerStyle={styles.categoriesContent}
-        >
-
-          <View style={{ height: 220 }}>
-            <FlatList
-              data={carouselData}
-              horizontal
-              scrollEnabled={true}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={item => item.id}
-              contentContainerStyle={{ paddingHorizontal: 20, marginTop: 40 }}
-              ItemSeparatorComponent={() => <View style={{ width: 12 }} />} // Changed width from 8 to 12
-              renderItem={({ item }) => (
-                <CarouselItem item={item} />
-              )}
-            />
-          </View>
-        </ScrollView>
+        <View style={{ height: 220, marginBottom: 24 }}>
+          <FlatList
+            data={carouselData}
+            horizontal
+            scrollEnabled={true}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => item.id}
+            contentContainerStyle={{ paddingHorizontal: 0 }}
+            ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+            renderItem={({ item }) => (
+              <CarouselItem item={item} />
+            )}
+          />
+        </View>
 
         {/* Browse All */}
         <View style={styles.browseAllContainer}>

@@ -154,93 +154,102 @@ export default function DiscoverScreen() {
     : filteredFighters;
 
   const navigation = useNavigation<any>();
+
+  // Render header section
+  const renderHeader = () => (
+    <>
+      <SearchSection
+        title='Discover'
+        subtitle='Browser fighters and events world wide.'
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        onFilterPress={() => setIsFilterActive(!isFilterActive)}
+      />
+
+      <View style={{ height: 220 }}>
+        <FlatList
+          data={carouselData}
+          horizontal
+          scrollEnabled={true}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={item => item.id}
+          contentContainerStyle={{ paddingHorizontal: 20, marginTop: 40 }}
+          ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+          renderItem={({ item }) => (
+            <CarouselItem item={item} />
+          )}
+        />
+      </View>
+
+      <View style={{ paddingHorizontal: 20, paddingTop: 30, paddingBottom: 40 }}>
+        <AppText
+          text="Events soon 👀"
+          fontSize={16}
+          color={'#FFFFFFCC'}
+          style={{ fontWeight: 500 }}
+        />
+
+        {finalEvents.map((item) => (
+          <View key={item.id} style={{ marginTop: 16 }}>
+            <EventCard
+              title={item.title}
+              subtitle={item.subtitle}
+              image={item.image}
+              containerStyle={styles.cardSpacing}
+              onPress={() => navigation.navigate('EventDetail')}
+            />
+          </View>
+        ))}
+        <View style={{ marginTop: 16 }}>
+          <AppButton text='Browse events' btnStyle={{ backgroundColor: 'transparant', borderWidth: 1, borderColor: "#FFFFFF80", borderRadius: 50, width: "auto", paddingHorizontal: 32, paddingVertical: 17 }} onPress={() => navigation.navigate('Event')} />
+        </View>
+      </View>
+
+      <View style={{ paddingHorizontal: 20 }}>
+        <AppText
+          text="Popular fighters 🔥"
+          fontSize={16}
+          color={'#FFFFFFCC'}
+          style={{ fontWeight: 500 }}
+        />
+      </View>
+    </>
+  );
+
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <SearchSection
-          title='Discover'
-          subtitle='Browser fighters and events world wide.'
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          onFilterPress={() => setIsFilterActive(!isFilterActive)}
-        />
-
-        <View style={{ height: 220 }}>
-          <FlatList
-            data={carouselData} // Changed to carouselData
-            horizontal
-            scrollEnabled={true}
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{ paddingHorizontal: 20, marginTop: 40 }}
-            ItemSeparatorComponent={() => <View style={{ width: 12 }} />} // Changed width from 8 to 12
-            renderItem={({ item }) => (
-              <CarouselItem item={item} />
-            )}
-          />
-        </View>
-
-        <View style={{ paddingHorizontal: 20, paddingTop: 30, paddingBottom: 40 }}>
-          <AppText
-            text="Events soon 👀"
-            fontSize={16}
-            color={'#FFFFFFCC'}
-            style={{ fontWeight: 500 }}
-          />
-
-          <FlatList
-            data={finalEvents}
-            keyExtractor={item => item.id}
-            scrollEnabled={false}
-            contentContainerStyle={{ paddingTop: 16 }}
-            ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-            renderItem={({ item }) => (
-              <EventCard
-                title={item.title}
-                subtitle={item.subtitle}
-                image={item.image}
-                containerStyle={styles.cardSpacing}
-                onPress={() => navigation.navigate('EventDetail')}
-              />
-            )}
-          />
-          <AppButton text='Browse events' btnStyle={{ backgroundColor: 'transparant', borderWidth: 1, borderColor: "#FFFFFF80", borderRadius: 50, width: "auto", paddingHorizontal: 32, paddingVertical: 17 }} onPress={() => navigation.navigate('Event')} />
-        </View>
-
-        <View style={{ paddingHorizontal: 20 }}>
-          <AppText
-            text="Popular fighters 🔥"
-            fontSize={16}
-            color={'#FFFFFFCC'}
-            style={{ fontWeight: 500 }}
-          />
-
-          <FlatList
-            data={finalFighters}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={item => item.id}
-            contentContainerStyle={{
-              paddingTop: 20
-            }}
-            ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-            renderItem={({ item }) => (
-              <FighterCard
-                fighterName={item.fighterName}
-                fighterImage={item.fighterImage}
-                fighterFlag={item.fighterFlag}
-                countryCode={item.countryCode}
-                discipline={item.discipline}
-                fightRecord={item.fightRecord}
-                weightClass={item.weightClass}
-                onPress={() => navigation.navigate('FighterProfileScreen')}
-              />
-            )}
-          />
-          <AppButton text='Browse fighters' btnStyle={{ backgroundColor: 'transparant', borderWidth: 1, borderColor: "#FFFFFF80", borderRadius: 50, width: "auto", paddingHorizontal: 32, paddingVertical: 17 }}
-            onPress={() => navigation.navigate('FighterScreen')} />
-        </View>
-      </ScrollView>
+      <FlatList
+        data={finalFighters}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={item => item.id}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={{
+          paddingTop: 0,
+          paddingBottom: 20
+        }}
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+        renderItem={({ item }) => (
+          <View style={{ paddingHorizontal: 20 }}>
+            <FighterCard
+              fighterName={item.fighterName}
+              fighterImage={item.fighterImage}
+              fighterFlag={item.fighterFlag}
+              countryCode={item.countryCode}
+              discipline={item.discipline}
+              fightRecord={item.fightRecord}
+              weightClass={item.weightClass}
+              onPress={() => navigation.navigate('FighterProfileScreen')}
+            />
+          </View>
+        )}
+        ListFooterComponent={() => (
+          <View style={{ paddingHorizontal: 20, marginTop: 16 }}>
+            <AppButton text='Browse fighters' btnStyle={{ backgroundColor: 'transparant', borderWidth: 1, borderColor: "#FFFFFF80", borderRadius: 50, width: "auto", paddingHorizontal: 32, paddingVertical: 17 }}
+              onPress={() => navigation.navigate('FighterScreen')} />
+          </View>
+        )}
+      />
       <AppLoader isLoading={isLoading} />
     </View>
   );

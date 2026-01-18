@@ -94,43 +94,50 @@ export default function FighterScreen() {
         },
     ];
 
+    const renderHeader = () => (
+        <>
+            <SearchSection
+                title="Fighters"
+                subtitle="Browser fighters and events world wide."
+                placeholder="Search"
+            />
+
+            <View style={styles.categoriesContainer}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScroll}>
+                    {categories.map((item) => <CarouselItem key={item.id} item={item} />)}
+                </ScrollView>
+            </View>
+
+            <View style={styles.listContainer}>
+                <AppText text="Browse all" fontSize={16} color={Colors.textSecondary} style={styles.sectionTitle} />
+            </View>
+        </>
+    );
+
     return (
         <View style={styles.container}>
             <Header isBack={true} />
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <SearchSection
-                    title="Fighters"
-                    subtitle="Browser fighters and events world wide."
-                    placeholder="Search"
-                />
-
-                <View style={styles.categoriesContainer}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScroll}>
-                        {categories.map((item) => <CarouselItem item={item} />)}
-                    </ScrollView>
-                </View>
-
-                <View style={styles.listContainer}>
-                    <AppText text="Browse all" fontSize={16} color={Colors.textSecondary} style={styles.sectionTitle} />
-                    <FlatList
-                        data={fighters}
-                        keyExtractor={(item) => item.id}
-                        scrollEnabled={false}
-                        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-                        renderItem={({ item }) => (
-                            <FighterCard
-                                fighterName={item.fighterName}
-                                fighterImage={item.fighterImage}
-                                fighterFlag={item.fighterFlag}
-                                discipline={item.discipline}
-                                fightRecord={item.fightRecord}
-                                weightClass={item.weightClass}
-                                onPress={() => navigation.navigate('FighterProfileScreen')}
-                            />
-                        )}
-                    />
-                </View>
-            </ScrollView>
+            <FlatList
+                data={fighters}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
+                ListHeaderComponent={renderHeader}
+                contentContainerStyle={{ paddingBottom: 40 }}
+                ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+                renderItem={({ item }) => (
+                    <View style={{ paddingHorizontal: 20 }}>
+                        <FighterCard
+                            fighterName={item.fighterName}
+                            fighterImage={item.fighterImage}
+                            fighterFlag={item.fighterFlag}
+                            discipline={item.discipline}
+                            fightRecord={item.fightRecord}
+                            weightClass={item.weightClass}
+                            onPress={() => navigation.navigate('FighterProfileScreen')}
+                        />
+                    </View>
+                )}
+            />
         </View>
     );
 }
