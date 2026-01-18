@@ -119,6 +119,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         dob: birthDate.toISOString().split('T')[0], // YYYY-MM-DD
         gender: gender,
         country: country,
+        email: user.email,
       });
       
       await updateBasicProfile(user.id, {
@@ -126,12 +127,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         last_name: lastName,
       });
       
-      // If the UI collects country here, maybe we should save it later or current Step ?
-      // The UI purely does "Complete Profile".
-      // I will stick to what the service allows for now (first/last) to be safe with the requested architecture.
       
-      // Navigate to OnboardingRoles screen
-      setIsAuthenticated(true); 
       navigation.navigate('OnboardingRoles');
 
     } catch (error: any) {
@@ -146,7 +142,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
     if (onComplete) {
       onComplete();
     }
-    navigation.navigate('Home');
+    // Switch to App Stack
+    setIsAuthenticated(true);
   };
 
   const renderStepContent = () => {

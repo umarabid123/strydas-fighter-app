@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 export interface ProfileData {
   first_name: string;
   last_name: string;
+    email?: string; // Added email for upsert robustness
   dob?: string;
   gender?: string;
   country?: string;
@@ -54,12 +55,13 @@ export interface OrganizerProfileData {
 /**
  * Step 1: Complete Account
  * Saves first_name and last_name to the profiles table.
+ * Uses upsert to ensure profile exists even if trigger failed.
  */
 export const updateBasicProfile = async (userId: string, data: ProfileData) => {
+    // We include 'id' for upsert to work on the Primary Key
   const { error } = await supabase
     .from('profiles')
-    .update({ ...data, updated_at: new Date() })
-    .eq('id', userId);
+      .upsert({ id: userId, ...data, updated_at: new Date() });
 
   if (error) {
     console.error('Error updating basic profile:', error);
