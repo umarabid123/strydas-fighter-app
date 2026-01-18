@@ -1,11 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MenuItem from '../../components/MenuItem';
 import AppText from '../../components/common/AppText';
 import { Colors } from '../../constant';
-import { CommonActions } from '@react-navigation/native';
 
 const Menu = () => {
     const navigation = useNavigation<any>();
@@ -16,8 +15,12 @@ const Menu = () => {
                 <View style={styles.header}>
                     <AppText text="Menu" fontSize={24} fontName="CircularStd-Bold" color={Colors.white} />
                     <View style={styles.headerIcons}>
-                        <Image source={require('../../assets/images/notifications.png')} style={styles.icon} />
-                        <Image source={require('../../assets/images/menu-line-icon.png')} style={styles.icon} />
+                        <TouchableOpacity>
+                            <Image source={require('../../assets/images/notifications.png')} style={styles.icon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <Image source={require('../../assets/images/menu-line-icon.png')} style={styles.icon} />
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.menuItems}>

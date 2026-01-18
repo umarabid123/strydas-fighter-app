@@ -5,6 +5,7 @@ import AppStatusBar from '../components/common/AppStatusBar';
 import AppSetting from '../screens/AppSetting';
 import GiveFeedback from '../screens/GiveFeedback';
 import MedicalPaper from '../screens/MedicalPaper';
+import Menu from '../screens/Menu/Menu';
 import TabNavigator from './TabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -21,6 +22,7 @@ const AppNavigator = () => {
         initialRouteName="Main"
       >
         <Stack.Screen name="Main" component={TabNavigator} />
+        <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="AppSetting" component={AppSetting} />
         <Stack.Screen name="MedicalPaper" component={MedicalPaper} />
         <Stack.Screen name="Feedback" component={GiveFeedback} />

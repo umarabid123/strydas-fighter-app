@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, DESIGN_WIDTH } from '../../constant';
 import AppText from './AppText';
 
@@ -34,66 +35,68 @@ export default function Header({
   const navigation = useNavigation<any>()
   const route = useRoute();
   return (
-    <View style={[styles.container, headerContainerStyle]}>
+    <SafeAreaView edges={['top']} style={{ backgroundColor: 'transparent' }}>
+      <View style={[styles.container, headerContainerStyle]}>
 
-      <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-        {isBack &&
-          <Pressable style={{ backgroundColor: Colors.darkGray1, padding: 8, borderRadius: 10 }} onPress={() => navigation.goBack()}>
-            <Image source={require('../../assets/images/back-arrow-icon.png')} resizeMode='contain' style={{ width: 16, height: 16 }} />
-          </Pressable>
-        }
-        <AppText
-          text={title}
-          fontSize={18}
-          style={{ fontWeight: 600 }}
-          fontName="CircularStd-Medium"
-          color={Colors.white}
-        />
-      </View>
-
-      <View style={styles.rightSection}>
-        {/* Notification Bell */}
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={onNotificationPress}
-        >
-          {/* Bell Icon SVG */}
-          <View style={styles.bellIcon}>
-            <Image
-              source={require('../../assets/images/notifications.png')}
-              width={24}
-              height={24}
-            />
-          </View>
-
-          {/* Notification Dot */}
-          {showNotificationDot && <View style={styles.notificationDot} />}
-        </TouchableOpacity>
-
-        {/* Hamburger Menu */}
-        <TouchableOpacity style={styles.iconButton} onPress={() => {
-          if (onMenuPress) {
-            onMenuPress();
-          } else {
-            // Professional toggle behavior: if on Account screen, go back, otherwise navigate to Account
-            const currentRoute = route.name;
-            if (currentRoute === 'Account') {
-              navigation.goBack();
-            } else {
-              navigation.navigate('Account');
-            }
+        <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+          {isBack &&
+            <Pressable style={{ backgroundColor: Colors.darkGray1, padding: 8, borderRadius: 10 }} onPress={() => navigation.goBack()}>
+              <Image source={require('../../assets/images/back-arrow-icon.png')} resizeMode='contain' style={{ width: 16, height: 16 }} />
+            </Pressable>
           }
-        }}>
-          <View style={styles.hamburgerIcon}>
-            <Image
-              source={require('../../assets/images/menu-line-icon.png')}
-              width={24}
-              height={24}
-            />
-          </View>
-        </TouchableOpacity>
+          <AppText
+            text={title}
+            fontSize={18}
+            style={{ fontWeight: 600 }}
+            fontName="CircularStd-Medium"
+            color={Colors.white}
+          />
+        </View>
+
+        <View style={styles.rightSection}>
+          {/* Notification Bell */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={onNotificationPress}
+          >
+            {/* Bell Icon SVG */}
+            <View style={styles.bellIcon}>
+              <Image
+                source={require('../../assets/images/notifications.png')}
+                width={24}
+                height={24}
+              />
+            </View>
+
+            {/* Notification Dot */}
+            {showNotificationDot && <View style={styles.notificationDot} />}
+          </TouchableOpacity>
+
+          {/* Hamburger Menu */}
+          <TouchableOpacity style={styles.iconButton} onPress={() => {
+            if (onMenuPress) {
+              onMenuPress();
+            } else {
+              // Professional toggle behavior: if on Menu screen, go back, otherwise navigate to Menu
+              const currentRoute = route.name;
+              if (currentRoute === 'Menu') {
+                navigation.goBack();
+              } else {
+                navigation.navigate('Menu');
+              }
+            }
+          }}>
+            <View style={styles.hamburgerIcon}>
+              <Image
+                source={require('../../assets/images/menu-line-icon.png')}
+                width={24}
+                height={24}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
