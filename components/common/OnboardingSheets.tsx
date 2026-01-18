@@ -16,11 +16,18 @@ const AVAILABLE_FIGHTERS = [
     { id: '4', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
 ];
 
-export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave?: (data: any) => void }) => {
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [org, setOrg] = useState('');
+
+    const handleSave = () => {
+        if (onSave) {
+            onSave({ full_name: fullName, phone, email, organisation: org });
+        }
+        onClose();
+    }
 
     return (
         <CustomBottomSheet
@@ -60,7 +67,7 @@ export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: 
             <View style={styles.footer}>
                 <AppButton
                     text="Save & close"
-                    onPress={onClose}
+                    onPress={handleSave}
                     btnStyle={styles.saveButton}
                     textStyle={styles.saveButtonText}
                 />
@@ -74,10 +81,10 @@ const SPORT_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing'];
 const RESULT_OPTIONS = ['Won', 'Lost', 'Draw', 'No Contest'];
 
 
-export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave?: (data: any) => void }) => {
     const [date, setDate] = useState('Aug 04, 2025');
-    const [opponent, setOpponent] = useState('+45 12 34 56 78');
-    const [event, setEvent] = useState('+45 12 34 56 78');
+    const [opponent, setOpponent] = useState('');
+    const [event, setEvent] = useState('');
 
     const [division, setDivision] = useState('');
     const [sport, setSport] = useState('');
@@ -105,6 +112,28 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
         if (pickerType === 'result') return 'Select Result';
         return '';
     };
+
+    const handleSave = () => {
+        if (onSave) {
+            // Map UI values to DB values
+            // Result mapping: 'Won' -> 'win', 'Lost' -> 'loss', 'Draw' -> 'draw'
+            let resultDb = 'draw';
+            if (result.toLowerCase().includes('won')) resultDb = 'win';
+            if (result.toLowerCase().includes('lost')) resultDb = 'loss';
+
+            // Date parsing logic might be needed if date is text, assume standard format or handle later
+            // For now passing raw date string
+            onSave({
+                match_date: new Date().toISOString(), // Fallback or parse actual date
+                opponent_name: opponent,
+                event_name: event,
+                division,
+                sport,
+                result: resultDb
+            });
+        }
+        onClose();
+    }
 
     return (
         <CustomBottomSheet
@@ -158,7 +187,7 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
             <View style={styles.footer}>
                 <AppButton
                     text="Add match"
-                    onPress={onClose}
+                    onPress={handleSave}
                     btnStyle={styles.saveButton}
                     textStyle={styles.saveButtonText}
                 />
@@ -180,7 +209,7 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
     );
 };
 
-export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+export const AddFighterSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave?: (fighters: string[]) => void }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedFighters, setSelectedFighters] = useState<string[]>([]);
     const colorScheme = useColorScheme();
@@ -195,6 +224,13 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
     const handleRemoveFighter = (id: string) => {
         setSelectedFighters(selectedFighters.filter(fighterId => fighterId !== id));
     };
+
+    const handleSave = () => {
+        if (onSave) {
+            onSave(selectedFighters);
+        }
+        onClose();
+    }
 
     // Filter available fighters excluding already selected ones
     const availableList = AVAILABLE_FIGHTERS.filter(f => !selectedFighters.includes(f.id));
@@ -296,7 +332,7 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
             <View style={styles.footer}>
                 <AppButton
                     text="Save & close"
-                    onPress={onClose}
+                    onPress={handleSave}
                     btnStyle={styles.saveButton}
                     textStyle={styles.saveButtonText}
                 />

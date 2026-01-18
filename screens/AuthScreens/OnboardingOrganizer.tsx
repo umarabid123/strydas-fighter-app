@@ -18,6 +18,8 @@ import AppText from '../../components/common/AppText';
 import { AddFighterSheet, ContactSheet } from '../../components/common/OnboardingSheets';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { supabase } from '@/lib/supabase';
+import { saveOrganizerProfile, completeOnboarding, saveContactInfo, saveManagedFighters } from '@/lib/services/onboardingService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -52,20 +54,63 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
     }
   };
 
-  const handleComplete = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Complete organizer profile:', {
-        profileImage,
-        jobTitle,
+  // Handler for Contact Sheet Save
+  const handleSaveContact = async (data: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await saveContactInfo(user.id, data);
+      // alert('Contact info saved');
+    } catch (error) {
+      console.error(error);
+      alert('Error saving contact info');
+    }
+  };
+
+  // Handler for Add Fighter Sheet Save
+  const handleSaveFighters = async (fighterIds: string[]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Note: This might fail if fighterIds are just mock IDs not in DB
+      await saveManagedFighters(user.id, fighterIds);
+      // alert('Fighters saved');
+    } catch (error: any) {
+      console.error(error);
+      alert('Error saving fighters: ' + error.message);
+    }
+  };
+
+  const handleComplete = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("No user found");
+        return;
+      }
+
+      // 1. Save Organizer Profile
+      await saveOrganizerProfile(user.id, {
+        job_title: jobTitle,
         organisation,
       });
+
+      // 2. Mark Onboarding Complete
+      await completeOnboarding(user.id);
+
+      // 3. Navigate
       if (onComplete) {
         onComplete();
       }
-      setIsAuthenticated(true)
-    }, 1500);
+      setIsAuthenticated(true);
+    } catch (error: any) {
+      console.error(error);
+      alert('Failed to save profile: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -270,8 +315,8 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
             />
           </View>
         </ScrollView>
-        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
-        <AddFighterSheet visible={showAddFighterSheet} onClose={() => setShowAddFighterSheet(false)} />
+        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} onSave={handleSaveContact} />
+        <AddFighterSheet visible={showAddFighterSheet} onClose={() => setShowAddFighterSheet(false)} onSave={handleSaveFighters} />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />
     </View >

@@ -17,6 +17,8 @@ import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { supabase } from '@/lib/supabase';
+import { setUserRole } from '@/lib/services/onboardingService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -62,11 +64,18 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
     },
   ];
 
-  const handleNext = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Selected role:', selectedRole);
+  const handleNext = async () => {
+    try {
+      setIsLoading(true);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("No user found");
+        return;
+      }
+
+      // Save role to database
+      await setUserRole(user.id, selectedRole);
 
       // Navigate to appropriate screen based on selected role
       switch (selectedRole) {
@@ -83,9 +92,14 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
           if (onComplete) {
             onComplete();
           }
-          setIsAuthenticated(true)
+          setIsAuthenticated(true);
       }
-    }, 500); // Shorter delay for roles
+    } catch (error: any) {
+      console.error(error);
+      alert('Failed to save role: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderRadioButton = (isSelected: boolean) => {

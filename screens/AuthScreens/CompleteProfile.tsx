@@ -28,6 +28,10 @@ const TOTAL_STEPS = 2;
 interface CompleteProfileProps {
   onComplete?: () => void;
 }
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '../../navigation';
+import { updateBasicProfile } from '@/lib/services/onboardingService';
+
 export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
@@ -44,10 +48,9 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [socialLinks, setSocialLinks] = useState([
-    { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
-  ]);
+  const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { setIsAuthenticated } = useAuth();
 
   // Calculate progress: Step 1 = 25%, Step 2 = 50%
   const progressPercentage = currentStep === 1 ? 25 : 50;
@@ -94,35 +97,48 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   };
 
 
-  const handleNext = () => {
-    if (currentStep < TOTAL_STEPS) {
-      // Advance to next step
+  const handleNext = async () => {
+    if (currentStep === 1) {
+      if (!firstName || !lastName || !dateOfBirth || !gender || !country) {
+        alert('Please fill in all required fields');
+        return;
+      }
       setCurrentStep(currentStep + 1);
-    } else {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        // Complete profile and navigate
-        console.log('Complete profile:', {
-          profileImage,
-          firstName,
-          lastName,
-          dateOfBirth,
-          gender,
-          country,
-          socialLinks,
-        });
-        if (onComplete) {
-          onComplete();
-        }
-        navigation.navigate('Home');
-      }, 1500);
     }
   };
 
-  const handleLetsDoIt = () => {
-    // Navigate to OnboardingRoles screen
-    navigation.navigate('OnboardingRoles');
+  const handleLetsDoIt = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) throw new Error('No user found');
+      await updateBasicProfile(user.id, {
+        first_name: firstName,
+        last_name: lastName,
+        dob: birthDate.toISOString().split('T')[0], // YYYY-MM-DD
+        gender: gender,
+        country: country,
+      });
+      
+      await updateBasicProfile(user.id, {
+        first_name: firstName,
+        last_name: lastName,
+      });
+      
+      // If the UI collects country here, maybe we should save it later or current Step ?
+      // The UI purely does "Complete Profile".
+      // I will stick to what the service allows for now (first/last) to be safe with the requested architecture.
+      
+      // Navigate to OnboardingRoles screen
+      setIsAuthenticated(true); 
+      navigation.navigate('OnboardingRoles');
+
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDoItLater = () => {
@@ -187,27 +203,27 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
           <View style={styles.formContainer}>
             <ProfileInput
               label="First Name *"
-              // value={firstName}
+              value={firstName}
               onChangeText={setFirstName}
               placeholder="Jonathan"
             />
             <ProfileInput
               label="Last Name *"
-              // value={lastName}
+              value={lastName}
               onChangeText={setLastName}
               placeholder="Haggerty"
             />
             <ProfileInput
               label="Date of birth *"
-              // value={dateOfBirth}
-              placeholder="Mar 03, 2000"
+              value={dateOfBirth}
+              placeholder="Select Date"
               editable={false}
               onPress={handleDatePickerPress}
             />
             <ProfileInput
               label="Gender *"
-              // value={gender}
-              placeholder="-"
+              value={gender}
+              placeholder="Select"
               editable={false}
               onPress={() => setShowGenderPicker(true)}
             />

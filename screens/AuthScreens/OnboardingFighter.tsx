@@ -23,6 +23,8 @@ import ProfileInput from '../../components/common/ProfileInput';
 import { Rail, RailSelected, Thumb } from '../../components/common/SliderComponents';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { supabase } from '@/lib/supabase';
+import { saveFighterProfile, completeOnboarding, saveContactInfo, addFighterMatch } from '@/lib/services/onboardingService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -60,22 +62,69 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
     }
   };
 
-  const handleComplete = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Complete fighter profile:', {
-        profileImage,
-        weightDivision,
-        weightRange,
-        height,
+  // Handler for Contact Sheet Save
+  const handleSaveContact = async (data: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await saveContactInfo(user.id, data);
+      // alert('Contact info saved');
+    } catch (error) {
+      console.error(error);
+      alert('Error saving contact info');
+    }
+  };
+
+  // Handler for Match Sheet Save
+  const handleSaveMatch = async (data: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await addFighterMatch(user.id, data);
+      // alert('Match added');
+    } catch (error) {
+      console.error(error);
+      alert('Error adding match');
+    }
+  };
+
+  const handleComplete = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("No user found");
+        return;
+      }
+
+      // 1. Save Fighter Profile
+      await saveFighterProfile(user.id, {
+        weight_range: weightRange,
+        // weight_division: weightDivision, // Note: Schema in Step 143 didn't expressly key "weight_division", check prompt schema. 
+        // Prompt Schema: "fighter_profiles ... weight_range, weight_kg".
+        // UI has "Weight Division" (63.5kg) AND "Weight Range" (2.0kg).
+        // I'll map "Weight Division" to "weight_kg" as that seems to be the target weight.
+        weight_kg: parseFloat(weightDivision),
+        height_cm: parseInt(height),
         gym,
+        country: 'England', // Hardcoded per UI "ENG" flag or ideally state, leaving as placeholder or 'England' per UI default.
       });
+
+      // 2. Mark Onboarding Complete
+      await completeOnboarding(user.id);
+
+      // 3. Navigate
       if (onComplete) {
         onComplete();
       }
       setIsAuthenticated(true);
-    }, 1500);
+
+    } catch (error: any) {
+      console.error(error);
+      alert('Failed to save profile: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -373,8 +422,8 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             />
           </View>
         </ScrollView>
-        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
-        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
+        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} onSave={handleSaveContact} />
+        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} onSave={handleSaveMatch} />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />
     </View>

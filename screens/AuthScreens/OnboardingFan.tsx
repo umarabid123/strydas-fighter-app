@@ -19,6 +19,8 @@ import AppText from '../../components/common/AppText';
 import Toggle from '../../components/common/Toggle';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { saveFanProfile, completeOnboarding } from '@/lib/services/onboardingService';
+import { supabase } from '@/lib/supabase';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -53,20 +55,36 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
     }
   };
 
-  const handleComplete = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Complete fan profile:', {
-        profileImage,
-        notificationsEnabled,
-        locationEnabled,
+  const handleComplete = async () => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("No user found");
+        return;
+      }
+
+      // 1. Save Fan Profile
+      await saveFanProfile(user.id, {
+        allow_notifications: notificationsEnabled,
+        allow_location: locationEnabled,
       });
+
+      // 2. Mark Onboarding as Complete
+      await completeOnboarding(user.id);
+
+      // 3. Navigate & Authenticate
       if (onComplete) {
         onComplete();
       }
       setIsAuthenticated(true);
-    }, 1500);
+
+    } catch (error: any) {
+      console.error(error);
+      alert('Failed to save profile: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
