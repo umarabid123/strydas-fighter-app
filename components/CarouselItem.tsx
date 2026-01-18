@@ -1,7 +1,7 @@
 import { Colors } from '@/constant';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import AppText from './common/AppText';
 
 export default function CarouselItem({
@@ -9,28 +9,31 @@ export default function CarouselItem({
   size = 173,
   borderRadius = 16,
   style = {},
+  onPress = () => { },
 }) {
   return (
-    <View style={styles.carouselItem}>
-      <Image
-        source={item.image}
-        style={styles.carouselImage}
-        resizeMode="cover"
-      />
-      <LinearGradient
-        colors={['transparent', '#AC1746']}
-        style={styles.gradientOverlay}
-      />
-      <View style={styles.carouselContent}>
-        <AppText
-          text={item.title}
-          fontSize={17}
-          color={Colors.white}
-          fontName="CircularStd-Bold"
-          style={styles.carouselTitle}
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <View style={styles.carouselItem}>
+        <Image
+          source={item.image}
+          style={styles.carouselImage}
+          resizeMode="cover"
         />
+        <LinearGradient
+          colors={['transparent', '#AC1746']}
+          style={styles.gradientOverlay}
+        />
+        <View style={styles.carouselContent}>
+          <AppText
+            text={item.title}
+            fontSize={17}
+            color={Colors.white}
+            fontName="CircularStd-Bold"
+            style={styles.carouselTitle}
+          />
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

@@ -176,7 +176,19 @@ export default function DiscoverScreen() {
           contentContainerStyle={{ paddingHorizontal: 20, marginTop: 40 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({ item }) => (
-            <CarouselItem item={item} />
+            <CarouselItem
+              item={item}
+              onPress={() => {
+                if (item.title === 'Events') {
+                  navigation.navigate('Event');
+                } else if (item.title === 'Fighters') {
+                  navigation.navigate('FighterScreen');
+                } else if (item.title === 'Gyms') {
+                  // Navigate to Gyms screen when available
+                  console.log('Navigate to Gyms');
+                }
+              }}
+            />
           )}
         />
       </View>

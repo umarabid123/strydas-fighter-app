@@ -1,4 +1,5 @@
 import CarouselItem from '@/components/CarouselItem'
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { Dimensions, FlatList, Platform, ScrollView, StyleSheet, View } from 'react-native'
 import AppText from '../components/common/AppText'
@@ -86,6 +87,8 @@ const carouselData = [
 
 
 export default function EventScreen() {
+  const navigation = useNavigation<any>();
+
   return (
     <View style={styles.container}>
       <Header
@@ -117,7 +120,20 @@ export default function EventScreen() {
             contentContainerStyle={{ paddingHorizontal: 0 }}
             ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
             renderItem={({ item }) => (
-              <CarouselItem item={item} />
+              <CarouselItem
+                item={item}
+                onPress={() => {
+                  if (item.title === 'Events') {
+                    // Already on Events screen
+                    console.log('Already on Events');
+                  } else if (item.title === 'Fighters') {
+                    navigation.navigate('FighterScreen');
+                  } else if (item.title === 'Gyms') {
+                    // Navigate to Gyms screen when available
+                    console.log('Navigate to Gyms');
+                  }
+                }}
+              />
             )}
           />
         </View>
