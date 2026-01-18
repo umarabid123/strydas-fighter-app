@@ -17,6 +17,7 @@ import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { supabase } from '@/lib/supabase';
 import { useRoute } from '@react-navigation/native';
+import { useAuth } from '../../navigation';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface VerifyProps {
@@ -33,7 +34,11 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   const [errorMessage, setErrorMessage] = useState('');
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const route = useRoute();
-  const email = route.params?.email;
+  const { setIsAuthenticated } = useAuth();
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const params = route.params as any;
+  const email = params?.email;
+  const isProfileComplete = params?.isProfileComplete;
 
   const handleCodeChange = async (text: string, index: number) => {
     setErrorMessage('')
@@ -70,7 +75,11 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
         }
 
         // ✅ Logged in successfully
-        navigation.replace('CompleteProfile')
+        if (isProfileComplete) {
+          setIsAuthenticated(true);
+        } else {
+          navigation.replace('CompleteProfile');
+        }
         onVerifyComplete?.()
 
       } catch (err) {
