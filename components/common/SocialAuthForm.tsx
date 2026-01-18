@@ -13,6 +13,7 @@ import AppButton from './AppButton';
 import AppText from './AppText';
 import CustomIconButton from './CustomIconButton';
 import Divider from './Divider';
+import { supabase } from '@/lib/supabase';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -35,6 +36,7 @@ interface SocialAuthFormProps {
   socialButtonTextSize?: number;
   titleContainerMarginBottom?: number;
   titleContainerMarginTop?: number;
+  error?: string;
 }
 
 export default function SocialAuthForm({
@@ -54,6 +56,7 @@ export default function SocialAuthForm({
   socialButtonPadding = Spacing.lg,
   socialButtonTextSize = Typography.fontSize.md,
   titleContainerMarginBottom = Spacing.xxl,
+  error,
 }: SocialAuthFormProps) {
   const handleGoogleAuth = () => {
     console.log('Google auth');
@@ -66,6 +69,8 @@ export default function SocialAuthForm({
   const handleFacebookAuth = () => {
     console.log('Facebook auth');
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -158,6 +163,15 @@ export default function SocialAuthForm({
                 onChangeText={onEmailChange}
               />
             </View>
+            {error ? (
+              <AppText
+                text={error}
+                fontSize={Typography.fontSize.sm}
+                fontName="CircularStd-Book"
+                color={Colors.errorRed}
+                style={{ marginTop: 8, paddingHorizontal: Spacing.xs }}
+              />
+            ) : null}
           </View>
         </ScrollView>
 

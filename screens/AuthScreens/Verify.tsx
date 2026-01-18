@@ -1,6 +1,6 @@
-import type { NavigationProp } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   KeyboardAvoidingView,
@@ -15,7 +15,8 @@ import {
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
-
+import { supabase } from '@/lib/supabase';
+import { useRoute } from '@react-navigation/native';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface VerifyProps {
@@ -23,48 +24,62 @@ interface VerifyProps {
 }
 
 export default function Verify({ onVerifyComplete }: VerifyProps) {
-  const navigation = useNavigation<NavigationProp<any>>();
+  const navigation = useNavigation<StackNavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const [code, setCode] = useState(['', '', '', '']);
+  const [code, setCode] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
   const inputRefs = useRef<(TextInput | null)[]>([]);
+  const route = useRoute();
+  const email = route.params?.email;
 
-  const handleCodeChange = (text: string, index: number) => {
-    // Only allow single character (numbers or letters)
-    if (text.length > 1) {
-      text = text.slice(-1).toUpperCase();
-    } else {
-      text = text.toUpperCase();
+  const handleCodeChange = async (text: string, index: number) => {
+    setErrorMessage('')
+    // Allow only ONE digit
+    const value = text.replace(/[^0-9]/g, '').slice(-1)
+
+    const newCode = [...code]
+    newCode[index] = value
+    setCode(newCode)
+
+    // Move focus forward
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus()
     }
 
-    const newCode = [...code];
-    newCode[index] = text;
-    setCode(newCode);
+    // Auto-verify when last digit entered
+    if (value && index === 5) {
+      const fullCode = newCode.join('')
 
-    // Auto-focus next input
-    if (text && index < 3) {
-      inputRefs.current[index + 1]?.focus();
-    }
+      if (fullCode.length !== 6) return
 
-    // Auto-verify when all 4 digits are entered
-    if (text && index === 3) {
-      const fullCode = newCode.join('');
-      if (fullCode.length === 4) {
-        setIsLoading(true);
-        setTimeout(() => {
-          setIsLoading(false);
-          // Handle verification logic
-          console.log('Verify code:', fullCode);
-          // Navigate to CompleteProfile after verification
-          navigation.navigate('CompleteProfile');
-          if (onVerifyComplete) {
-            onVerifyComplete();
-          }
-        }, 1500);
+      try {
+        setIsLoading(true)
+
+        const { data, error } = await supabase.auth.verifyOtp({
+          email,
+          token: fullCode,
+          type: 'email',
+        })
+
+        if (error) {
+          setErrorMessage('Invalid or expired code')
+          return
+        }
+
+        // ✅ Logged in successfully
+        navigation.replace('CompleteProfile')
+        onVerifyComplete?.()
+
+      } catch (err) {
+        setErrorMessage('Something went wrong')
+      } finally {
+        setIsLoading(false)
       }
     }
-  };
+  }
 
   const handleKeyPress = (key: string, index: number) => {
     if (key === 'Backspace' && !code[index] && index > 0) {
@@ -72,9 +87,36 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
     }
   };
 
-  const handleResend = () => {
-    // Handle resend code logic
-    console.log('Resend code');
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timer = setTimeout(() => setResendCountdown(resendCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCountdown]);
+
+  const handleResend = async () => {
+    if (resendCountdown > 0) return;
+
+    if (!email) {
+      alert('Email not found');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOtp({ email });
+
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Code resent successfully');
+        setResendCountdown(60);
+      }
+    } catch (err) {
+      alert('Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -106,7 +148,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                 style={styles.title}
               />
               <AppText
-                text="Enter the 4 digits sent to your inbox."
+                text="Enter the 6 digits sent to your inbox."
                 fontSize={Typography.fontSize.md}
                 fontName="CircularStd-Book"
                 color={Colors.textSecondary}
@@ -145,6 +187,16 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                 </View>
               ))}
             </View>
+            {errorMessage ? (
+              <AppText
+                text={errorMessage}
+                fontSize={Typography.fontSize.sm}
+                fontName="CircularStd-Book"
+                color={Colors.errorRed}
+                textAlign="center"
+                style={{ marginTop: Spacing.sm }}
+              />
+            ) : null}
           </View>
           {/* Resend Section */}
           <View style={styles.resendContainer}>
@@ -157,12 +209,16 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
               style={styles.resendText}
             />
             <TouchableOpacity
-              style={styles.resendButton}
+              style={[
+                styles.resendButton,
+                resendCountdown > 0 && { opacity: 0.5 }
+              ]}
               onPress={handleResend}
               activeOpacity={0.8}
+              disabled={resendCountdown > 0}
             >
               <AppText
-                text="Resend code"
+                text={resendCountdown > 0 ? `Resend code (${resendCountdown}s)` : "Resend code"}
                 fontSize={Typography.fontSize.md}
                 fontName="CircularStd-Medium"
                 color={colors.white}
@@ -236,7 +292,7 @@ const styles = StyleSheet.create({
   codeContainer: {
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     flexDirection: 'row',
-    gap: Spacing.md,
+    gap: Spacing.sm,
     justifyContent: 'center',
     marginBottom: Spacing.xxl,
   },
@@ -244,10 +300,10 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    minWidth: (79.25 / DESIGN_WIDTH) * SCREEN_WIDTH,
-    minHeight: (79.25 / DESIGN_WIDTH) * SCREEN_WIDTH,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    minWidth: (48 / DESIGN_WIDTH) * SCREEN_WIDTH,
+    minHeight: (48 / DESIGN_WIDTH) * SCREEN_WIDTH,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -262,7 +318,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   codeInput: {
-    fontSize: Typography.fontSize.xxl,
+    fontSize: Typography.fontSize.xl,
     fontFamily: 'Inter',
     fontWeight: Typography.fontWeight.normal,
     color: Colors.white,
