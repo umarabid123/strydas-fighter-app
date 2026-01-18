@@ -56,6 +56,7 @@ const DrawerNavigator = () => {
                 },
                 drawerType: 'front',
                 overlayColor: 'rgba(0,0,0,0.7)',
+                swipeEnabled: false,
             }}
             drawerContent={(props) => <CustomDrawerContent {...props} />}
         >

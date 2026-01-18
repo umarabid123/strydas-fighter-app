@@ -75,7 +75,13 @@ export default function Header({
           if (onMenuPress) {
             onMenuPress();
           } else {
-            navigation.dispatch(DrawerActions.openDrawer());
+            // Professional toggle behavior: if on Account screen, go back, otherwise navigate to Account
+            const currentRoute = route.name;
+            if (currentRoute === 'Account') {
+              navigation.goBack();
+            } else {
+              navigation.navigate('Account');
+            }
           }
         }}>
           <View style={styles.hamburgerIcon}>

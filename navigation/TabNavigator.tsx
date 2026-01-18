@@ -2,7 +2,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import BottomTabs from '../components/common/BottomTabs';
-import MyProfile from '../screens/MyProfile';
+import Menu from '../screens/Menu/Menu';
 import DiscoverNavigator from './DicoverNavigator';
 import HomeNavigator from './HomeNavigator';
 
@@ -20,7 +20,7 @@ const TabNavigator = () => {
           } else if (route.name === 'Discover') {
             icon = require('../assets/images/explore-icon.png');
           } else {
-            icon = require('../assets/images/profile-image-icon.png');
+            icon = require('../assets/images/profile-image-icon.png'); // You might want to update this icon to match the 'Account' concept if needed, or keep profile icon
           }
           return {
             id: route.name,
@@ -50,7 +50,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeNavigator} />
       <Tab.Screen name="Discover" component={DiscoverNavigator} />
-      <Tab.Screen name="My Profile" component={MyProfile} />
+      <Tab.Screen name="Account" component={Menu} />
     </Tab.Navigator>
   );
 };
