@@ -9,7 +9,7 @@ export default function SearchSection({
   subtitle = "",
   placeholder = "Search",
   searchValue = "",
-  onSearchChange = () => { },
+  onSearchChange = (value: string) => { },
   onFilterPress = () => { },
   searchIcon = require("../../assets/images/search-icon.png"),
   filterIcon = require("../../assets/images/search-filter-icon.png"),

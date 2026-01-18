@@ -22,6 +22,8 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function DiscoverScreen() {
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFilterActive, setIsFilterActive] = useState(false);
 
   useEffect(() => {
     // Simulate initial data fetching
@@ -120,12 +122,49 @@ export default function DiscoverScreen() {
       weightClass: "75 kg",
     },
   ];
+
+  // Filter events based on search query
+  const filteredEvents = events.filter(event => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      event.title.toLowerCase().includes(query) ||
+      event.subtitle.toLowerCase().includes(query)
+    );
+  });
+
+  // Filter fighters based on search query
+  const filteredFighters = fighters.filter(fighter => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      fighter.fighterName.toLowerCase().includes(query) ||
+      fighter.discipline.toLowerCase().includes(query) ||
+      fighter.countryCode.toLowerCase().includes(query)
+    );
+  });
+
+  // Apply additional filter logic when filter is active
+  const finalEvents = isFilterActive
+    ? filteredEvents.filter(event => event.title.includes('Muay Thai')) // Example: show only Muay Thai events when filtered
+    : filteredEvents;
+
+  const finalFighters = isFilterActive
+    ? filteredFighters.filter(fighter => fighter.discipline === 'Muay Thai') // Example: show only Muay Thai fighters when filtered
+    : filteredFighters;
+
   const navigation = useNavigation<any>();
   return (
     <View style={styles.container}>
       <Header />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <SearchSection title='Discover' subtitle='Browser fighters and events world wide.' />
+        <SearchSection
+          title='Discover'
+          subtitle='Browser fighters and events world wide.'
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          onFilterPress={() => setIsFilterActive(!isFilterActive)}
+        />
 
         <View style={{ height: 220 }}>
           <FlatList
@@ -151,7 +190,7 @@ export default function DiscoverScreen() {
           />
 
           <FlatList
-            data={events}
+            data={finalEvents}
             keyExtractor={item => item.id}
             scrollEnabled={false}
             contentContainerStyle={{ paddingTop: 16 }}
@@ -178,7 +217,7 @@ export default function DiscoverScreen() {
           />
 
           <FlatList
-            data={fighters}
+            data={finalFighters}
             showsVerticalScrollIndicator={false}
             keyExtractor={item => item.id}
             contentContainerStyle={{
