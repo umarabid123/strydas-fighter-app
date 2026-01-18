@@ -42,7 +42,7 @@ export default function BottomTabs({
                 source={tab.icon}
                 style={{ width: 32, height: 32, tintColor: activeTab === tab.id ? Colors.successGreen : Colors.white }}
                 resizeMode="contain"
-              />s
+              />
 
               <AppText
                 text={tab.label}
