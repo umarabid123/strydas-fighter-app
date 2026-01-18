@@ -250,6 +250,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                     renderThumb={() => <Thumb />}
                     renderRail={() => <Rail />}
                     renderRailSelected={() => <RailSelected />}
+                    renderLowValue={() => null}
 
                   />
                 </View>
