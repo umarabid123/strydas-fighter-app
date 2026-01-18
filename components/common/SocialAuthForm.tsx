@@ -176,18 +176,16 @@ export default function SocialAuthForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: Colors.black,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    width: '100%',
   },
   keyboardView: {
     flex: 1,
   },
   progressContainer: {
     position: 'absolute',
-    top: (60 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
-    left: (SCREEN_WIDTH - (196.5 / DESIGN_WIDTH) * SCREEN_WIDTH) / 2,
-    width: (196.5 / DESIGN_WIDTH) * SCREEN_WIDTH,
+    top: '7%', // approx 60/852
+    left: '25%', // (100% - 50%) / 2
+    width: '50%', // 196.5/393
     height: 4,
     borderRadius: 30,
     zIndex: 10,
@@ -210,24 +208,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: (20 / DESIGN_WIDTH) * SCREEN_WIDTH,
-    paddingBottom: (200 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
-    paddingTop: (100 / DESIGN_HEIGHT) * SCREEN_HEIGHT, // Added padding for top spacing
+    paddingHorizontal: '5%', // 20/393
+    paddingBottom: '25%', // 200/852 approx, ensuring enough space for button
+    paddingTop: '15%', // 100/852 approx 11.7% -> increased slightly for safety
+    flexGrow: 1,
   },
   titleContainer: {
-    width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
+    width: '84%', // 329/393
+    maxWidth: 500, // Limit width on large screens
     alignItems: 'center',
-    gap: Spacing.sm, // Increased gap slightly
+    gap: Spacing.sm,
     alignSelf: 'center',
   },
   title: {
     width: '100%',
     letterSpacing: -0.48,
-    lineHeight: 32, // Added line height
+    lineHeight: 32,
   },
   subtitle: {
     width: '100%',
-    opacity: 0.8, // Slight opacity adjustment
+    opacity: 0.8,
     lineHeight: 22,
   },
   socialButtonsContainer: {
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: BorderRadius.md, // Increased border radius
+    borderRadius: BorderRadius.md,
     backgroundColor: 'transparent',
   },
   socialButtonText: {
@@ -255,9 +255,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.lg,
-    paddingVertical: 12, // Fixed padding
-    gap: 4, // Smaller gap between label and input
-    height: 64, // Taller input container
+    paddingVertical: 12,
+    gap: 4,
+    height: 64,
     justifyContent: 'center',
   },
   inputLabel: {
@@ -266,15 +266,15 @@ const styles = StyleSheet.create({
   },
   input: {
     fontWeight: Typography.fontWeight.light,
-    color: 'rgba(255, 255, 255, 0.8)', // Brighter text
+    color: 'rgba(255, 255, 255, 0.8)',
     padding: 0,
-    height: 24, // Fixed height for input text
+    height: 24,
   },
   nextButton: {
     position: 'absolute',
-    bottom: (50 / DESIGN_HEIGHT) * SCREEN_HEIGHT, // Adjusted bottom position
-    left: (SCREEN_WIDTH - (120 / DESIGN_WIDTH) * SCREEN_WIDTH) / 2,
-    width: (120 / DESIGN_WIDTH) * SCREEN_WIDTH,
+    bottom: '6%', // 50/852
+    alignSelf: 'center', // Replaces left calculation
+    width: '30%', // 120/393
     minWidth: 120,
     height: 51,
     backgroundColor: Colors.white,
