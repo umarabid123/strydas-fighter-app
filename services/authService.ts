@@ -133,6 +133,7 @@ export const authService = {
       if (isNewUser && data.user) {
         try {
           await profileService.createProfile({
+            id: data.user.id, // Use auth user's ID to ensure consistency
             email: data.user.email || email,
             first_name: null,
             last_name: null,
@@ -372,6 +373,7 @@ export const authService = {
       if (isNewUser && data.user) {
         try {
           await profileService.createProfile({
+            id: data.user.id, // Use auth user's ID to ensure consistency
             email: data.user.email || '',
             first_name: null,
             last_name: null,

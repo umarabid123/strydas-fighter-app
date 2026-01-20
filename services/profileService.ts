@@ -32,7 +32,6 @@ export const profileService = {
         social_links (*),
         contact_info (*),
         sports_records (*),
-        managed_fighters (*),
         sports_of_interest (*)
       `)
       .eq('id', id)
@@ -69,7 +68,12 @@ export const profileService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === 'PGRST116') {
+        throw new Error(`Profile with ID ${id} not found. Please complete your profile first.`);
+      }
+      throw error;
+    }
     return data;
   },
 

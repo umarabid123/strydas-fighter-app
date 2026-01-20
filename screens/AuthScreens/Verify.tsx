@@ -15,7 +15,7 @@ import {
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
-import { authService } from '../../services/authService';
+import { authService, checkOnboardingStatus } from '../../services/authService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -35,7 +35,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const [code, setCode] = useState(['', '', '', '', '', '', '']); // 6 digits now
+  const [code, setCode] = useState(['', '', '', '', '', '']); // 6 digits
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -88,8 +88,8 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
           navigation.navigate('CompleteProfile');
         } else {
           // Existing user - check if onboarding completed
-          const hasCompletedOnboarding = await authService.checkOnboardingStatus(result.user?.id || '');
-          
+          const hasCompletedOnboarding = await checkOnboardingStatus(result.user?.id || '');
+
           if (hasCompletedOnboarding) {
             // Onboarding done - go to Welcome screen (role selection) or Home
             navigation.navigate('Welcome');
@@ -297,18 +297,17 @@ const styles = StyleSheet.create({
   codeContainer: {
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     flexDirection: 'row',
-    gap: Spacing.md,
-    justifyContent: 'center',
+    gap: Spacing.sm,
+    justifyContent: 'space-between',
     marginBottom: Spacing.xxl,
   },
   codeInputWrapper: {
     aspectRatio: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    minWidth: (50 / DESIGN_WIDTH) * SCREEN_WIDTH,
-    minHeight: (50 / DESIGN_WIDTH) * SCREEN_HEIGHT,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    width: (44 / DESIGN_WIDTH) * SCREEN_WIDTH,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -13,7 +13,7 @@ import AppText from '../components/common/AppText';
 import Header from '../components/common/Header';
 import NextFightCard from '../components/NextFightCard';
 import { Colors } from '../constant';
-import { profileService } from '../services/profileService';
+import { profileService, fightersManagedService } from '../services/profileService';
 import { ProfileWithRelations } from '../lib/types';
 
 
@@ -47,6 +47,7 @@ const ProfileRow = ({ label, value, children, labelStyle }: any) => (
 export default function MyProfile() {
     const navigation = useNavigation<any>()
     const [profile, setProfile] = useState<ProfileWithRelations | null>(null);
+    const [managedFighters, setManagedFighters] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -59,6 +60,12 @@ export default function MyProfile() {
             const profileId = 'default-profile-id'; // Replace with actual profile ID
             const data = await profileService.getProfileById(profileId);
             setProfile(data);
+
+            // If profile is an organizer, load managed fighters
+            if (data?.role === 'organizer') {
+                const fighters = await fightersManagedService.getFightersByOrganizerId(profileId);
+                setManagedFighters(fighters);
+            }
         } catch (error) {
             console.error('Error loading profile:', error);
         } finally {
@@ -192,25 +199,27 @@ export default function MyProfile() {
 
                 <View style={styles.divider} />
 
-                {/* Manager Section - Show if profile is a fighter with an organizer */}
-                {profile?.managed_fighters && profile.managed_fighters.length > 0 && (
+                {/* Manager Section - Show if profile is an organizer with managed fighters */}
+                {profile?.role === 'organizer' && managedFighters.length > 0 && (
                     <>
                         <View style={styles.divider} />
                         <TouchableOpacity style={styles.section} onPress={() => navigation.navigate('OrganizerScreen')}>
                             <AppText text="Manager" fontSize={18} color={Colors.white} style={styles.sectionTitle} />
-                            {/* Display organizer info from managed_fighters relation */}
-                            {profile.managed_fighters.map((relation) => (
+                            {/* Display organizer info from managed fighters */}
+                            {managedFighters.map((relation) => (
                                 <View key={relation.id} style={styles.managerCard}>
                                     <Image source={require('../assets/images/profile-img.png')} style={styles.managerAvatar} />
                                     <View>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingBottom: 8 }}>
                                             <AppText 
-                                                text={relation.fighter_id} 
+                                                text={`${relation.fighter?.first_name || ''} ${relation.fighter?.last_name || ''}`}
                                                 fontSize={18} 
                                                 color={Colors.white} 
                                                 style={{ fontWeight: '600' }} 
                                             />
-                                            <Image source={require('../assets/images/flag-icon.png')} style={styles.flagIconSmall} />
+                                            {relation.fighter?.country && (
+                                                <Image source={require('../assets/images/flag-icon.png')} style={styles.flagIconSmall} />
+                                            )}
                                         </View>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                             <AppText 

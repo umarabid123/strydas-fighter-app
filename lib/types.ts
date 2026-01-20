@@ -77,6 +77,83 @@ export interface ProfileWithRelations extends Profile {
   social_links?: SocialLink[];
   contact_info?: ContactInfo[];
   sports_records?: SportsRecord[];
-  managed_fighters?: FighterManaged[];
+  fighters_managed?: FighterManaged[];
   sports_of_interest?: SportOfInterest[];
+}
+
+// Event and Match Types
+export interface Event {
+  id: string;
+  organizer_id: string;
+  title: string;
+  description?: string;
+  event_date: string;
+  event_time?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  image_url?: string;
+  website_url?: string;
+  instagram_url?: string;
+  ticket_url?: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Match {
+  id: string;
+  event_id: string;
+  sport_type: string;
+  match_type: string;
+  weight_class?: string;
+  description?: string;
+  status: string;
+  fighter_a_id?: string;
+  fighter_b_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EventApplication {
+  id: string;
+  match_id: string;
+  fighter_id: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  applied_at: string;
+  updated_at: string;
+}
+
+export interface EventWithMatches extends Event {
+  matches?: Match[];
+  organizer?: Profile;
+}
+
+export interface MatchWithApplications extends Match {
+  applications?: EventApplication[];
+  fighter_a?: Profile;
+  fighter_b?: Profile;
+}
+
+export interface CreateEventInput {
+  title: string;
+  description?: string;
+  event_date: string;
+  event_time?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  image_url?: string;
+  website_url?: string;
+  instagram_url?: string;
+  ticket_url?: string;
+  tags?: string[];
+}
+
+export interface CreateMatchInput {
+  event_id: string;
+  sport_type: string;
+  match_type: string;
+  weight_class?: string;
+  description?: string;
 }
