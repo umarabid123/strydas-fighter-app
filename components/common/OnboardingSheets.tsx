@@ -10,10 +10,10 @@ import SelectPicker from './SelectPicker';
 
 // Mock data for Fighters
 const AVAILABLE_FIGHTERS = [
-    { id: '1', name: 'Jaspar Landal', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
-    { id: '2', name: 'Niclas R. Larsen', record: '24-8-1', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'MMA', avatar: require('../../assets/images/profile-image-icon.png') },
-    { id: '3', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
-    { id: '4', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', name: 'Jaspar Landal', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '2b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', name: 'Niclas R. Larsen', record: '24-8-1', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'MMA', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '3b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
+    { id: '4b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
 ];
 
 export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave?: (data: any) => void }) => {
