@@ -20,6 +20,7 @@ import DatePickerModal from '../../components/common/DatePickerModal';
 import ProfileInput from '../../components/common/ProfileInput';
 import SelectPicker from '../../components/common/SelectPicker';
 import { BorderRadius, Colors, CountryOptions, DESIGN_HEIGHT, DESIGN_WIDTH, GenderOptions, MonthNames, Spacing, Typography } from '../../constant';
+import { profileService, socialLinksService } from '../../services/profileService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -94,15 +95,42 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   };
 
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < TOTAL_STEPS) {
       // Advance to next step
       setCurrentStep(currentStep + 1);
     } else {
       setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        // Complete profile and navigate
+      try {
+        // TODO: Get profile ID from auth context or storage
+        const profileId = 'default-profile-id'; // Replace with actual profile ID
+
+        // Update basic profile info
+        await profileService.updateBasicInfo(profileId, {
+          first_name: firstName,
+          last_name: lastName,
+          date_of_birth: birthDate.toISOString(),
+          gender: gender,
+          country: country,
+        });
+
+        // Add social links
+        for (const link of socialLinks) {
+          if (link.platform && link.url) {
+            await socialLinksService.addSocialLink({
+              profile_id: profileId,
+              platform: link.platform,
+              url: link.url,
+            });
+          }
+        }
+
+        // TODO: Upload profile image to Supabase Storage and get URL
+        if (profileImage) {
+          // const imageUrl = await uploadProfileImage(profileId, profileImage);
+          // await profileService.updateBasicInfo(profileId, { profile_image_url: imageUrl });
+        }
+
         console.log('Complete profile:', {
           profileImage,
           firstName,
@@ -112,11 +140,17 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
           country,
           socialLinks,
         });
+
         if (onComplete) {
           onComplete();
         }
         navigation.navigate('Home');
-      }, 1500);
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        alert('Failed to save profile. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 

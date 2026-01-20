@@ -18,6 +18,7 @@ import AppText from '../../components/common/AppText';
 import { AddFighterSheet, ContactSheet } from '../../components/common/OnboardingSheets';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { profileService, contactInfoService, fightersManagedService } from '../../services/profileService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -52,20 +53,40 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // TODO: Get profile ID from auth context or storage
+      const profileId = 'default-profile-id'; // Replace with actual profile ID
+
+      // Update organizer profile
+      await profileService.updateOrganizerProfile(profileId, {
+        job_title: jobTitle,
+        organisation: organisation,
+      });
+
+      // TODO: Add contact info when ContactSheet returns data
+      // TODO: Add managed fighters when AddFighterSheet returns data
+
+      // Mark onboarding as complete
+      await profileService.completeOnboarding(profileId);
+
       console.log('Complete organizer profile:', {
         profileImage,
         jobTitle,
         organisation,
       });
+
       if (onComplete) {
         onComplete();
       }
-      setIsAuthenticated(true)
-    }, 1500);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error saving organizer profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
