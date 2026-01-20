@@ -13,6 +13,7 @@ import AppButton from './AppButton';
 import AppText from './AppText';
 import CustomIconButton from './CustomIconButton';
 import Divider from './Divider';
+import { authService } from '../../services/authService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -55,16 +56,64 @@ export default function SocialAuthForm({
   socialButtonTextSize = Typography.fontSize.md,
   titleContainerMarginBottom = Spacing.xxl,
 }: SocialAuthFormProps) {
-  const handleGoogleAuth = () => {
-    console.log('Google auth');
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleGoogleAuth = async () => {
+    setIsLoading(true);
+    try {
+      const result = await authService.signInWithGoogle();
+      
+      if (result.success) {
+        console.log('Google auth successful');
+        // Note: OAuth flow requires callback handling
+        // The auth state will be handled by the auth listener
+      } else {
+        alert(result.error || 'Failed to sign in with Google');
+      }
+    } catch (error) {
+      console.error('Google auth error:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAppleAuth = () => {
-    console.log('Apple auth');
+  const handleAppleAuth = async () => {
+    setIsLoading(true);
+    try {
+      const result = await authService.signInWithApple();
+      
+      if (result.success) {
+        console.log('Apple auth successful');
+        // Note: OAuth flow requires callback handling
+      } else {
+        alert(result.error || 'Failed to sign in with Apple');
+      }
+    } catch (error) {
+      console.error('Apple auth error:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleFacebookAuth = () => {
-    console.log('Facebook auth');
+  const handleFacebookAuth = async () => {
+    setIsLoading(true);
+    try {
+      const result = await authService.signInWithFacebook();
+      
+      if (result.success) {
+        console.log('Facebook auth successful');
+        // Note: OAuth flow requires callback handling
+      } else {
+        alert(result.error || 'Failed to sign in with Facebook');
+      }
+    } catch (error) {
+      console.error('Facebook auth error:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -117,6 +166,7 @@ export default function SocialAuthForm({
                 textStyle={[styles.socialButtonText, { fontSize: socialButtonTextSize }]}
                 iconStyle={styles.socialIcon}
                 onPress={handleGoogleAuth}
+                disabled={isLoading}
               />
               <CustomIconButton
                 text="Continue with Apple"
@@ -125,6 +175,7 @@ export default function SocialAuthForm({
                 textStyle={[styles.socialButtonText, { fontSize: socialButtonTextSize }]}
                 iconStyle={styles.socialIcon}
                 onPress={handleAppleAuth}
+                disabled={isLoading}
               />
               <CustomIconButton
                 text="Continue with Facebook"
@@ -133,6 +184,7 @@ export default function SocialAuthForm({
                 textStyle={[styles.socialButtonText, { fontSize: socialButtonTextSize }]}
                 iconStyle={styles.socialIcon}
                 onPress={handleFacebookAuth}
+                disabled={isLoading}
               />
             </View>
 
@@ -156,6 +208,7 @@ export default function SocialAuthForm({
                 autoCapitalize="none"
                 value={email}
                 onChangeText={onEmailChange}
+                editable={!isLoading}
               />
             </View>
           </View>

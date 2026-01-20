@@ -21,6 +21,7 @@ import ProfileInput from '../../components/common/ProfileInput';
 import SelectPicker from '../../components/common/SelectPicker';
 import { BorderRadius, Colors, CountryOptions, DESIGN_HEIGHT, DESIGN_WIDTH, GenderOptions, MonthNames, Spacing, Typography } from '../../constant';
 import { profileService, socialLinksService } from '../../services/profileService';
+import { useAuth } from '../../navigation';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -33,6 +34,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const { user } = useAuth();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -100,13 +102,15 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
       // Advance to next step
       setCurrentStep(currentStep + 1);
     } else {
+      if (!user?.id) {
+        alert('User not authenticated. Please sign in again.');
+        return;
+      }
+
       setIsLoading(true);
       try {
-        // TODO: Get profile ID from auth context or storage
-        const profileId = 'default-profile-id'; // Replace with actual profile ID
-
         // Update basic profile info
-        await profileService.updateBasicInfo(profileId, {
+        await profileService.updateBasicInfo(user.id, {
           first_name: firstName,
           last_name: lastName,
           date_of_birth: birthDate.toISOString(),
@@ -118,7 +122,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         for (const link of socialLinks) {
           if (link.platform && link.url) {
             await socialLinksService.addSocialLink({
-              profile_id: profileId,
+              profile_id: user.id,
               platform: link.platform,
               url: link.url,
             });
@@ -127,8 +131,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
         // TODO: Upload profile image to Supabase Storage and get URL
         if (profileImage) {
-          // const imageUrl = await uploadProfileImage(profileId, profileImage);
-          // await profileService.updateBasicInfo(profileId, { profile_image_url: imageUrl });
+          // const imageUrl = await uploadProfileImage(user.id, profileImage);
+          // await profileService.updateBasicInfo(user.id, { profile_image_url: imageUrl });
         }
 
         console.log('Complete profile:', {

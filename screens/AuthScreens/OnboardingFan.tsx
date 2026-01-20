@@ -34,7 +34,7 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, user } = useAuth();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -55,19 +55,21 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
   };
 
   const handleComplete = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // TODO: Get profile ID from auth context or storage
-      const profileId = 'default-profile-id'; // Replace with actual profile ID
-
       // Update fan profile
-      await profileService.updateFanProfile(profileId, {
+      await profileService.updateFanProfile(user.id, {
         allow_notifications: notificationsEnabled,
         allow_location: locationEnabled,
       });
 
       // Mark onboarding as complete
-      await profileService.completeOnboarding(profileId);
+      await profileService.completeOnboarding(user.id);
 
       console.log('Complete fan profile:', {
         profileImage,

@@ -38,7 +38,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, user } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [weightDivision, setWeightDivision] = useState('63.5');
   const [weightRange, setWeightRange] = useState('2.0');
@@ -62,13 +62,15 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   };
 
   const handleComplete = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // TODO: Get profile ID from auth context or storage
-      const profileId = 'default-profile-id'; // Replace with actual profile ID
-
       // Update fighter profile
-      await profileService.updateFighterProfile(profileId, {
+      await profileService.updateFighterProfile(user.id, {
         weight_division: parseFloat(weightDivision),
         weight_range: parseFloat(weightRange),
         height: parseInt(height),
@@ -80,7 +82,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
       // TODO: Add sports records when MatchSheet returns data
 
       // Mark onboarding as complete
-      await profileService.completeOnboarding(profileId);
+      await profileService.completeOnboarding(user.id);
 
       console.log('Complete fighter profile:', {
         profileImage,
