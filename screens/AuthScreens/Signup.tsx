@@ -26,6 +26,15 @@ export default function SignUp({ onNext }: SignUpProps) {
     setIsLoading(true);
 
     try {
+      // Check if user exists first to prevent re-signup
+      const profile = await authService.checkUserExists(trimmedEmail);
+      if (profile) {
+        setIsLoading(false);
+        alert('User already exists. Please log in instead.');
+        // Optionally redirect to Login: navigation.navigate('Login');
+        return;
+      }
+
       const result = await authService.signUpWithOTP(trimmedEmail);
 
       setIsLoading(false);
@@ -35,7 +44,7 @@ export default function SignUp({ onNext }: SignUpProps) {
         console.log('OTP sent successfully');
         navigation.navigate('Verify', {
           email: trimmedEmail,
-          isNewUser: result.isNewUser
+          isNewUser: true // We know they are new here
         });
 
         if (onNext) {

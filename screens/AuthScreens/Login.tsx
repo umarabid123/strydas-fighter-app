@@ -26,6 +26,14 @@ export default function Login({ onSignUpPress }: LoginProps) {
     setIsLoading(true);
 
     try {
+      // Check if user exists first to prevent login for non-existent users
+      const profile = await authService.checkUserExists(trimmedEmail);
+      if (!profile) {
+        setIsLoading(false);
+        alert('User does not exist. Please create an account.');
+        return;
+      }
+
       const result = await authService.signUpWithOTP(trimmedEmail);
 
       setIsLoading(false);
@@ -35,7 +43,7 @@ export default function Login({ onSignUpPress }: LoginProps) {
         console.log('OTP sent successfully to existing user');
         navigation.navigate('Verify', {
           email: trimmedEmail,
-          isNewUser: result.isNewUser ?? false
+          isNewUser: false // We know they exist
         });
       } else {
         // Show error to user

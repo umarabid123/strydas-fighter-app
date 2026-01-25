@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { profileService } from './profileService';
+import { UserRoleEnum } from '../lib/types';
 
 /**
  * Authentication Service
@@ -49,6 +50,13 @@ export const authService = {
       return null;
     }
     return user;
+  },
+
+  /**
+   * Check if a user exists by email
+   */
+  async checkUserExists(email: string): Promise<import('../lib/types').Profile | null> {
+    return await profileService.getProfileByEmail(email);
   },
 
   /**
@@ -123,7 +131,7 @@ export const authService = {
       }
 
       // Check if user exists in our profiles table
-      const existingProfile = data.user 
+      const existingProfile = data.user
         ? await profileService.getProfileByEmail(data.user.email || '')
         : null;
 
@@ -277,7 +285,7 @@ export const authService = {
   async signOut(): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase.auth.signOut();
-      
+
       if (error) {
         console.error('Error signing out:', error.message);
         return {
@@ -363,7 +371,7 @@ export const authService = {
       }
 
       // Check if user exists in profiles
-      const existingProfile = data.user 
+      const existingProfile = data.user
         ? await profileService.getProfileByEmail(data.user.email || '')
         : null;
 
