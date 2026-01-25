@@ -90,8 +90,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: Platform.OS === 'ios' ? 16 : 6,
     flexDirection: "row",
-    width: wp(75),
-    maxWidth: wp(75),
+    flex: 1, // Make it take available space
     alignItems: "center",
   },
   searchIcon: {
