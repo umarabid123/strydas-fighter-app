@@ -22,6 +22,7 @@ import SelectPicker from '../../components/common/SelectPicker';
 import { BorderRadius, Colors, CountryOptions, DESIGN_HEIGHT, DESIGN_WIDTH, GenderOptions, MonthNames, Spacing, Typography } from '../../constant';
 import { profileService, socialLinksService } from '../../services/profileService';
 import { useAuth } from '../../navigation';
+import { CountryEnum, GenderEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -42,8 +43,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [birthDate, setBirthDate] = useState(new Date());
-  const [gender, setGender] = useState('');
-  const [country, setCountry] = useState('England');
+  const [gender, setGender] = useState<GenderEnum | ''>('');
+  const [country, setCountry] = useState<CountryEnum | ''>('');
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -105,13 +106,26 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
     setIsLoading(true);
     try {
+      let uploadedImageUrl = null;
+
+      // Upload profile image to Supabase Storage and get URL if selected
+      if (profileImage) {
+        try {
+          uploadedImageUrl = await profileService.uploadProfileImage(user.id, profileImage);
+        } catch (uploadError) {
+          console.error('Failed to upload profile image:', uploadError);
+          // Continue saving profile without image if upload fails, or handle as critical error
+        }
+      }
+
       // Update basic profile info
       await profileService.updateBasicInfo(user.id, {
         first_name: firstName,
         last_name: lastName,
         date_of_birth: birthDate.toISOString(),
-        gender: gender,
-        country: country,
+        gender: gender ? (gender as GenderEnum) : undefined,
+        country: country ? (country as CountryEnum) : undefined,
+        profile_image_url: uploadedImageUrl || undefined,
       });
 
       // Add social links
@@ -456,7 +470,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Gender"
         options={GenderOptions}
         selectedValue={gender}
-        onSelect={setGender}
+        onSelect={(val) => setGender(val as GenderEnum)}
       />
 
       {/* Country Picker Modal */}
@@ -466,7 +480,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Country"
         options={CountryOptions}
         selectedValue={country}
-        onSelect={setCountry}
+        onSelect={(val) => setCountry(val as CountryEnum)}
       />
 
       {/* Date Picker Modal */}

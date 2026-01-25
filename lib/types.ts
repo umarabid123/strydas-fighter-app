@@ -1,5 +1,84 @@
 // Database Types
-export type UserRole = 'fan' | 'fighter' | 'organizer';
+// Database Types
+export enum UserRoleEnum {
+  FAN = 'fan',
+  FIGHTER = 'fighter',
+  ORGANIZER = 'organizer',
+}
+
+export enum GenderEnum {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+  PREFER_NOT_TO_SAY = 'prefer_not_to_say',
+}
+
+export enum DivisionEnum {
+  AMATEUR = 'Amateur', // Keep capitalized if these are just strings, or check DB. Assuming strings for now as no error reported.
+  SEMI_PRO = 'Semi-Pro',
+  PRO = 'Pro',
+}
+
+export enum CountryEnum {
+  ENGLAND = 'England', // Keep capitalized for now.
+  UNITED_STATES = 'United States',
+  CANADA = 'Canada',
+  // ... (Keep the rest capitalized as they are likely text values not strict enums like gender)
+  AUSTRALIA = 'Australia',
+  GERMANY = 'Germany',
+  FRANCE = 'France',
+  SPAIN = 'Spain',
+  ITALY = 'Italy',
+  BRAZIL = 'Brazil',
+  MEXICO = 'Mexico',
+  JAPAN = 'Japan',
+  CHINA = 'China',
+  INDIA = 'India',
+  THAILAND = 'Thailand',
+  NETHERLANDS = 'Netherlands',
+  BELGIUM = 'Belgium',
+  SWEDEN = 'Sweden',
+  NORWAY = 'Norway',
+  DENMARK = 'Denmark',
+  POLAND = 'Poland',
+  PORTUGAL = 'Portugal',
+  GREECE = 'Greece',
+  TURKEY = 'Turkey',
+  RUSSIA = 'Russia',
+  SOUTH_KOREA = 'South Korea',
+  SINGAPORE = 'Singapore',
+  MALAYSIA = 'Malaysia',
+  PHILIPPINES = 'Philippines',
+  INDONESIA = 'Indonesia',
+  VIETNAM = 'Vietnam',
+  NEW_ZEALAND = 'New Zealand',
+  SOUTH_AFRICA = 'South Africa',
+  ARGENTINA = 'Argentina',
+  CHILE = 'Chile',
+  COLOMBIA = 'Colombia',
+  PERU = 'Peru',
+  VENEZUELA = 'Venezuela',
+  ECUADOR = 'Ecuador',
+  URUGUAY = 'Uruguay',
+  PARAGUAY = 'Paraguay',
+  BOLIVIA = 'Bolivia',
+  COSTA_RICA = 'Costa Rica',
+  PANAMA = 'Panama',
+  GUATEMALA = 'Guatemala',
+  HONDURAS = 'Honduras',
+  EL_SALVADOR = 'El Salvador',
+  NICARAGUA = 'Nicaragua',
+  DOMINICAN_REPUBLIC = 'Dominican Republic',
+  CUBA = 'Cuba',
+  JAMAICA = 'Jamaica',
+  TRINIDAD_AND_TOBAGO = 'Trinidad and Tobago',
+  BARBADOS = 'Barbados',
+  BAHAMAS = 'Bahamas',
+  BELIZE = 'Belize',
+  GUYANA = 'Guyana',
+  SURINAME = 'Suriname',
+  OTHER = 'Other',
+}
 
 export interface Profile {
   id: string;
@@ -7,24 +86,24 @@ export interface Profile {
   first_name?: string;
   last_name?: string;
   date_of_birth?: string;
-  gender?: string;
-  country?: string;
+  gender?: GenderEnum;
+  country?: CountryEnum;
   profile_image_url?: string;
   allow_notifications: boolean;
   allow_location: boolean;
-  role: UserRole;
-  
+  role: UserRoleEnum;
+
   // Fighter-specific
   weight_division?: number;
   weight_range?: number;
   height?: number;
   gym?: string;
-  division?: string;
-  
+  division?: DivisionEnum;
+
   // Organizer-specific
   job_title?: string;
   organisation?: string;
-  
+
   onboarding_completed: boolean;
   created_at: string;
   updated_at: string;

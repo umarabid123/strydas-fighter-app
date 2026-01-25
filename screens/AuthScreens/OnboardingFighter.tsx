@@ -24,6 +24,7 @@ import { Rail, RailSelected, Thumb } from '../../components/common/SliderCompone
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
 import { profileService, contactInfoService, sportsRecordsService } from '../../services/profileService';
+import { DivisionEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -75,7 +76,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
         weight_range: parseFloat(weightRange),
         height: parseInt(height),
         gym: gym,
-        division: 'Pro', // Default to Pro, could be from user input
+        division: DivisionEnum.PRO, // Default to Pro, could be from user input
       });
 
       // TODO: Add contact info when ContactSheet returns data

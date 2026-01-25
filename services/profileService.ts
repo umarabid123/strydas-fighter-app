@@ -11,6 +11,46 @@ import {
 
 // Profile CRUD operations
 export const profileService = {
+  // Upload profile image
+  async uploadProfileImage(userId: string, fileUri: string): Promise<string> {
+    try {
+      // 1. Create a FormData object properly for React Native
+      const formData = new FormData();
+
+      // We need to infer the file type from the extension
+      const fileExt = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = `${userId}_${Date.now()}.${fileExt}`;
+      const mimeType = fileExt === 'png' ? 'image/png' : 'image/jpeg';
+
+      // @ts-ignore - React Native's FormData expects these specific fields for file uploads
+      formData.append('file', {
+        uri: fileUri,
+        name: fileName,
+        type: mimeType,
+      });
+
+      // 2. Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, formData, {
+          contentType: mimeType,
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      // 3. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      throw error;
+    }
+  },
+
   // Create a new profile
   async createProfile(profile: Partial<Profile>) {
     const { data, error } = await supabase
@@ -82,8 +122,8 @@ export const profileService = {
     first_name?: string;
     last_name?: string;
     date_of_birth?: string;
-    gender?: string;
-    country?: string;
+    gender?: import('../lib/types').GenderEnum;
+    country?: import('../lib/types').CountryEnum;
     profile_image_url?: string;
   }) {
     return this.updateProfile(id, data);
@@ -103,7 +143,7 @@ export const profileService = {
     weight_range?: number;
     height?: number;
     gym?: string;
-    division?: string;
+    division?: import('../lib/types').DivisionEnum;
   }) {
     return this.updateProfile(id, data);
   },

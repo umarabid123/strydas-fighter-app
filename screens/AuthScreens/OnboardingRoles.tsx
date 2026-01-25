@@ -18,6 +18,7 @@ import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
 import { profileService } from '../../services/profileService';
+import { UserRoleEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -25,7 +26,7 @@ interface OnboardingRolesProps {
   onComplete?: () => void;
 }
 
-type RoleType = 'fan' | 'fighter' | 'organizer';
+type RoleType = UserRoleEnum;
 
 interface RoleOption {
   id: RoleType;
@@ -39,24 +40,24 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const { setIsAuthenticated, user } = useAuth()
-  const [selectedRole, setSelectedRole] = useState<RoleType>('fan');
+  const [selectedRole, setSelectedRole] = useState<RoleType>(UserRoleEnum.FAN);
   const [isLoading, setIsLoading] = useState(false);
 
   const roles: RoleOption[] = [
     {
-      id: 'fan',
+      id: UserRoleEnum.FAN,
       title: "I'm a fan",
       subtitle: 'Just want to browse',
       icon: require('../../assets/images/user-avatar-icon.png'), // Placeholder
     },
     {
-      id: 'fighter',
+      id: UserRoleEnum.FIGHTER,
       title: "I'm a fighter",
       subtitle: 'Muay Thai, BJJ, MMA...',
       icon: require('../../assets/images/user-avatar-icon.png'), // Placeholder
     },
     {
-      id: 'organizer',
+      id: UserRoleEnum.ORGANIZER,
       title: "I'm an organizer",
       subtitle: 'Promotion, Manager, Federation...',
       icon: require('../../assets/images/user-avatar-icon.png'), // Placeholder

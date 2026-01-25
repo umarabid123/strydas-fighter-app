@@ -69,7 +69,11 @@ export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: 
     );
 };
 
-const DIVISION_OPTIONS = ['Amateur', 'Semi-Pro', 'Pro'];
+import { DivisionEnum } from '../../lib/types';
+const DIVISION_OPTIONS = Object.values(DivisionEnum).map(div => ({
+    label: div, // DivisionEnum values are capitalized strings currently.
+    value: div
+}));
 const SPORT_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing'];
 const RESULT_OPTIONS = ['Won', 'Lost', 'Draw', 'No Contest'];
 
