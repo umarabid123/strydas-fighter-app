@@ -38,10 +38,10 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState('Jonathan');
-  const [lastName, setLastName] = useState('Haggerty');
-  const [dateOfBirth, setDateOfBirth] = useState('Mar 03, 2000');
-  const [birthDate, setBirthDate] = useState(new Date(2000, 2, 3)); // March 3, 2000
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [birthDate, setBirthDate] = useState(new Date());
   const [gender, setGender] = useState('');
   const [country, setCountry] = useState('England');
   const [showGenderPicker, setShowGenderPicker] = useState(false);
@@ -97,70 +97,66 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   };
 
 
+  const saveProfile = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return false;
+    }
+
+    setIsLoading(true);
+    try {
+      // Update basic profile info
+      await profileService.updateBasicInfo(user.id, {
+        first_name: firstName,
+        last_name: lastName,
+        date_of_birth: birthDate.toISOString(),
+        gender: gender,
+        country: country,
+      });
+
+      // Add social links
+      for (const link of socialLinks) {
+        if (link.platform && link.url) {
+          await socialLinksService.addSocialLink({
+            profile_id: user.id,
+            platform: link.platform,
+            url: link.url,
+          });
+        }
+      }
+
+      console.log('Complete profile saved:', {
+        firstName,
+        lastName,
+        dateOfBirth,
+        gender,
+        country,
+        socialLinks,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to save profile. Please try again.');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleNext = async () => {
     if (currentStep < TOTAL_STEPS) {
       // Advance to next step
       setCurrentStep(currentStep + 1);
-    } else {
-      if (!user?.id) {
-        alert('User not authenticated. Please sign in again.');
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        // Update basic profile info
-        await profileService.updateBasicInfo(user.id, {
-          first_name: firstName,
-          last_name: lastName,
-          date_of_birth: birthDate.toISOString(),
-          gender: gender,
-          country: country,
-        });
-
-        // Add social links
-        for (const link of socialLinks) {
-          if (link.platform && link.url) {
-            await socialLinksService.addSocialLink({
-              profile_id: user.id,
-              platform: link.platform,
-              url: link.url,
-            });
-          }
-        }
-
-        // TODO: Upload profile image to Supabase Storage and get URL
-        if (profileImage) {
-          // const imageUrl = await uploadProfileImage(user.id, profileImage);
-          // await profileService.updateBasicInfo(user.id, { profile_image_url: imageUrl });
-        }
-
-        console.log('Complete profile:', {
-          profileImage,
-          firstName,
-          lastName,
-          dateOfBirth,
-          gender,
-          country,
-          socialLinks,
-        });
-
-        if (onComplete) {
-          onComplete();
-        }
-        navigation.navigate('Home');
-      } catch (error) {
-        console.error('Error saving profile:', error);
-        alert('Failed to save profile. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
     }
   };
 
-  const handleLetsDoIt = () => {
-    // Navigate to OnboardingRoles screen
-    navigation.navigate('OnboardingRoles');
+  const handleLetsDoIt = async () => {
+    const success = await saveProfile();
+    if (success) {
+      // Navigate to OnboardingRoles screen
+      navigation.navigate('OnboardingRoles');
+    }
   };
 
   const handleDoItLater = () => {

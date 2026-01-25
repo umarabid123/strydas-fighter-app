@@ -74,8 +74,13 @@ const SPORT_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing'];
 const RESULT_OPTIONS = ['Won', 'Lost', 'Draw', 'No Contest'];
 
 
+import DatePickerModal from './DatePickerModal';
+import { MonthNames } from '../../constant';
+
 export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
     const [date, setDate] = useState('');
+    const [matchDate, setMatchDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const [opponent, setOpponent] = useState('');
     const [event, setEvent] = useState('');
 
@@ -106,6 +111,20 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
         return '';
     };
 
+    const formatDate = (date: Date): string => {
+        const month = MonthNames[date.getMonth()];
+        const day = date.getDate().toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month} ${day}, ${year}`;
+    };
+
+    const handleDateChange = (event: any, selectedDate?: Date) => {
+        if (selectedDate) {
+            setMatchDate(selectedDate);
+            setDate(formatDate(selectedDate));
+        }
+    };
+
     return (
         <CustomBottomSheet
             visible={visible}
@@ -115,14 +134,15 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
         >
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ flexGrow: 1 }}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
             >
                 <View style={styles.form}>
                     <ProfileInput
                         label="Date of match *"
                         placeholder="Select Date"
                         value={date}
-                        onChangeText={setDate}
+                        editable={false}
+                        onPress={() => setShowDatePicker(true)}
                     />
                     <ProfileInput
                         label="Name of opponent *"
@@ -180,6 +200,14 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
                         pickerType === 'sport' ? sport :
                             pickerType === 'result' ? result : undefined
                 }
+            />
+
+            <DatePickerModal
+                visible={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+                title="Select Date of Match"
+                value={matchDate}
+                onChange={handleDateChange}
             />
         </CustomBottomSheet>
     );

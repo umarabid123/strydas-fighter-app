@@ -34,7 +34,7 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated, user } = useAuth();
+  const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -80,6 +80,7 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
       if (onComplete) {
         onComplete();
       }
+      setHasCompletedOnboarding(true);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error saving fan profile:', error);

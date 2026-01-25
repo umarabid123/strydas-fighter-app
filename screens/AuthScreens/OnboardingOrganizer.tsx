@@ -32,7 +32,7 @@ interface OnboardingOrganizerProps {
 export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerProps) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated, user } = useAuth();
+  const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState('IFMA President');
   const [organisation, setOrganisation] = useState('Keddles Gym');
@@ -82,6 +82,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
       if (onComplete) {
         onComplete();
       }
+      setHasCompletedOnboarding(true);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error saving organizer profile:', error);

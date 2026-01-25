@@ -16,6 +16,7 @@ import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { authService, checkOnboardingStatus } from '../../services/authService';
+import { profileService } from '../../services/profileService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -89,14 +90,17 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
           // New user - go to complete profile
           navigation.navigate('CompleteProfile');
         } else {
-          // Existing user - check if onboarding completed
-          const hasCompletedOnboarding = await checkOnboardingStatus(result.user?.id || '');
+          // Existing user - check profile status
+          const profile = await profileService.getProfileById(result.user?.id || '');
 
-          if (hasCompletedOnboarding) {
-            // Onboarding done - go to Welcome screen (role selection) or Home
+          if (profile?.onboarding_completed) {
+            // Onboarding done - go to Home/Welcome
             navigation.navigate('Welcome');
+          } else if (!profile?.first_name) {
+            // Profile incomplete (step 1)
+            navigation.navigate('CompleteProfile');
           } else {
-            // Onboarding not done - go to role selection
+            // Profile step 1 done, go to role selection (step 2)
             navigation.navigate('OnboardingRoles');
           }
         }

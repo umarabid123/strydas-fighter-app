@@ -38,7 +38,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated, user } = useAuth();
+  const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [weightDivision, setWeightDivision] = useState('63.5');
   const [weightRange, setWeightRange] = useState('2.0');
@@ -95,6 +95,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
       if (onComplete) {
         onComplete();
       }
+      setHasCompletedOnboarding(true);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error saving fighter profile:', error);
