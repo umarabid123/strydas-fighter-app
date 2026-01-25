@@ -15,26 +15,29 @@ export default function SignUp({ onNext }: SignUpProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleNext = async () => {
-    if (!email || !email.includes('@')) {
+    if (isLoading) return;
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
       alert('Please enter a valid email address');
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
-      const result = await authService.signUpWithOTP(email);
-      
+      const result = await authService.signUpWithOTP(trimmedEmail);
+
       setIsLoading(false);
-      
+
       if (result.success) {
         // Navigate to Verify screen with email
         console.log('OTP sent successfully');
-        navigation.navigate('Verify', { 
-          email: email,
-          isNewUser: result.isNewUser 
+        navigation.navigate('Verify', {
+          email: trimmedEmail,
+          isNewUser: result.isNewUser
         });
-        
+
         if (onNext) {
           onNext();
         }

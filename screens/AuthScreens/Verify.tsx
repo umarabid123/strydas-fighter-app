@@ -32,7 +32,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const route = useRoute<RouteProp<{ params: VerifyRouteParams }>>();
   const { email, isNewUser } = route.params || { email: '', isNewUser: false };
-  
+
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const [code, setCode] = useState(['', '', '', '', '', '']); // 6 digits
@@ -70,6 +70,8 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   };
 
   const handleVerify = async (fullCode: string) => {
+    if (isLoading) return;
+
     if (!email) {
       alert('Email address missing. Please go back and try again.');
       return;
@@ -79,10 +81,10 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
 
     try {
       const result = await authService.verifyOTP(email, fullCode);
-      
+
       if (result.success) {
         console.log('Verification successful');
-        
+
         if (result.isNewUser) {
           // New user - go to complete profile
           navigation.navigate('CompleteProfile');
@@ -118,6 +120,8 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   };
 
   const handleResend = async () => {
+    if (isLoading) return;
+
     if (!email) {
       alert('Email address missing. Please go back and try again.');
       return;
@@ -125,7 +129,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
 
     try {
       const result = await authService.resendOTP(email);
-      
+
       if (result.success) {
         alert('A new verification code has been sent to your email.');
         console.log('OTP resent successfully');

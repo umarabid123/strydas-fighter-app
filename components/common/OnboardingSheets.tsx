@@ -75,9 +75,9 @@ const RESULT_OPTIONS = ['Won', 'Lost', 'Draw', 'No Contest'];
 
 
 export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
-    const [date, setDate] = useState('Aug 04, 2025');
-    const [opponent, setOpponent] = useState('+45 12 34 56 78');
-    const [event, setEvent] = useState('+45 12 34 56 78');
+    const [date, setDate] = useState('');
+    const [opponent, setOpponent] = useState('');
+    const [event, setEvent] = useState('');
 
     const [division, setDivision] = useState('');
     const [sport, setSport] = useState('');
@@ -113,56 +113,61 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
             title="Add match"
             contentStyle={styles.sheetContent}
         >
-            <View style={styles.form}>
-                <ProfileInput
-                    label="Date of match *"
-                    placeholder="Select Date"
-                    value={date}
-                    onChangeText={setDate}
-                />
-                <ProfileInput
-                    label="Name of opponent *"
-                    placeholder="Name"
-                    value={opponent}
-                    onChangeText={setOpponent}
-                />
-                <ProfileInput
-                    label="Name of event *"
-                    placeholder="Event Name"
-                    value={event}
-                    onChangeText={setEvent}
-                />
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
+                <View style={styles.form}>
+                    <ProfileInput
+                        label="Date of match *"
+                        placeholder="Select Date"
+                        value={date}
+                        onChangeText={setDate}
+                    />
+                    <ProfileInput
+                        label="Name of opponent *"
+                        placeholder="Name"
+                        value={opponent}
+                        onChangeText={setOpponent}
+                    />
+                    <ProfileInput
+                        label="Name of event *"
+                        placeholder="Event Name"
+                        value={event}
+                        onChangeText={setEvent}
+                    />
 
-                <ProfileInput
-                    label="Division"
-                    placeholder="Select"
-                    value={division}
-                    editable={false}
-                    onPress={() => setPickerType('division')}
-                />
-                <ProfileInput
-                    label="Sport"
-                    placeholder="Select"
-                    value={sport}
-                    editable={false}
-                    onPress={() => setPickerType('sport')}
-                />
-                <ProfileInput
-                    label="Result"
-                    placeholder="Select"
-                    value={result}
-                    editable={false}
-                    onPress={() => setPickerType('result')}
-                />
-            </View>
-            <View style={styles.footer}>
-                <AppButton
-                    text="Add match"
-                    onPress={onClose}
-                    btnStyle={styles.saveButton}
-                    textStyle={styles.saveButtonText}
-                />
-            </View>
+                    <ProfileInput
+                        label="Division"
+                        placeholder="Select"
+                        value={division}
+                        editable={false}
+                        onPress={() => setPickerType('division')}
+                    />
+                    <ProfileInput
+                        label="Sport"
+                        placeholder="Select"
+                        value={sport}
+                        editable={false}
+                        onPress={() => setPickerType('sport')}
+                    />
+                    <ProfileInput
+                        label="Result"
+                        placeholder="Select"
+                        value={result}
+                        editable={false}
+                        onPress={() => setPickerType('result')}
+                    />
+                </View>
+                <View style={styles.footer}>
+                    <AppButton
+                        text="Add match"
+                        onPress={onClose}
+                        btnStyle={styles.saveButton}
+                        textStyle={styles.saveButtonText}
+                    />
+                </View>
+            </ScrollView>
 
             <SelectPicker
                 visible={pickerType !== 'none'}
