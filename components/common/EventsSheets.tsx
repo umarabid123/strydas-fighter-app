@@ -2,14 +2,30 @@ import React, { useState } from 'react';
 import { Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors, CountryOptions, Spacing, Typography } from '../../constant';
-import { CreateMatchInput, CountryEnum } from '../../lib/types';
+import { CreateMatchInput, CountryEnum, EventType, EventStatus } from '../../lib/types';
 import { createEvent, createMatch } from '../../services/eventService';
 import AppButton from './AppButton';
 import AppText from './AppText';
 import CustomBottomSheet from './CustomBottomSheet';
 import ProfileInput from './ProfileInput';
 import SelectPicker from './SelectPicker';
-import { MatchSheet } from './OnboardingSheets'; // Reusing MatchSheet
+import { MatchSheet } from './OnboardingSheets';
+
+const EventTypeOptions = [
+    { label: 'Fight Night', value: 'fight_night' },
+    { label: 'Tournament', value: 'tournament' }
+];
+
+const SportOptions = [
+    { label: 'MMA', value: 'MMA' },
+    { label: 'Muay Thai', value: 'Muay Thai' },
+    { label: 'Boxing', value: 'Boxing' }
+];
+
+const LevelOptions = [
+    { label: 'Amateur', value: 'Amateur' },
+    { label: 'Professional', value: 'Professional' }
+];
 
 interface CreateEventSheetProps {
     visible: boolean;
@@ -20,6 +36,13 @@ interface CreateEventSheetProps {
 
 export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: CreateEventSheetProps) => {
     // Event fields
+    const [eventType, setEventType] = useState<string>('fight_night');
+    const [showTypePicker, setShowTypePicker] = useState(false);
+    const [sport, setSport] = useState('');
+    const [showSportPicker, setShowSportPicker] = useState(false);
+    const [level, setLevel] = useState('');
+    const [showLevelPicker, setShowLevelPicker] = useState(false);
+
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [eventDate, setEventDate] = useState(new Date());
@@ -76,6 +99,14 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
             alert('Please enter event title');
             return;
         }
+        if (!sport) {
+            alert('Please select a sport');
+            return;
+        }
+        if (!level) {
+            alert('Please select a level');
+            return;
+        }
 
         setIsLoading(true);
 
@@ -89,6 +120,10 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
                 address,
                 city,
                 country,
+                type: eventType as EventType,
+                status: 'draft',
+                sport,
+                level,
                 image_url: imageUrl,
                 website_url: websiteUrl,
                 instagram_url: instagramUrl,
@@ -136,6 +171,30 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
             contentStyle={styles.sheetContentFull}
         >
             <ScrollView contentContainerStyle={styles.form}>
+                <ProfileInput
+                    label="Event Type *"
+                    placeholder="Select Type"
+                    value={EventTypeOptions.find(o => o.value === eventType)?.label || 'Fight Night'}
+                    editable={false}
+                    onPress={() => setShowTypePicker(true)}
+                />
+
+                <ProfileInput
+                    label="Sport *"
+                    placeholder="Select Sport"
+                    value={SportOptions.find(o => o.value === sport)?.label || ''}
+                    editable={false}
+                    onPress={() => setShowSportPicker(true)}
+                />
+
+                <ProfileInput
+                    label="Level *"
+                    placeholder="Select Level"
+                    value={LevelOptions.find(o => o.value === level)?.label || ''}
+                    editable={false}
+                    onPress={() => setShowLevelPicker(true)}
+                />
+
                 <ProfileInput
                     label="Event Title *"
                     placeholder="Event Title"
@@ -246,6 +305,33 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
                 options={CountryOptions}
                 selectedValue={country}
                 onSelect={(val) => setCountry(val)}
+            />
+
+            <SelectPicker
+                visible={showTypePicker}
+                onClose={() => setShowTypePicker(false)}
+                title="Select Event Type"
+                options={EventTypeOptions}
+                selectedValue={eventType}
+                onSelect={(val) => setEventType(val)}
+            />
+
+            <SelectPicker
+                visible={showSportPicker}
+                onClose={() => setShowSportPicker(false)}
+                title="Select Sport"
+                options={SportOptions}
+                selectedValue={sport}
+                onSelect={(val) => setSport(val)}
+            />
+
+            <SelectPicker
+                visible={showLevelPicker}
+                onClose={() => setShowLevelPicker(false)}
+                title="Select Level"
+                options={LevelOptions}
+                selectedValue={level}
+                onSelect={(val) => setLevel(val)}
             />
 
         </CustomBottomSheet>

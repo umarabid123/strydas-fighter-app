@@ -2,18 +2,20 @@
 
 ## Events / Home
 - **Create Event Sheet**:
-    - Removed match creation logic from this sheet (single responsibility).
-    - Checks inputs and calls `createEvent`. Logging added for debugging.
-    - Improved "Description" field style (smaller font, better spacing).
+    - **New Fields for Event Types**:
+        - Added **Event Type** selector (Fight Night vs Tournament).
+        - Added **Sport** selector (MMA, Muay Thai, Boxing).
+        - Added **Level** selector (Amateur, Professional).
+        - Updated `createEvent` payload to include `type`, `status` (default: 'draft'), `sport`, and `level`.
+        - Added form validation for Sport and Level.
     - Added Missing Fields: Website URL, Instagram URL, and Ticket URL inputs.
+    - Improved styling and organization.
 - **Create Match**:
     - Implemented "Create Match" form directly in `Home.tsx` bottom sheet.
         - Includes fields: Select Event, Sport Type, Match Type, Weight Class, Description.
         - Uses `SelectPicker`.
         - Calls `createMatch` service.
-        - **Refined Design**: 
-            - Updated styles to match `CreateEventSheet`.
-            - **Spacing & Width Fix**: Adjusted `CustomBottomSheet` content style to ensure full width usage and correct padding (20px).
+        - **Refined Design**: Updated styles to match `CreateEventSheet`, fixed spacing and width issues.
 - **Navigation**:
     - Fixed TypeScript errors related to `navigation.navigate`.
 

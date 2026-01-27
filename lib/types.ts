@@ -161,6 +161,9 @@ export interface ProfileWithRelations extends Profile {
 }
 
 // Event and Match Types
+export type EventType = 'fight_night' | 'tournament';
+export type EventStatus = 'draft' | 'upcoming' | 'live' | 'completed' | 'cancelled';
+
 export interface Event {
   id: string;
   organizer_id: string;
@@ -171,6 +174,10 @@ export interface Event {
   address?: string;
   city?: string;
   country?: string;
+  type?: EventType;
+  status?: EventStatus;
+  sport?: string;
+  level?: string;
   image_url?: string;
   website_url?: string;
   instagram_url?: string;
@@ -222,6 +229,10 @@ export interface CreateEventInput {
   address?: string;
   city?: string;
   country?: string;
+  type: EventType;
+  status?: EventStatus;
+  sport: string;
+  level: string;
   image_url?: string;
   website_url?: string;
   instagram_url?: string;
