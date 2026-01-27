@@ -49,6 +49,14 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [showMatchSheet, setShowMatchSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // State for contact info
+  const [contactData, setContactData] = useState<{
+    fullName: string;
+    phone: string;
+    email: string;
+    org: string;
+  } | null>(null);
+
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -60,6 +68,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setProfileImage(result.assets[0].uri);
     }
+  };
+
+  const handleContactSave = (data: { fullName: string; phone: string; email: string; org: string }) => {
+    setContactData(data);
   };
 
   const handleComplete = async () => {
@@ -79,19 +91,51 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
         division: DivisionEnum.PRO, // Default to Pro, could be from user input
       });
 
-      // TODO: Add contact info when ContactSheet returns data
+      // Save contact info if exists
+      if (contactData) {
+        const contactPromises = [];
+
+        if (contactData.fullName) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'name',
+            contact_value: contactData.fullName,
+          }));
+        }
+
+        if (contactData.phone) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'phone',
+            contact_value: contactData.phone,
+          }));
+        }
+
+        if (contactData.email) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'email',
+            contact_value: contactData.email,
+          }));
+        }
+
+        if (contactData.org) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'organization',
+            contact_value: contactData.org,
+          }));
+        }
+
+        await Promise.all(contactPromises);
+      }
+
       // TODO: Add sports records when MatchSheet returns data
 
       // Mark onboarding as complete
       await profileService.completeOnboarding(user.id);
 
-      console.log('Complete fighter profile:', {
-        profileImage,
-        weightDivision,
-        weightRange,
-        height,
-        gym,
-      });
+      console.log('Complete fighter profile saved');
 
       if (onComplete) {
         onComplete();
@@ -355,10 +399,22 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 color={colors.white}
                 style={styles.sectionLabel}
               />
+
+              {contactData && (
+                <View style={{ marginBottom: 10 }}>
+                  <AppText
+                    text={`${contactData.fullName} (${contactData.phone})`}
+                    fontSize={Typography.fontSize.md}
+                    color={colors.white}
+                    fontName="CircularStd-Book"
+                  />
+                </View>
+              )}
+
               <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
                 <AppText
-                  text="+"
-                  fontSize={Typography.fontSize.xxl}
+                  text={contactData ? "Edit" : "+"}
+                  fontSize={contactData ? Typography.fontSize.sm : Typography.fontSize.xxl}
                   fontName="CircularStd-Medium"
                   color={Colors.black}
                 />
@@ -401,7 +457,11 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             />
           </View>
         </ScrollView>
-        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
+        <ContactSheet
+          visible={showContactSheet}
+          onClose={() => setShowContactSheet(false)}
+          onSave={handleContactSave}
+        />
         <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />

@@ -40,6 +40,14 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
   const [showAddFighterSheet, setShowAddFighterSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // State for contact info
+  const [contactData, setContactData] = useState<{
+    fullName: string;
+    phone: string;
+    email: string;
+    org: string;
+  } | null>(null);
+
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -51,6 +59,10 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setProfileImage(result.assets[0].uri);
     }
+  };
+
+  const handleContactSave = (data: { fullName: string; phone: string; email: string; org: string }) => {
+    setContactData(data);
   };
 
   const handleComplete = async () => {
@@ -67,17 +79,51 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
         organisation: organisation,
       });
 
-      // TODO: Add contact info when ContactSheet returns data
+      // Save contact info if exists
+      if (contactData) {
+        const contactPromises = [];
+
+        if (contactData.fullName) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'name',
+            contact_value: contactData.fullName,
+          }));
+        }
+
+        if (contactData.phone) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'phone',
+            contact_value: contactData.phone,
+          }));
+        }
+
+        if (contactData.email) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'email',
+            contact_value: contactData.email,
+          }));
+        }
+
+        if (contactData.org) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'organization',
+            contact_value: contactData.org,
+          }));
+        }
+
+        await Promise.all(contactPromises);
+      }
+
       // TODO: Add managed fighters when AddFighterSheet returns data
 
       // Mark onboarding as complete
       await profileService.completeOnboarding(user.id);
 
-      console.log('Complete organizer profile:', {
-        profileImage,
-        jobTitle,
-        organisation,
-      });
+      console.log('Complete organizer profile saved');
 
       if (onComplete) {
         onComplete();
@@ -246,10 +292,22 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                   color={Colors.whiteOpacity80}
                 />
               </View>
+
+              {contactData && (
+                <View style={{ marginTop: 10 }}>
+                  <AppText
+                    text={`${contactData.fullName} (${contactData.phone})`}
+                    fontSize={Typography.fontSize.md}
+                    color={colors.white}
+                    fontName="CircularStd-Book"
+                  />
+                </View>
+              )}
+
               <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
                 <AppText
-                  text="+"
-                  fontSize={Typography.fontSize.xxl}
+                  text={contactData ? "Edit" : "+"}
+                  fontSize={contactData ? Typography.fontSize.sm : Typography.fontSize.xxl}
                   fontName="CircularStd-Medium"
                   color={Colors.black}
                 />
@@ -294,7 +352,11 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
             />
           </View>
         </ScrollView>
-        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
+        <ContactSheet
+          visible={showContactSheet}
+          onClose={() => setShowContactSheet(false)}
+          onSave={handleContactSave}
+        />
         <AddFighterSheet visible={showAddFighterSheet} onClose={() => setShowAddFighterSheet(false)} />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />

@@ -16,11 +16,23 @@ const AVAILABLE_FIGHTERS = [
     { id: '4', name: 'Kristoffer Björgskog', record: '12-4-0', country: 'DEN', flag: require('../../assets/images/flag-icon.png'), sport: 'Muay Thai', avatar: require('../../assets/images/profile-image-icon.png') },
 ];
 
-export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave?: (data: { fullName: string; phone: string; email: string; org: string }) => void }) => {
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [org, setOrg] = useState('');
+
+    const handleSave = () => {
+        if (onSave) {
+            onSave({
+                fullName,
+                phone,
+                email,
+                org
+            });
+        }
+        onClose();
+    };
 
     return (
         <CustomBottomSheet
@@ -45,7 +57,7 @@ export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: 
                 />
                 <ProfileInput
                     label="Email (optional)"
-                    placeholder="+45 12 34 56 78"
+                    placeholder="john@example.com"
                     value={email}
                     onChangeText={setEmail}
                     keyboardType="email-address"
@@ -60,7 +72,7 @@ export const ContactSheet = ({ visible, onClose }: { visible: boolean; onClose: 
             <View style={styles.footer}>
                 <AppButton
                     text="Save & close"
-                    onPress={onClose}
+                    onPress={handleSave}
                     btnStyle={styles.saveButton}
                     textStyle={styles.saveButtonText}
                 />
