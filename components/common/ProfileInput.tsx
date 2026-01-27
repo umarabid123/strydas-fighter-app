@@ -11,6 +11,9 @@ interface ProfileInputProps {
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad"
   editable?: boolean
   onPress?: () => void
+  multiline?: boolean
+  numberOfLines?: number
+  height?: number
 }
 
 export default function ProfileInput({
@@ -21,6 +24,9 @@ export default function ProfileInput({
   keyboardType = "default",
   editable = true,
   onPress,
+  multiline = false,
+  numberOfLines,
+  height
 }: ProfileInputProps) {
   const colorScheme = useColorScheme()
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light
@@ -36,12 +42,19 @@ export default function ProfileInput({
       />
       {editable ? (
         <TextInput
-          style={[styles.input, { color: colors.textTertiary }]}
+          style={[styles.input, {
+            color: colors.textTertiary,
+            height: height,
+            textAlignVertical: multiline ? 'top' : 'center',
+            fontSize: multiline ? Typography.fontSize.md : Typography.fontSize.xl
+          }]}
           placeholder={placeholder}
           placeholderTextColor="rgba(255, 255, 255, 0.5)"
           keyboardType={keyboardType}
           value={value}
           onChangeText={onChangeText}
+          multiline={multiline}
+          numberOfLines={numberOfLines}
         />
       ) : (
         <TouchableOpacity style={styles.inputContainer} onPress={onPress}>

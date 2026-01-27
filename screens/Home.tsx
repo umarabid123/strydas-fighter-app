@@ -11,14 +11,28 @@ import { useAuth } from '../navigation';
 import { getEventsByOrganizer } from '../services/eventService';
 import { Event } from '../lib/types';
 
+import { CreateEventSheet } from '../components/common/EventsSheets';
+import ProfileInput from '../components/common/ProfileInput';
+import SelectPicker from '../components/common/SelectPicker';
+import { createMatch } from '../services/eventService';
+
 const Home = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { user } = useAuth();
   const [sheetVisible, setSheetVisible] = useState(false);
   const [sheetType, setSheetType] = useState<'match' | 'event' | null>(null);
+  const [showCreateEventSheet, setShowCreateEventSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [myMatches, setMyMatches] = useState<any[]>([]);
+
+  // Match Creation State
+  const [matchSport, setMatchSport] = useState('');
+  const [matchTypeInput, setMatchTypeInput] = useState('');
+  const [matchWeight, setMatchWeight] = useState('');
+  const [matchDesc, setMatchDesc] = useState('');
+  const [selectedEventId, setSelectedEventId] = useState('');
+  const [showEventPicker, setShowEventPicker] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -50,12 +64,48 @@ const Home = () => {
 
   const handleCreateEvent = () => {
     setSheetVisible(false);
-    navigation.navigate('CreateEvent' as never);
+    setShowCreateEventSheet(true);
+  };
+
+  const handleCreateMatch = async () => {
+    if (!selectedEventId) {
+      alert('Please select an event first');
+      return;
+    }
+    if (!matchSport || !matchTypeInput) {
+      alert('Please fill in Sport Type and Match Type');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await createMatch({
+        event_id: selectedEventId,
+        sport_type: matchSport,
+        match_type: matchTypeInput,
+        weight_class: matchWeight,
+        description: matchDesc
+      });
+      alert('Match created successfully!');
+      setSheetVisible(false);
+      // Reset form
+      setMatchSport('');
+      setMatchTypeInput('');
+      setMatchWeight('');
+      setMatchDesc('');
+      setSelectedEventId('');
+    } catch (error: any) {
+      alert(error.message || 'Failed to create match');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleEventPress = (eventId: string) => {
     navigation.navigate('EventDetail', { eventId } as never);
   };
+
+  const eventOptions = userEvents.map(e => ({ label: e.title, value: e.id }));
 
   return (
     <View style={[styles.container]}>
@@ -84,7 +134,7 @@ const Home = () => {
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.matchItem}
-                onPress={() => {/* TODO: Navigate to match detail */}}
+                onPress={() => {/* TODO: Navigate to match detail */ }}
               >
                 <AppText text={item.title} color={Colors.white} fontSize={16} />
               </TouchableOpacity>
@@ -159,22 +209,76 @@ const Home = () => {
               textAlign="center"
               style={{ marginBottom: 30 }}
             />
-            {/* Create Event Button would be added here */}
-            <AppButton onPress={handleCreateEvent}>
-              <AppText text="Create Event" color={Colors.black} fontSize={16} />
-            </AppButton>
+            <AppButton
+              text="Create Event"
+              onPress={handleCreateEvent}
+              textStyle={{ color: Colors.black, fontSize: 16 }}
+            />
           </View>
         ) : (
-          <AppText
-            text="TODO\nMatches field"
-            color={Colors.white}
-            fontSize={32}
-            fontName="CircularStd-Bold"
-            textAlign="center"
-            style={{ marginTop: 50 }}
-          />
+          <View style={styles.sheetContent}>
+            <View style={{ gap: 16, paddingBottom: 20 }}>
+              <ProfileInput
+                label="Select Event *"
+                placeholder="Choose an event"
+                value={userEvents.find(e => e.id === selectedEventId)?.title || ''}
+                editable={false}
+                onPress={() => setShowEventPicker(true)}
+              />
+              <ProfileInput
+                label="Sport Type *"
+                placeholder="Muay Thai, MMA"
+                value={matchSport}
+                onChangeText={setMatchSport}
+              />
+              <ProfileInput
+                label="Match Type *"
+                placeholder="Amateur, Pro"
+                value={matchTypeInput}
+                onChangeText={setMatchTypeInput}
+              />
+              <ProfileInput
+                label="Weight Class"
+                placeholder="63.5 kg"
+                value={matchWeight}
+                onChangeText={setMatchWeight}
+              />
+              <ProfileInput
+                label="Description"
+                placeholder="Description"
+                value={matchDesc}
+                onChangeText={setMatchDesc}
+                multiline
+                height={100}
+              />
+              <AppButton
+                text="Create Match"
+                onPress={handleCreateMatch}
+                textStyle={{ color: Colors.black, fontSize: 16 }}
+              />
+            </View>
+          </View>
         )}
       </CustomBottomSheet>
+
+      <SelectPicker
+        visible={showEventPicker}
+        onClose={() => setShowEventPicker(false)}
+        title="Select Event"
+        options={eventOptions}
+        selectedValue={selectedEventId}
+        onSelect={(val) => setSelectedEventId(val)}
+      />
+
+      {user?.id && (
+        <CreateEventSheet
+          visible={showCreateEventSheet}
+          onClose={() => setShowCreateEventSheet(false)}
+          userId={user.id}
+          onEventCreated={loadData}
+        />
+      )}
+
       <AppLoader isLoading={isLoading} />
     </View>
   );

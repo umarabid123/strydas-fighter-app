@@ -14,6 +14,7 @@ export const createEvent = async (
   organizerId: string,
   eventData: CreateEventInput
 ): Promise<Event> => {
+  console.log('Creating event for organizer:', organizerId, 'with data:', eventData);
   const { data, error } = await supabase
     .from('events')
     .insert({
@@ -23,7 +24,11 @@ export const createEvent = async (
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error creating event:', error);
+    throw error;
+  }
+  console.log('Event created successfully:', data);
   return data;
 };
 
