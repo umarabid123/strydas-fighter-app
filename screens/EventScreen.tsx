@@ -88,6 +88,11 @@ const carouselData = [
 
 export default function EventScreen() {
   const navigation = useNavigation<any>();
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const filteredEvents = EVENTS.filter(event =>
+    event.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
@@ -106,7 +111,8 @@ export default function EventScreen() {
           subtitle="Browser fighters and events world wide."
           containerStyle={{ paddingHorizontal: 0, marginBottom: 20 }}
           searchBarStyle={{ width: 'auto', flex: 1, maxWidth: '100%' }}
-        // Adjust search section to match the specific layout if needed
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
         />
 
         {/* Categories */}
@@ -148,7 +154,7 @@ export default function EventScreen() {
             style={{ marginBottom: 12 }}
           />
 
-          {EVENTS.map((event) => (
+          {filteredEvents.map((event) => (
             <EventCard
               key={event.id}
               title={event.title}
@@ -157,6 +163,14 @@ export default function EventScreen() {
               matches={event.matches as MatchItem[]}
             />
           ))}
+          {filteredEvents.length === 0 && (
+            <AppText
+              text="No events found"
+              color={Colors.textSecondary}
+              fontSize={14}
+              style={{ textAlign: 'center', marginTop: 20 }}
+            />
+          )}
         </View>
 
       </ScrollView>

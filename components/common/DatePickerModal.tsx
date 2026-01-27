@@ -107,8 +107,9 @@ export default function DatePickerModal({
                 maximumDate={maximumDate}
                 minimumDate={minimumDate}
                 textColor={Colors.white}
-                themeVariant="dark"
+                themeVariant="dark" // Important for iOS dark mode
                 style={styles.iosPicker}
+                locale="en_GB" // Force locale if needed, or stick to default
               />
             </View>
           </View>
@@ -183,7 +184,6 @@ const styles = StyleSheet.create({
   iosPicker: {
     width: '100%',
     height: 216,
-    backgroundColor: 'transparent',
   },
   footer: {
     paddingHorizontal: Spacing.xl,

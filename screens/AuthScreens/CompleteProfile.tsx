@@ -13,6 +13,7 @@ import {
   useColorScheme,
   View
 } from 'react-native';
+import { AddFighterSheet, ContactSheet, MatchSheet, SocialLinkSheet, SportsSheet } from '../../components/common/OnboardingSheets';
 import AppButton from '../../components/common/AppButton';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
@@ -20,6 +21,9 @@ import DatePickerModal from '../../components/common/DatePickerModal';
 import ProfileInput from '../../components/common/ProfileInput';
 import SelectPicker from '../../components/common/SelectPicker';
 import { BorderRadius, Colors, CountryOptions, DESIGN_HEIGHT, DESIGN_WIDTH, GenderOptions, MonthNames, Spacing, Typography } from '../../constant';
+import { profileService, socialLinksService, sportsOfInterestService } from '../../services/profileService';
+import { useAuth } from '../../navigation';
+import { CountryEnum, GenderEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -32,19 +36,23 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
+  const { user } = useAuth();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [firstName, setFirstName] = useState('Jonathan');
-  const [lastName, setLastName] = useState('Haggerty');
-  const [dateOfBirth, setDateOfBirth] = useState('Mar 03, 2000');
-  const [birthDate, setBirthDate] = useState(new Date(2000, 2, 3)); // March 3, 2000
-  const [gender, setGender] = useState('');
-  const [country, setCountry] = useState('England');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [birthDate, setBirthDate] = useState(new Date());
+  const [gender, setGender] = useState<GenderEnum | ''>('');
+  const [country, setCountry] = useState<CountryEnum | ''>('');
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [socialLinks, setSocialLinks] = useState([
+  const [showSportSheet, setShowSportSheet] = useState(false);
+  const [showSocialSheet, setShowSocialSheet] = useState(false);
+  const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
+  const [socialLinks, setSocialLinks] = useState<Array<{ platform: string, url: string }>>([
     { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,12 +60,22 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   // Calculate progress: Step 1 = 25%, Step 2 = 50%
   const progressPercentage = currentStep === 1 ? 25 : 50;
 
-  const handleAddSocialLink = () => {
-    setSocialLinks([...socialLinks, { platform: '', url: '' }]);
-  };
-
   const handleRemoveSocialLink = (index: number) => {
     setSocialLinks(socialLinks.filter((_, i) => i !== index));
+  };
+
+  const handleSocialSave = (link: { platform: string; url: string }) => {
+    setSocialLinks([...socialLinks, link]);
+  };
+
+  const handleSportSave = (sport: string) => {
+    if (!sportsOfInterest.includes(sport)) {
+      setSportsOfInterest([...sportsOfInterest, sport]);
+    }
+  };
+
+  const handleRemoveSport = (sport: string) => {
+    setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
   };
 
   const handleProfileImagePress = async () => {
@@ -94,35 +112,88 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   };
 
 
-  const handleNext = () => {
-    if (currentStep < TOTAL_STEPS) {
-      // Advance to next step
-      setCurrentStep(currentStep + 1);
-    } else {
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        // Complete profile and navigate
-        console.log('Complete profile:', {
-          profileImage,
-          firstName,
-          lastName,
-          dateOfBirth,
-          gender,
-          country,
-          socialLinks,
-        });
-        if (onComplete) {
-          onComplete();
+  const saveProfile = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return false;
+    }
+
+    setIsLoading(true);
+    try {
+      let uploadedImageUrl = null;
+
+      // Upload profile image to Supabase Storage and get URL if selected
+      if (profileImage) {
+        try {
+          uploadedImageUrl = await profileService.uploadProfileImage(user.id, profileImage);
+        } catch (uploadError) {
+          console.error('Failed to upload profile image:', uploadError);
+          // Continue saving profile without image if upload fails, or handle as critical error
         }
-        navigation.navigate('Home');
-      }, 1500);
+      }
+
+      // Update basic profile info
+      await profileService.updateBasicInfo(user.id, {
+        first_name: firstName,
+        last_name: lastName,
+        date_of_birth: birthDate.toISOString(),
+        gender: gender ? (gender as GenderEnum) : undefined,
+        country: country ? (country as CountryEnum) : undefined,
+        profile_image_url: uploadedImageUrl || undefined,
+      });
+
+      // Add social links
+      for (const link of socialLinks) {
+        if (link.platform && link.url) {
+          await socialLinksService.addSocialLink({
+            profile_id: user.id,
+            platform: link.platform,
+            url: link.url,
+          });
+        }
+      }
+
+      // Add sports of interest
+      for (const sport of sportsOfInterest) {
+        await sportsOfInterestService.addSportOfInterest({
+          profile_id: user.id,
+          sport_name: sport,
+        });
+      }
+
+      console.log('Complete profile saved:', {
+        firstName,
+        lastName,
+        dateOfBirth,
+        gender,
+        country,
+        socialLinks,
+        sportsOfInterest,
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to save profile. Please try again.');
+      return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleLetsDoIt = () => {
-    // Navigate to OnboardingRoles screen
-    navigation.navigate('OnboardingRoles');
+  const handleNext = async () => {
+    if (currentStep < TOTAL_STEPS) {
+      // Advance to next step
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleLetsDoIt = async () => {
+    const success = await saveProfile();
+    if (success) {
+      // Navigate to OnboardingRoles screen
+      navigation.navigate('OnboardingRoles');
+    }
   };
 
   const handleDoItLater = () => {
@@ -221,14 +292,36 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
             {/* Sports of Interest */}
             <View style={styles.sectionContainer}>
-              <AppText
-                text="Sports of interest (optional)"
-                fontSize={Typography.fontSize.md}
-                fontName="CircularStd-Medium"
-                color={colors.white}
-                style={styles.sectionLabel}
-              />
-              <TouchableOpacity style={styles.addButton}>
+              <View style={styles.socialLinksHeader}>
+                <AppText
+                  text="Sports of interest (optional)"
+                  fontSize={Typography.fontSize.md}
+                  fontName="CircularStd-Medium"
+                  color={colors.white}
+                  style={styles.sectionLabel}
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                {sportsOfInterest.map(sport => (
+                  <View key={sport} style={{
+                    backgroundColor: '#303030',
+                    borderRadius: 99,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6
+                  }}>
+                    <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
+                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowSportSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -290,7 +383,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
               <TouchableOpacity
                 style={styles.addButton}
-                onPress={handleAddSocialLink}
+                onPress={() => setShowSocialSheet(true)}
               >
                 <AppText
                   text="+"
@@ -422,7 +515,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Gender"
         options={GenderOptions}
         selectedValue={gender}
-        onSelect={setGender}
+        onSelect={(val) => setGender(val as GenderEnum)}
       />
 
       {/* Country Picker Modal */}
@@ -432,7 +525,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Country"
         options={CountryOptions}
         selectedValue={country}
-        onSelect={setCountry}
+        onSelect={(val) => setCountry(val as CountryEnum)}
       />
 
       {/* Date Picker Modal */}
@@ -444,6 +537,19 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         onChange={handleDateChange}
         maximumDate={new Date()}
         minimumDate={new Date(1900, 0, 1)}
+      />
+      {/* Sports Sheet */}
+      <SportsSheet
+        visible={showSportSheet}
+        onClose={() => setShowSportSheet(false)}
+        onSave={handleSportSave}
+      />
+
+      {/* Social Link Sheet */}
+      <SocialLinkSheet
+        visible={showSocialSheet}
+        onClose={() => setShowSocialSheet(false)}
+        onSave={handleSocialSave}
       />
     </View>
   );

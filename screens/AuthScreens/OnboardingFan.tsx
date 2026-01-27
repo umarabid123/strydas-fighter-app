@@ -19,6 +19,7 @@ import AppText from '../../components/common/AppText';
 import Toggle from '../../components/common/Toggle';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { profileService } from '../../services/profileService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -33,7 +34,7 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -53,20 +54,40 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Update fan profile
+      await profileService.updateFanProfile(user.id, {
+        allow_notifications: notificationsEnabled,
+        allow_location: locationEnabled,
+      });
+
+      // Mark onboarding as complete
+      await profileService.completeOnboarding(user.id);
+
       console.log('Complete fan profile:', {
         profileImage,
         notificationsEnabled,
         locationEnabled,
       });
+
       if (onComplete) {
         onComplete();
       }
+      setHasCompletedOnboarding(true);
       setIsAuthenticated(true);
-    }, 1500);
+    } catch (error) {
+      console.error('Error saving fan profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

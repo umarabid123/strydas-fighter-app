@@ -17,6 +17,8 @@ import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { profileService } from '../../services/profileService';
+import { UserRoleEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -24,7 +26,7 @@ interface OnboardingRolesProps {
   onComplete?: () => void;
 }
 
-type RoleType = 'fan' | 'fighter' | 'organizer';
+type RoleType = UserRoleEnum;
 
 interface RoleOption {
   id: RoleType;
@@ -37,36 +39,44 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated } = useAuth()
-  const [selectedRole, setSelectedRole] = useState<RoleType>('fan');
+  const { setIsAuthenticated, user } = useAuth()
+  const [selectedRole, setSelectedRole] = useState<RoleType>(UserRoleEnum.FAN);
   const [isLoading, setIsLoading] = useState(false);
 
   const roles: RoleOption[] = [
     {
-      id: 'fan',
+      id: UserRoleEnum.FAN,
       title: "I'm a fan",
       subtitle: 'Just want to browse',
       icon: require('../../assets/images/user-avatar-icon.png'), // Placeholder
     },
     {
-      id: 'fighter',
+      id: UserRoleEnum.FIGHTER,
       title: "I'm a fighter",
       subtitle: 'Muay Thai, BJJ, MMA...',
       icon: require('../../assets/images/user-avatar-icon.png'), // Placeholder
     },
     {
-      id: 'organizer',
+      id: UserRoleEnum.ORGANIZER,
       title: "I'm an organizer",
       subtitle: 'Promotion, Manager, Federation...',
       icon: require('../../assets/images/user-avatar-icon.png'), // Placeholder
     },
   ];
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      // Update user's role in database
+      await profileService.updateProfile(user.id, { role: selectedRole });
+      console.log('Updated user role to:', selectedRole);
+
       setIsLoading(false);
-      console.log('Selected role:', selectedRole);
 
       // Navigate to appropriate screen based on selected role
       switch (selectedRole) {
@@ -85,7 +95,11 @@ export default function OnboardingRoles({ onComplete }: OnboardingRolesProps) {
           }
           setIsAuthenticated(true)
       }
-    }, 500); // Shorter delay for roles
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Error updating role:', error);
+      alert('Failed to save role. Please try again.');
+    }
   };
 
   const renderRadioButton = (isSelected: boolean) => {

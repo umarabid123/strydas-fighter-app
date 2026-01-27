@@ -18,26 +18,25 @@ import Slider from 'react-native-sticky-range-slider';
 import AppButton from '../../components/common/AppButton';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
-import { ContactSheet, MatchSheet } from '../../components/common/OnboardingSheets';
+import { ContactSheet, MatchSheet, SportsSheet } from '../../components/common/OnboardingSheets';
 import ProfileInput from '../../components/common/ProfileInput';
 import { Rail, RailSelected, Thumb } from '../../components/common/SliderComponents';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { profileService, contactInfoService, sportsOfInterestService, sportsRecordsService } from '../../services/profileService';
+import { DivisionEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 
 interface OnboardingFighterProps {
   onComplete?: () => void;
 }
 
-
-// ... (inside component)
 export default function OnboardingFighter({ onComplete }: OnboardingFighterProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [weightDivision, setWeightDivision] = useState('63.5');
   const [weightRange, setWeightRange] = useState('2.0');
@@ -45,7 +44,50 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [gym, setGym] = useState('Keddles Gym');
   const [showContactSheet, setShowContactSheet] = useState(false);
   const [showMatchSheet, setShowMatchSheet] = useState(false);
+  const [showSportSheet, setShowSportSheet] = useState(false);
+  const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
+  const [fighterRecords, setFighterRecords] = useState<Record<string, { wins: number, losses: number, draws: number }>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  // State for contact info
+  const [contactData, setContactData] = useState<{
+    fullName: string;
+    phone: string;
+    email: string;
+    org: string;
+  } | null>(null);
+
+  const handleSportSave = (sport: string) => {
+    if (!sportsOfInterest.includes(sport)) {
+      setSportsOfInterest([...sportsOfInterest, sport]);
+    }
+  };
+
+  const handleRemoveSport = (sport: string) => {
+    setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
+  };
+
+  const handleMatchSave = (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => {
+    const current = fighterRecords[match.sport] || { wins: 0, losses: 0, draws: 0 };
+    if (match.result === 'Won') current.wins++;
+    else if (match.result === 'Lost') current.losses++;
+    else if (match.result === 'Draw') current.draws++;
+
+    setFighterRecords({
+      ...fighterRecords,
+      [match.sport]: current
+    });
+  };
+
+  const getTotalRecord = () => {
+    let w = 0, l = 0, d = 0;
+    Object.values(fighterRecords).forEach(r => {
+      w += r.wins;
+      l += r.losses;
+      d += r.draws;
+    });
+    return `${w}W ${l}L ${d}D`;
+  };
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -60,22 +102,105 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
     }
   };
 
-  const handleComplete = () => {
+  const handleContactSave = (data: { fullName: string; phone: string; email: string; org: string }) => {
+    setContactData(data);
+  };
+
+  const handleComplete = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Complete fighter profile:', {
-        profileImage,
-        weightDivision,
-        weightRange,
-        height,
-        gym,
+    try {
+      // Update fighter profile
+      await profileService.updateFighterProfile(user.id, {
+        weight_division: parseFloat(weightDivision),
+        weight_range: parseFloat(weightRange),
+        height: parseInt(height),
+        gym: gym,
+        division: DivisionEnum.PRO, // Default to Pro, could be from user input
       });
+
+      // Save contact info if exists
+      if (contactData) {
+        const contactPromises = [];
+
+        if (contactData.fullName) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'name',
+            contact_value: contactData.fullName,
+          }));
+        }
+
+        if (contactData.phone) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'phone',
+            contact_value: contactData.phone,
+          }));
+        }
+
+        if (contactData.email) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'email',
+            contact_value: contactData.email,
+          }));
+        }
+
+        if (contactData.org) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'organization',
+            contact_value: contactData.org,
+          }));
+        }
+
+        await Promise.all(contactPromises);
+      }
+
+      // Save sports of interest
+      if (sportsOfInterest.length > 0) {
+        const sportPromises = sportsOfInterest.map(sport =>
+          sportsOfInterestService.addSportOfInterest({
+            profile_id: user.id,
+            sport_name: sport,
+          })
+        );
+        await Promise.all(sportPromises);
+      }
+
+      // Save sports records
+      const recordPromises = Object.entries(fighterRecords).map(([sport, record]) =>
+        sportsRecordsService.addSportsRecord({
+          profile_id: user.id,
+          sport_name: sport,
+          wins: record.wins,
+          losses: record.losses,
+          draws: record.draws
+        })
+      );
+      await Promise.all(recordPromises);
+
+      // Mark onboarding as complete
+      await profileService.completeOnboarding(user.id);
+
+      console.log('Complete fighter profile saved');
+
       if (onComplete) {
         onComplete();
       }
+      setHasCompletedOnboarding(true);
       setIsAuthenticated(true);
-    }, 1500);
+    } catch (error) {
+      console.error('Error saving fighter profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -151,7 +276,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             />
             <View style={styles.fighterInfo}>
               <AppText
-                text="0W 0L 0D"
+                text={getTotalRecord()}
                 fontSize={Typography.fontSize.md}
                 fontName="CircularStd-Book"
                 color="rgba(255, 255, 255, 0.8)"
@@ -177,14 +302,36 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
           <View style={styles.formContainer}>
             {/* Sports you compete in */}
             <View style={styles.sectionContainer}>
-              <AppText
-                text="Sports you compete in *"
-                fontSize={Typography.fontSize.md}
-                fontName="CircularStd-Medium"
-                color={colors.white}
-                style={styles.sectionLabel}
-              />
-              <TouchableOpacity style={styles.addButton}>
+              <View style={styles.recordHeader}>
+                <AppText
+                  text="Sports you compete in *"
+                  fontSize={Typography.fontSize.md}
+                  fontName="CircularStd-Medium"
+                  color={colors.white}
+                  style={styles.sectionLabel}
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                {sportsOfInterest.map(sport => (
+                  <View key={sport} style={{
+                    backgroundColor: '#303030',
+                    borderRadius: 99,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6
+                  }}>
+                    <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
+                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowSportSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -327,10 +474,22 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 color={colors.white}
                 style={styles.sectionLabel}
               />
+
+              {contactData && (
+                <View style={{ marginBottom: 10 }}>
+                  <AppText
+                    text={`${contactData.fullName} (${contactData.phone})`}
+                    fontSize={Typography.fontSize.md}
+                    color={colors.white}
+                    fontName="CircularStd-Book"
+                  />
+                </View>
+              )}
+
               <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
                 <AppText
-                  text="+"
-                  fontSize={Typography.fontSize.xxl}
+                  text={contactData ? "Edit" : "+"}
+                  fontSize={contactData ? Typography.fontSize.sm : Typography.fontSize.xxl}
                   fontName="CircularStd-Medium"
                   color={Colors.black}
                 />
@@ -373,8 +532,17 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             />
           </View>
         </ScrollView>
-        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
-        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
+        <ContactSheet
+          visible={showContactSheet}
+          onClose={() => setShowContactSheet(false)}
+          onSave={handleContactSave}
+        />
+        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} onSave={handleMatchSave} />
+        <SportsSheet
+          visible={showSportSheet}
+          onClose={() => setShowSportSheet(false)}
+          onSave={handleSportSave}
+        />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />
     </View>

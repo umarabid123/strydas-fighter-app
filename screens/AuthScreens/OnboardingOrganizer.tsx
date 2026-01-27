@@ -18,6 +18,7 @@ import AppText from '../../components/common/AppText';
 import { AddFighterSheet, ContactSheet } from '../../components/common/OnboardingSheets';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
+import { profileService, contactInfoService, fightersManagedService } from '../../services/profileService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -31,13 +32,21 @@ interface OnboardingOrganizerProps {
 export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerProps) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const { setIsAuthenticated } = useAuth()
+  const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState('IFMA President');
   const [organisation, setOrganisation] = useState('Keddles Gym');
   const [showContactSheet, setShowContactSheet] = useState(false);
   const [showAddFighterSheet, setShowAddFighterSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // State for contact info
+  const [contactData, setContactData] = useState<{
+    fullName: string;
+    phone: string;
+    email: string;
+    org: string;
+  } | null>(null);
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -52,20 +61,81 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
     }
   };
 
-  const handleComplete = () => {
+  const handleContactSave = (data: { fullName: string; phone: string; email: string; org: string }) => {
+    setContactData(data);
+  };
+
+  const handleComplete = async () => {
+    if (!user?.id) {
+      alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log('Complete organizer profile:', {
-        profileImage,
-        jobTitle,
-        organisation,
+    try {
+      // Update organizer profile
+      await profileService.updateOrganizerProfile(user.id, {
+        job_title: jobTitle,
+        organisation: organisation,
       });
+
+      // Save contact info if exists
+      if (contactData) {
+        const contactPromises = [];
+
+        if (contactData.fullName) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'name',
+            contact_value: contactData.fullName,
+          }));
+        }
+
+        if (contactData.phone) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'phone',
+            contact_value: contactData.phone,
+          }));
+        }
+
+        if (contactData.email) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'email',
+            contact_value: contactData.email,
+          }));
+        }
+
+        if (contactData.org) {
+          contactPromises.push(contactInfoService.addContactInfo({
+            profile_id: user.id,
+            contact_type: 'organization',
+            contact_value: contactData.org,
+          }));
+        }
+
+        await Promise.all(contactPromises);
+      }
+
+      // TODO: Add managed fighters when AddFighterSheet returns data
+
+      // Mark onboarding as complete
+      await profileService.completeOnboarding(user.id);
+
+      console.log('Complete organizer profile saved');
+
       if (onComplete) {
         onComplete();
       }
-      setIsAuthenticated(true)
-    }, 1500);
+      setHasCompletedOnboarding(true);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Error saving organizer profile:', error);
+      alert('Failed to save profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -222,10 +292,22 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                   color={Colors.whiteOpacity80}
                 />
               </View>
+
+              {contactData && (
+                <View style={{ marginTop: 10 }}>
+                  <AppText
+                    text={`${contactData.fullName} (${contactData.phone})`}
+                    fontSize={Typography.fontSize.md}
+                    color={colors.white}
+                    fontName="CircularStd-Book"
+                  />
+                </View>
+              )}
+
               <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
                 <AppText
-                  text="+"
-                  fontSize={Typography.fontSize.xxl}
+                  text={contactData ? "Edit" : "+"}
+                  fontSize={contactData ? Typography.fontSize.sm : Typography.fontSize.xxl}
                   fontName="CircularStd-Medium"
                   color={Colors.black}
                 />
@@ -270,7 +352,11 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
             />
           </View>
         </ScrollView>
-        <ContactSheet visible={showContactSheet} onClose={() => setShowContactSheet(false)} />
+        <ContactSheet
+          visible={showContactSheet}
+          onClose={() => setShowContactSheet(false)}
+          onSave={handleContactSave}
+        />
         <AddFighterSheet visible={showAddFighterSheet} onClose={() => setShowAddFighterSheet(false)} />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />

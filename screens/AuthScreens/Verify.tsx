@@ -1,5 +1,5 @@
-import type { NavigationProp } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
+import type { NavigationProp, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useRef, useState } from 'react';
 import {
   Dimensions,
@@ -15,8 +15,15 @@ import {
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
+import { authService, checkOnboardingStatus } from '../../services/authService';
+import { profileService } from '../../services/profileService';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+type VerifyRouteParams = {
+  email: string;
+  isNewUser: boolean;
+};
 
 interface VerifyProps {
   onVerifyComplete?: () => void;
@@ -24,18 +31,19 @@ interface VerifyProps {
 
 export default function Verify({ onVerifyComplete }: VerifyProps) {
   const navigation = useNavigation<NavigationProp<any>>();
+  const route = useRoute<RouteProp<{ params: VerifyRouteParams }>>();
+  const { email, isNewUser } = route.params || { email: '', isNewUser: false };
+
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
-  const [code, setCode] = useState(['', '', '', '']);
+  const [code, setCode] = useState(['', '', '', '', '', '']); // 6 digits
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleCodeChange = (text: string, index: number) => {
-    // Only allow single character (numbers or letters)
+    // Only allow single digit
     if (text.length > 1) {
-      text = text.slice(-1).toUpperCase();
-    } else {
-      text = text.toUpperCase();
+      text = text.slice(-1);
     }
 
     const newCode = [...code];
@@ -43,25 +51,15 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
     setCode(newCode);
 
     // Auto-focus next input
-    if (text && index < 3) {
+    if (text && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-verify when all 4 digits are entered
-    if (text && index === 3) {
+    // Auto-verify when all 6 digits are entered
+    if (text && index === 5) {
       const fullCode = newCode.join('');
-      if (fullCode.length === 4) {
-        setIsLoading(true);
-        setTimeout(() => {
-          setIsLoading(false);
-          // Handle verification logic
-          console.log('Verify code:', fullCode);
-          // Navigate to CompleteProfile after verification
-          navigation.navigate('CompleteProfile');
-          if (onVerifyComplete) {
-            onVerifyComplete();
-          }
-        }, 1500);
+      if (fullCode.length === 6) {
+        handleVerify(fullCode);
       }
     }
   };
@@ -72,9 +70,80 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
     }
   };
 
-  const handleResend = () => {
-    // Handle resend code logic
-    console.log('Resend code');
+  const handleVerify = async (fullCode: string) => {
+    if (isLoading) return;
+
+    if (!email) {
+      alert('Email address missing. Please go back and try again.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await authService.verifyOTP(email, fullCode);
+
+      if (result.success) {
+        console.log('Verification successful');
+
+        if (result.isNewUser) {
+          // New user - go to complete profile
+          navigation.navigate('CompleteProfile');
+        } else {
+          // Existing user - check profile status
+          const profile = await profileService.getProfileById(result.user?.id || '');
+
+          if (profile?.onboarding_completed) {
+            // Onboarding done - go to Home/Welcome
+            navigation.navigate('Welcome');
+          } else if (!profile?.first_name) {
+            // Profile incomplete (step 1)
+            navigation.navigate('CompleteProfile');
+          } else {
+            // Profile step 1 done, go to role selection (step 2)
+            navigation.navigate('OnboardingRoles');
+          }
+        }
+
+        if (onVerifyComplete) {
+          onVerifyComplete();
+        }
+      } else {
+        setIsLoading(false);
+        // Show error to user
+        alert(result.error || 'Invalid verification code. Please check and try again.');
+        // Clear the code inputs
+        setCode(['', '', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      console.error('Error verifying OTP:', error);
+      alert('An unexpected error occurred. Please try again.');
+    }
+  };
+
+  const handleResend = async () => {
+    if (isLoading) return;
+
+    if (!email) {
+      alert('Email address missing. Please go back and try again.');
+      return;
+    }
+
+    try {
+      const result = await authService.resendOTP(email);
+
+      if (result.success) {
+        alert('A new verification code has been sent to your email.');
+        console.log('OTP resent successfully');
+      } else {
+        alert(result.error || 'Failed to resend code. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Error resending OTP:', error);
+      alert('An unexpected error occurred. Please try again.');
+    }
   };
 
   return (
@@ -86,7 +155,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
         {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBackground} />
-          <View style={styles.progressFill} />
+          <View style={[styles.progressFill, { width: isNewUser ? '50%' : '33%' }]} />
         </View>
 
         <ScrollView
@@ -106,7 +175,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                 style={styles.title}
               />
               <AppText
-                text="Enter the 4 digits sent to your inbox."
+                text="Enter the 6-digit code sent to your email."
                 fontSize={Typography.fontSize.md}
                 fontName="CircularStd-Book"
                 color={Colors.textSecondary}
@@ -115,7 +184,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
               />
             </View>
 
-            {/* Code Input Fields */}
+            {/* Code Input Fields - Now 6 digits */}
             <View style={styles.codeContainer}>
               {code.map((digit, index) => (
                 <View
@@ -137,10 +206,10 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                     onKeyPress={({ nativeEvent }) =>
                       handleKeyPress(nativeEvent.key, index)
                     }
-                    keyboardType="default"
-                    autoCapitalize="characters"
+                    keyboardType="number-pad"
                     maxLength={1}
                     selectTextOnFocus
+                    secureTextEntry={false}
                   />
                 </View>
               ))}
@@ -149,7 +218,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
           {/* Resend Section */}
           <View style={styles.resendContainer}>
             <AppText
-              text="Didn't recieve any e-mail?"
+              text="Didn't receive any e-mail?"
               fontSize={Typography.fontSize.md}
               fontName="CircularStd-Book"
               color={Colors.textSecondary}
@@ -204,7 +273,7 @@ const styles = StyleSheet.create({
   progressFill: {
     position: 'absolute',
     left: 0,
-    width: `${(49 / 196.5) * 100}%`,
+    width: '33%', // Changed from 49 to 33 for better visual
     height: '100%',
     backgroundColor: Colors.white,
     borderRadius: 30,
@@ -236,18 +305,17 @@ const styles = StyleSheet.create({
   codeContainer: {
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     flexDirection: 'row',
-    gap: Spacing.md,
-    justifyContent: 'center',
+    gap: Spacing.sm,
+    justifyContent: 'space-between',
     marginBottom: Spacing.xxl,
   },
   codeInputWrapper: {
     aspectRatio: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    minWidth: (79.25 / DESIGN_WIDTH) * SCREEN_WIDTH,
-    minHeight: (79.25 / DESIGN_WIDTH) * SCREEN_WIDTH,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    width: (44 / DESIGN_WIDTH) * SCREEN_WIDTH,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -271,11 +339,10 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   resendContainer: {
-    marginTop: 'auto', // 🔥 pushes the button to bottom
+    marginTop: 'auto', // Pushes button to bottom
     width: (329 / DESIGN_WIDTH) * SCREEN_WIDTH,
     alignItems: 'center',
     gap: Spacing.xl,
-    // paddingBottom: (32 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
   },
   resendText: {
     width: '100%',

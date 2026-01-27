@@ -11,9 +11,10 @@ interface CustomBottomSheetProps {
     title: string;
     children: React.ReactNode;
     contentStyle?: any;
+    sheetStyle?: any;
 }
 
-const CustomBottomSheet = ({ visible, onClose, title, children, contentStyle }: CustomBottomSheetProps) => {
+const CustomBottomSheet = ({ visible, onClose, title, children, contentStyle, sheetStyle }: CustomBottomSheetProps) => {
     return (
         <Modal
             isVisible={visible}
@@ -30,7 +31,7 @@ const CustomBottomSheet = ({ visible, onClose, title, children, contentStyle }: 
             swipeThreshold={50}
             avoidKeyboard
         >
-            <View style={styles.sheet}>
+            <View style={[styles.sheet, sheetStyle]}>
                 <View style={styles.handleContainer}>
                     <View style={styles.handle} />
                 </View>

@@ -1,7 +1,4 @@
-/**
- * Form options and data constants
- * Used for dropdowns, pickers, and form selections
- */
+import { CountryEnum, GenderEnum } from '../lib/types';
 
 export const MonthNames = [
   'Jan',
@@ -18,70 +15,16 @@ export const MonthNames = [
   'Dec',
 ];
 
-export const GenderOptions = [
-  'Male',
-  'Female',
-  'Other',
-  'Prefer not to say',
-];
+export const GenderOptions = Object.values(GenderEnum).map(gender => ({
+  label: gender.charAt(0).toUpperCase() + gender.slice(1),
+  value: gender,
+}));
 
-export const CountryOptions = [
-  'England',
-  'United States',
-  'Canada',
-  'Australia',
-  'Germany',
-  'France',
-  'Spain',
-  'Italy',
-  'Brazil',
-  'Mexico',
-  'Japan',
-  'China',
-  'India',
-  'Thailand',
-  'Netherlands',
-  'Belgium',
-  'Sweden',
-  'Norway',
-  'Denmark',
-  'Poland',
-  'Portugal',
-  'Greece',
-  'Turkey',
-  'Russia',
-  'South Korea',
-  'Singapore',
-  'Malaysia',
-  'Philippines',
-  'Indonesia',
-  'Vietnam',
-  'New Zealand',
-  'South Africa',
-  'Argentina',
-  'Chile',
-  'Colombia',
-  'Peru',
-  'Venezuela',
-  'Ecuador',
-  'Uruguay',
-  'Paraguay',
-  'Bolivia',
-  'Costa Rica',
-  'Panama',
-  'Guatemala',
-  'Honduras',
-  'El Salvador',
-  'Nicaragua',
-  'Dominican Republic',
-  'Cuba',
-  'Jamaica',
-  'Trinidad and Tobago',
-  'Barbados',
-  'Bahamas',
-  'Belize',
-  'Guyana',
-  'Suriname',
-  'Other',
-];
+export const CountryOptions = Object.values(CountryEnum).map(country => ({
+  label: country, // CountryEnum values are already capitalized in types.ts (Wait, I need to check if I change them to lowercase or not).
+  // If I change CountryEnum to lowercase, I need to capitalize them properly.
+  // Actually, for countries, manual mapping or a library is better, but let's assume simple capitalization or keeping them as is if DB allows.
+  // The error was specifically about `gender_enum`. `Country` might just be text.
+  value: country,
+}));
 

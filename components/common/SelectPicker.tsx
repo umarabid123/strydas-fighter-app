@@ -10,29 +10,44 @@ import {
 import { Colors, Spacing, Typography, BorderRadius } from '../../constant';
 import AppText from './AppText';
 
-interface SelectPickerProps {
+interface SelectPickerOption<T = string> {
+  label: string;
+  value: T;
+}
+
+interface SelectPickerProps<T = string> {
   visible: boolean;
   onClose: () => void;
   title: string;
-  options: string[];
-  selectedValue?: string;
-  onSelect: (value: string) => void;
+  options: (string | SelectPickerOption<T>)[];
+  selectedValue?: T;
+  onSelect: (value: T) => void;
 }
 
-export default function SelectPicker({
+export default function SelectPicker<T = string>({
   visible,
   onClose,
   title,
   options,
   selectedValue,
   onSelect,
-}: SelectPickerProps) {
+}: SelectPickerProps<T>) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: T) => {
     onSelect(value);
     onClose();
+  };
+
+  const getLabel = (item: string | SelectPickerOption<T>): string => {
+    if (typeof item === 'string') return item;
+    return item.label;
+  };
+
+  const getValue = (item: string | SelectPickerOption<T>): T => {
+    if (typeof item === 'string') return item as unknown as T;
+    return item.value;
   };
 
   return (
@@ -71,20 +86,22 @@ export default function SelectPicker({
           {options.length > 0 ? (
             <FlatList
               data={options}
-              keyExtractor={(item, index) => `${item}-${index}`}
+              keyExtractor={(item, index) => `${getValue(item)}-${index}`}
               renderItem={({ item }) => {
-                const isSelected = item === selectedValue;
+                const value = getValue(item);
+                const label = getLabel(item);
+                const isSelected = value === selectedValue;
                 return (
                   <TouchableOpacity
                     style={[
                       styles.option,
                       isSelected && styles.optionSelected,
                     ]}
-                    onPress={() => handleSelect(item)}
+                    onPress={() => handleSelect(value)}
                     activeOpacity={0.7}
                   >
                     <AppText
-                      text={item}
+                      text={label}
                       fontSize={Typography.fontSize.xl}
                       fontName={isSelected ? 'CircularStd-Medium' : 'CircularStd-Book'}
                       color={isSelected ? colors.white : colors.textTertiary}
