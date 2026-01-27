@@ -192,7 +192,7 @@ const Home = () => {
         visible={sheetVisible}
         onClose={() => setSheetVisible(false)}
         title={sheetType === 'match' ? 'Create Matches' : 'Create event'}
-        contentStyle={{ paddingHorizontal: 0, width: '100%' }}
+        contentStyle={{ paddingHorizontal: 0, alignItems: 'stretch', width: '100%' }}
       >
         {sheetType === 'event' ? (
           <View style={styles.sheetContent}>

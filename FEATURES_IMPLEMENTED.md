@@ -15,7 +15,9 @@
         - Includes fields: Select Event, Sport Type, Match Type, Weight Class, Description.
         - Uses `SelectPicker`.
         - Calls `createMatch` service.
-        - **Refined Design**: Updated styles to match `CreateEventSheet`, fixed spacing and width issues.
+        - **Refined Design**: 
+            - Updated styles to match `CreateEventSheet`.
+            - **Fixed Alignment**: Applied `alignItems: 'stretch'` to `CustomBottomSheet` to ensure full-width form and consistent appearance with Create Event sheet.
 - **Navigation**:
     - Fixed TypeScript errors related to `navigation.navigate`.
 
