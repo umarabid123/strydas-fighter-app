@@ -175,7 +175,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                 style={styles.title}
               />
               <AppText
-                text={`Enter the 6-digit code sent to your email${email ? ` (${email})` : ''}.`}
+                text="Enter the 6-digit code sent to your email."
                 fontSize={Typography.fontSize.md}
                 fontName="CircularStd-Book"
                 color={Colors.textSecondary}

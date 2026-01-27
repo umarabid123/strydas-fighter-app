@@ -1,6 +1,6 @@
 import { Search, X } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { FlatList, Image, ScrollView, StyleSheet, TextInput, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { FlatList, Image, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { BorderRadius, Colors, Spacing, Typography } from '../../constant';
 import AppButton from './AppButton';
 import AppText from './AppText';
@@ -148,54 +148,56 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
             title="Add match"
             contentStyle={styles.sheetContent}
         >
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
-            >
-                <View style={styles.form}>
-                    <ProfileInput
-                        label="Date of match *"
-                        placeholder="Select Date"
-                        value={date}
-                        editable={false}
-                        onPress={() => setShowDatePicker(true)}
-                    />
-                    <ProfileInput
-                        label="Name of opponent *"
-                        placeholder="Name"
-                        value={opponent}
-                        onChangeText={setOpponent}
-                    />
-                    <ProfileInput
-                        label="Name of event *"
-                        placeholder="Event Name"
-                        value={event}
-                        onChangeText={setEvent}
-                    />
+            <View style={{ flex: 1 }}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+                >
+                    <View style={styles.form}>
+                        <ProfileInput
+                            label="Date of match *"
+                            placeholder="Select Date"
+                            value={date}
+                            editable={false}
+                            onPress={() => setShowDatePicker(true)}
+                        />
+                        <ProfileInput
+                            label="Name of opponent *"
+                            placeholder="Name"
+                            value={opponent}
+                            onChangeText={setOpponent}
+                        />
+                        <ProfileInput
+                            label="Name of event *"
+                            placeholder="Event Name"
+                            value={event}
+                            onChangeText={setEvent}
+                        />
 
-                    <ProfileInput
-                        label="Division"
-                        placeholder="Select"
-                        value={division}
-                        editable={false}
-                        onPress={() => setPickerType('division')}
-                    />
-                    <ProfileInput
-                        label="Sport"
-                        placeholder="Select"
-                        value={sport}
-                        editable={false}
-                        onPress={() => setPickerType('sport')}
-                    />
-                    <ProfileInput
-                        label="Result"
-                        placeholder="Select"
-                        value={result}
-                        editable={false}
-                        onPress={() => setPickerType('result')}
-                    />
-                </View>
-                <View style={styles.footer}>
+                        <ProfileInput
+                            label="Division"
+                            placeholder="Select"
+                            value={division}
+                            editable={false}
+                            onPress={() => setPickerType('division')}
+                        />
+                        <ProfileInput
+                            label="Sport"
+                            placeholder="Select"
+                            value={sport}
+                            editable={false}
+                            onPress={() => setPickerType('sport')}
+                        />
+                        <ProfileInput
+                            label="Result"
+                            placeholder="Select"
+                            value={result}
+                            editable={false}
+                            onPress={() => setPickerType('result')}
+                        />
+                    </View>
+                </ScrollView>
+                <View style={[styles.footer, { paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: 'transparent' }]}>
                     <AppButton
                         text="Add match"
                         onPress={onClose}
@@ -203,7 +205,7 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
                         textStyle={styles.saveButtonText}
                     />
                 </View>
-            </ScrollView>
+            </View>
 
             <SelectPicker
                 visible={pickerType !== 'none'}
@@ -346,6 +348,126 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
                 <AppButton
                     text="Save & close"
                     onPress={onClose}
+                    btnStyle={styles.saveButton}
+                    textStyle={styles.saveButtonText}
+                />
+            </View>
+        </CustomBottomSheet>
+    );
+};
+
+
+const SOCIAL_PLATFORMS = ['Instagram', 'Facebook', 'Twitter', 'TikTok', 'YouTube', 'Website', 'Other'];
+
+export const SocialLinkSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave: (link: { platform: string; url: string }) => void }) => {
+    const [platform, setPlatform] = useState('');
+    const [url, setUrl] = useState('');
+    const [showPlatformPicker, setShowPlatformPicker] = useState(false);
+
+    const handleSave = () => {
+        if (platform && url) {
+            onSave({ platform, url });
+            setPlatform('');
+            setUrl('');
+            onClose();
+        } else {
+            alert('Please select a platform and enter a URL');
+        }
+    };
+
+    return (
+        <CustomBottomSheet
+            visible={visible}
+            onClose={onClose}
+            title="Add Social Link"
+            contentStyle={styles.sheetContent}
+        >
+            <View style={styles.form}>
+                <ProfileInput
+                    label="Platform *"
+                    placeholder="Select Platform"
+                    value={platform}
+                    editable={false}
+                    onPress={() => setShowPlatformPicker(true)}
+                />
+                <ProfileInput
+                    label="URL / Username *"
+                    placeholder="https://..."
+                    value={url}
+                    onChangeText={setUrl}
+                />
+            </View>
+            <View style={styles.footer}>
+                <AppButton
+                    text="Add Link"
+                    onPress={handleSave}
+                    btnStyle={styles.saveButton}
+                    textStyle={styles.saveButtonText}
+                />
+            </View>
+
+            <SelectPicker
+                visible={showPlatformPicker}
+                onClose={() => setShowPlatformPicker(false)}
+                title="Select Platform"
+                options={SOCIAL_PLATFORMS.map(p => ({ label: p, value: p }))}
+                onSelect={(val) => setPlatform(val)}
+                selectedValue={platform}
+            />
+        </CustomBottomSheet>
+    );
+};
+
+export const SportsSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave: (sport: string) => void }) => {
+    const [sport, setSport] = useState('');
+
+    const INTEREST_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing', 'BJJ', 'Wrestling', 'Karate', 'Judo'];
+
+    const handleSave = () => {
+        if (sport) {
+            onSave(sport);
+            setSport('');
+            onClose();
+        }
+    };
+
+    return (
+        <CustomBottomSheet
+            visible={visible}
+            onClose={onClose}
+            title="Add Sport"
+            contentStyle={styles.sheetContent}
+        >
+            <View style={styles.form}>
+                <ProfileInput
+                    label="Sport *"
+                    placeholder="Select or Type Sport"
+                    value={sport}
+                    onChangeText={setSport}
+                />
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                    {INTEREST_OPTIONS.map(s => (
+                        <TouchableOpacity
+                            key={s}
+                            style={[
+                                styles.tag,
+                                { backgroundColor: sport === s ? Colors.white : '#303030' }
+                            ]}
+                            onPress={() => setSport(s)}
+                        >
+                            <AppText
+                                text={s}
+                                fontSize={Typography.fontSize.sm}
+                                color={sport === s ? Colors.black : Colors.white}
+                            />
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </View>
+            <View style={styles.footer}>
+                <AppButton
+                    text="Add Sport"
+                    onPress={handleSave}
                     btnStyle={styles.saveButton}
                     textStyle={styles.saveButtonText}
                 />

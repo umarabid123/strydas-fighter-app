@@ -13,6 +13,7 @@ import {
   useColorScheme,
   View
 } from 'react-native';
+import { AddFighterSheet, ContactSheet, MatchSheet, SocialLinkSheet, SportsSheet } from '../../components/common/OnboardingSheets';
 import AppButton from '../../components/common/AppButton';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
@@ -20,7 +21,7 @@ import DatePickerModal from '../../components/common/DatePickerModal';
 import ProfileInput from '../../components/common/ProfileInput';
 import SelectPicker from '../../components/common/SelectPicker';
 import { BorderRadius, Colors, CountryOptions, DESIGN_HEIGHT, DESIGN_WIDTH, GenderOptions, MonthNames, Spacing, Typography } from '../../constant';
-import { profileService, socialLinksService } from '../../services/profileService';
+import { profileService, socialLinksService, sportsOfInterestService } from '../../services/profileService';
 import { useAuth } from '../../navigation';
 import { CountryEnum, GenderEnum } from '../../lib/types';
 
@@ -48,7 +49,10 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [showGenderPicker, setShowGenderPicker] = useState(false);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [socialLinks, setSocialLinks] = useState([
+  const [showSportSheet, setShowSportSheet] = useState(false);
+  const [showSocialSheet, setShowSocialSheet] = useState(false);
+  const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
+  const [socialLinks, setSocialLinks] = useState<Array<{ platform: string, url: string }>>([
     { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,12 +60,22 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   // Calculate progress: Step 1 = 25%, Step 2 = 50%
   const progressPercentage = currentStep === 1 ? 25 : 50;
 
-  const handleAddSocialLink = () => {
-    setSocialLinks([...socialLinks, { platform: '', url: '' }]);
-  };
-
   const handleRemoveSocialLink = (index: number) => {
     setSocialLinks(socialLinks.filter((_, i) => i !== index));
+  };
+
+  const handleSocialSave = (link: { platform: string; url: string }) => {
+    setSocialLinks([...socialLinks, link]);
+  };
+
+  const handleSportSave = (sport: string) => {
+    if (!sportsOfInterest.includes(sport)) {
+      setSportsOfInterest([...sportsOfInterest, sport]);
+    }
+  };
+
+  const handleRemoveSport = (sport: string) => {
+    setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
   };
 
   const handleProfileImagePress = async () => {
@@ -139,6 +153,14 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         }
       }
 
+      // Add sports of interest
+      for (const sport of sportsOfInterest) {
+        await sportsOfInterestService.addSportOfInterest({
+          profile_id: user.id,
+          sport_name: sport,
+        });
+      }
+
       console.log('Complete profile saved:', {
         firstName,
         lastName,
@@ -146,6 +168,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         gender,
         country,
         socialLinks,
+        sportsOfInterest,
       });
 
       return true;
@@ -269,14 +292,36 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
             {/* Sports of Interest */}
             <View style={styles.sectionContainer}>
-              <AppText
-                text="Sports of interest (optional)"
-                fontSize={Typography.fontSize.md}
-                fontName="CircularStd-Medium"
-                color={colors.white}
-                style={styles.sectionLabel}
-              />
-              <TouchableOpacity style={styles.addButton}>
+              <View style={styles.socialLinksHeader}>
+                <AppText
+                  text="Sports of interest (optional)"
+                  fontSize={Typography.fontSize.md}
+                  fontName="CircularStd-Medium"
+                  color={colors.white}
+                  style={styles.sectionLabel}
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                {sportsOfInterest.map(sport => (
+                  <View key={sport} style={{
+                    backgroundColor: '#303030',
+                    borderRadius: 99,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6
+                  }}>
+                    <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
+                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowSportSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -338,7 +383,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
 
               <TouchableOpacity
                 style={styles.addButton}
-                onPress={handleAddSocialLink}
+                onPress={() => setShowSocialSheet(true)}
               >
                 <AppText
                   text="+"
@@ -492,6 +537,19 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         onChange={handleDateChange}
         maximumDate={new Date()}
         minimumDate={new Date(1900, 0, 1)}
+      />
+      {/* Sports Sheet */}
+      <SportsSheet
+        visible={showSportSheet}
+        onClose={() => setShowSportSheet(false)}
+        onSave={handleSportSave}
+      />
+
+      {/* Social Link Sheet */}
+      <SocialLinkSheet
+        visible={showSocialSheet}
+        onClose={() => setShowSocialSheet(false)}
+        onSave={handleSocialSave}
       />
     </View>
   );
