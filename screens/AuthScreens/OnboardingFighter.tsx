@@ -18,23 +18,20 @@ import Slider from 'react-native-sticky-range-slider';
 import AppButton from '../../components/common/AppButton';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
-import { ContactSheet, MatchSheet } from '../../components/common/OnboardingSheets';
+import { ContactSheet, MatchSheet, SportsSheet } from '../../components/common/OnboardingSheets';
 import ProfileInput from '../../components/common/ProfileInput';
 import { Rail, RailSelected, Thumb } from '../../components/common/SliderComponents';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
-import { profileService, contactInfoService, sportsRecordsService } from '../../services/profileService';
+import { profileService, contactInfoService, sportsOfInterestService } from '../../services/profileService';
 import { DivisionEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 
 interface OnboardingFighterProps {
   onComplete?: () => void;
 }
 
-
-// ... (inside component)
 export default function OnboardingFighter({ onComplete }: OnboardingFighterProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const colorScheme = useColorScheme();
@@ -47,6 +44,8 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [gym, setGym] = useState('Keddles Gym');
   const [showContactSheet, setShowContactSheet] = useState(false);
   const [showMatchSheet, setShowMatchSheet] = useState(false);
+  const [showSportSheet, setShowSportSheet] = useState(false);
+  const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // State for contact info
@@ -56,6 +55,17 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
     email: string;
     org: string;
   } | null>(null);
+
+  const handleSportSave = (sport: string) => {
+    if (!sportsOfInterest.includes(sport)) {
+      setSportsOfInterest([...sportsOfInterest, sport]);
+    }
+  };
+
+  const handleRemoveSport = (sport: string) => {
+    setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
+  };
+
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -128,6 +138,17 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
         }
 
         await Promise.all(contactPromises);
+      }
+
+      // Save sports of interest
+      if (sportsOfInterest.length > 0) {
+        const sportPromises = sportsOfInterest.map(sport =>
+          sportsOfInterestService.addSportOfInterest({
+            profile_id: user.id,
+            sport_name: sport,
+          })
+        );
+        await Promise.all(sportPromises);
       }
 
       // TODO: Add sports records when MatchSheet returns data
@@ -249,14 +270,36 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
           <View style={styles.formContainer}>
             {/* Sports you compete in */}
             <View style={styles.sectionContainer}>
-              <AppText
-                text="Sports you compete in *"
-                fontSize={Typography.fontSize.md}
-                fontName="CircularStd-Medium"
-                color={colors.white}
-                style={styles.sectionLabel}
-              />
-              <TouchableOpacity style={styles.addButton}>
+              <View style={styles.recordHeader}>
+                <AppText
+                  text="Sports you compete in *"
+                  fontSize={Typography.fontSize.md}
+                  fontName="CircularStd-Medium"
+                  color={colors.white}
+                  style={styles.sectionLabel}
+                />
+              </View>
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                {sportsOfInterest.map(sport => (
+                  <View key={sport} style={{
+                    backgroundColor: '#303030',
+                    borderRadius: 99,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 6
+                  }}>
+                    <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
+                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.addButton} onPress={() => setShowSportSheet(true)}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -463,6 +506,11 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
           onSave={handleContactSave}
         />
         <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
+        <SportsSheet
+          visible={showSportSheet}
+          onClose={() => setShowSportSheet(false)}
+          onSave={handleSportSave}
+        />
       </KeyboardAvoidingView>
       <AppLoader isLoading={isLoading} />
     </View>

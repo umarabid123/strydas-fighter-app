@@ -83,7 +83,7 @@ export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; o
 
 import { DivisionEnum } from '../../lib/types';
 const DIVISION_OPTIONS = Object.values(DivisionEnum).map(div => ({
-    label: div, // DivisionEnum values are capitalized strings currently.
+    label: div.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
     value: div
 }));
 const SPORT_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing'];

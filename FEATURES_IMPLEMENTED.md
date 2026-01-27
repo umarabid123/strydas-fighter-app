@@ -1,25 +1,14 @@
 # Features Implemented
 
-## Contact Info Storage
-- **Onboarding Sheets**: Updated `ContactSheet` to return collected data.
-- **Fighter & Organizer Onboarding**: 
-    - Captured contact data (Name, Phone, Email, Organization).
-    - Saved data to `contact_info` table upon profile completion.
-    - Added visual feedback for added contact info.
+## Fighter Onboarding
+- **Sports You Compete In**: 
+    - Implemented `SportsSheet` integration in `OnboardingFighter.tsx`.
+    - Added ability to add, view, and remove sports (chips).
+    - Connected saving logic to `sportsOfInterestService`.
+- **Division Enum Fix**:
+    - Updated `DivisionEnum` values to lowercase (`pro`, `semi-pro`, `amateur`) to match database expectations and resolve "invalid input value" error.
+    - Updated UI labels to auto-capitalize these values for display.
 
-## Sports of Interest & Social Links
-- **Onboarding Sheets**:
-    - Created `SportsSheet` for selecting/adding sports.
-    - Created `SocialLinkSheet` for structured social link addition (Platform selection + URL).
-- **Complete Profile Screen**:
-    - Integrated `SportsSheet` and `SocialLinkSheet`.
-    - Implemented UI to display selected sports (as chips) and social links.
-    - Updated `saveProfile` logic to persist:
-        - `sports_of_interest` table (for sports).
-        - `social_links` table (for social media).
-
-## Minor Fixes
-- Removed email address from subtitle on OTP Verify screen for cleaner UI.
-- Fixed `DivisionEnum` usage in Fighter Onboarding to default correctly.
-
-These changes ensure a more comprehensive and robust profile setup flow for all user roles.
+## Complete Profile
+- **Social Links & Sports**: 
+    - (Previously completed) Implemented sheets and saving logic for both sections.

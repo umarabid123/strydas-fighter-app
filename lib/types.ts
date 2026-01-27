@@ -14,9 +14,9 @@ export enum GenderEnum {
 }
 
 export enum DivisionEnum {
-  AMATEUR = 'Amateur', // Keep capitalized if these are just strings, or check DB. Assuming strings for now as no error reported.
-  SEMI_PRO = 'Semi-Pro',
-  PRO = 'Pro',
+  AMATEUR = 'amateur',
+  SEMI_PRO = 'semi-pro',
+  PRO = 'pro',
 }
 
 export enum CountryEnum {
