@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Dimensions, Platform, StyleSheet, View, FlatList, TouchableOpacity } from 'react-native';
+import { Dimensions, Platform, ScrollView, StyleSheet, View, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import EmptyState from '../components/EmptyState';
 import AppLoader from '../components/common/AppLoader';
 import AppText from '../components/common/AppText';
 import CustomBottomSheet from '../components/common/CustomBottomSheet';
 import Header from '../components/common/Header';
-import { Colors } from '../constant';
+import { Colors, Spacing } from '../constant';
 import { useAuth } from '../navigation';
 import { getEventsByOrganizer } from '../services/eventService';
 import { Event } from '../lib/types';
@@ -192,6 +192,7 @@ const Home = () => {
         visible={sheetVisible}
         onClose={() => setSheetVisible(false)}
         title={sheetType === 'match' ? 'Create Matches' : 'Create event'}
+        contentStyle={{ paddingHorizontal: 0, width: '100%' }}
       >
         {sheetType === 'event' ? (
           <View style={styles.sheetContent}>
@@ -216,8 +217,8 @@ const Home = () => {
             />
           </View>
         ) : (
-          <View style={styles.sheetContent}>
-            <View style={{ gap: 16, paddingBottom: 20 }}>
+          <ScrollView contentContainerStyle={styles.sheetContent}>
+            <View style={{ gap: Spacing.lg, paddingBottom: 40 }}>
               <ProfileInput
                 label="Select Event *"
                 placeholder="Choose an event"
@@ -251,13 +252,16 @@ const Home = () => {
                 multiline
                 height={100}
               />
-              <AppButton
-                text="Create Match"
-                onPress={handleCreateMatch}
-                textStyle={{ color: Colors.black, fontSize: 16 }}
-              />
+              <View style={{ marginTop: 20 }}>
+                <AppButton
+                  text="Create Match"
+                  onPress={handleCreateMatch}
+                  btnStyle={styles.saveButton}
+                  textStyle={styles.saveButtonText}
+                />
+              </View>
             </View>
-          </View>
+          </ScrollView>
         )}
       </CustomBottomSheet>
 
@@ -325,5 +329,16 @@ const styles = StyleSheet.create({
   },
   sheetContent: {
     padding: 20,
+  },
+  saveButton: {
+    backgroundColor: Colors.white,
+    borderRadius: 100,
+    paddingHorizontal: 32,
+    paddingVertical: 17,
+    width: '100%'
+  },
+  saveButtonText: {
+    color: Colors.black,
+    fontWeight: '600',
   },
 });

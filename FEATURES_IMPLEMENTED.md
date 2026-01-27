@@ -5,12 +5,15 @@
     - Removed match creation logic from this sheet (single responsibility).
     - Checks inputs and calls `createEvent`. Logging added for debugging.
     - Improved "Description" field style (smaller font, better spacing).
-    - **Added Missing Fields**: Website URL, Instagram URL, and Ticket URL inputs are now available in the form.
+    - Added Missing Fields: Website URL, Instagram URL, and Ticket URL inputs.
 - **Create Match**:
     - Implemented "Create Match" form directly in `Home.tsx` bottom sheet.
         - Includes fields: Select Event, Sport Type, Match Type, Weight Class, Description.
-        - Uses `SelectPicker` to choose from user's existing events.
+        - Uses `SelectPicker`.
         - Calls `createMatch` service.
+        - **Refined Design**: 
+            - Updated styles to match `CreateEventSheet`.
+            - **Spacing & Width Fix**: Adjusted `CustomBottomSheet` content style to ensure full width usage and correct padding (20px).
 - **Navigation**:
     - Fixed TypeScript errors related to `navigation.navigate`.
 
