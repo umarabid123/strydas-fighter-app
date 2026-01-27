@@ -23,7 +23,7 @@ import ProfileInput from '../../components/common/ProfileInput';
 import { Rail, RailSelected, Thumb } from '../../components/common/SliderComponents';
 import { BorderRadius, Colors, DESIGN_HEIGHT, DESIGN_WIDTH, Spacing, Typography } from '../../constant';
 import { useAuth } from '../../navigation';
-import { profileService, contactInfoService, sportsOfInterestService } from '../../services/profileService';
+import { profileService, contactInfoService, sportsOfInterestService, sportsRecordsService } from '../../services/profileService';
 import { DivisionEnum } from '../../lib/types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -46,6 +46,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [showMatchSheet, setShowMatchSheet] = useState(false);
   const [showSportSheet, setShowSportSheet] = useState(false);
   const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
+  const [fighterRecords, setFighterRecords] = useState<Record<string, { wins: number, losses: number, draws: number }>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   // State for contact info
@@ -66,6 +67,27 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
     setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
   };
 
+  const handleMatchSave = (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => {
+    const current = fighterRecords[match.sport] || { wins: 0, losses: 0, draws: 0 };
+    if (match.result === 'Won') current.wins++;
+    else if (match.result === 'Lost') current.losses++;
+    else if (match.result === 'Draw') current.draws++;
+
+    setFighterRecords({
+      ...fighterRecords,
+      [match.sport]: current
+    });
+  };
+
+  const getTotalRecord = () => {
+    let w = 0, l = 0, d = 0;
+    Object.values(fighterRecords).forEach(r => {
+      w += r.wins;
+      l += r.losses;
+      d += r.draws;
+    });
+    return `${w}W ${l}L ${d}D`;
+  };
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -151,7 +173,17 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
         await Promise.all(sportPromises);
       }
 
-      // TODO: Add sports records when MatchSheet returns data
+      // Save sports records
+      const recordPromises = Object.entries(fighterRecords).map(([sport, record]) =>
+        sportsRecordsService.addSportsRecord({
+          profile_id: user.id,
+          sport_name: sport,
+          wins: record.wins,
+          losses: record.losses,
+          draws: record.draws
+        })
+      );
+      await Promise.all(recordPromises);
 
       // Mark onboarding as complete
       await profileService.completeOnboarding(user.id);
@@ -244,7 +276,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             />
             <View style={styles.fighterInfo}>
               <AppText
-                text="0W 0L 0D"
+                text={getTotalRecord()}
                 fontSize={Typography.fontSize.md}
                 fontName="CircularStd-Book"
                 color="rgba(255, 255, 255, 0.8)"
@@ -505,7 +537,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
           onClose={() => setShowContactSheet(false)}
           onSave={handleContactSave}
         />
-        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} />
+        <MatchSheet visible={showMatchSheet} onClose={() => setShowMatchSheet(false)} onSave={handleMatchSave} />
         <SportsSheet
           visible={showSportSheet}
           onClose={() => setShowSportSheet(false)}

@@ -1,4 +1,11 @@
 # Features Implemented
+## Sports Records Integration
+- **MatchSheet Update**: Connected `MatchSheet` to save logic. It now returns match data.
+- **OnboardingFighter Update**: 
+    - Added `fighterRecords` state to aggregate wins/losses/draws.
+    - Added `handleMatchSave` to aggregate incoming matches.
+    - Updated `handleComplete` to iterate over `fighterRecords` and save them to `sports_records` table using `sportsRecordsService`.
+    - Updated UI to show a dynamic total record (Wins/Losses/Draws) based on added matches.
 
 ## Fighter Onboarding
 - **Sports You Compete In**: 

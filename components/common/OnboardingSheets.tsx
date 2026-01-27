@@ -93,7 +93,7 @@ const RESULT_OPTIONS = ['Won', 'Lost', 'Draw', 'No Contest'];
 import DatePickerModal from './DatePickerModal';
 import { MonthNames } from '../../constant';
 
-export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
+export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave: (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => void }) => {
     const [date, setDate] = useState('');
     const [matchDate, setMatchDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -113,12 +113,38 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
         setPickerType('none');
     };
 
+    const handleSave = () => {
+        if (!opponent || !event || !sport || !result) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        onSave({
+            date: matchDate,
+            opponent,
+            event,
+            division,
+            sport,
+            result
+        });
+        // Reset form
+        setOpponent('');
+        setEvent('');
+        setDivision('');
+        setSport('');
+        setResult('');
+        setDate('');
+        setMatchDate(new Date());
+        onClose();
+    };
+
     const getOptions = () => {
         if (pickerType === 'division') return DIVISION_OPTIONS;
         if (pickerType === 'sport') return SPORT_OPTIONS;
         if (pickerType === 'result') return RESULT_OPTIONS;
         return [];
     };
+
+    // ... (rest of getPickerTitle, formatDate, handleDateChange)
 
     const getPickerTitle = () => {
         if (pickerType === 'division') return 'Select Division';
@@ -182,14 +208,14 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
                             onPress={() => setPickerType('division')}
                         />
                         <ProfileInput
-                            label="Sport"
+                            label="Sport *"
                             placeholder="Select"
                             value={sport}
                             editable={false}
                             onPress={() => setPickerType('sport')}
                         />
                         <ProfileInput
-                            label="Result"
+                            label="Result *"
                             placeholder="Select"
                             value={result}
                             editable={false}
@@ -200,7 +226,7 @@ export const MatchSheet = ({ visible, onClose }: { visible: boolean; onClose: ()
                 <View style={[styles.footer, { paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: 'transparent' }]}>
                     <AppButton
                         text="Add match"
-                        onPress={onClose}
+                        onPress={handleSave}
                         btnStyle={styles.saveButton}
                         textStyle={styles.saveButtonText}
                     />
