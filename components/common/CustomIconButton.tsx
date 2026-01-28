@@ -31,11 +31,7 @@ export default function CustomIconButton({
   disabled?: boolean;
 }) {
   return (
-    <TouchableOpacity
-      style={[styles.button, btnStyle, disabled && { opacity: 0.5 }]}
-      onPress={onPress}
-      disabled={disabled}
-    >
+    <TouchableOpacity style={[styles.button, btnStyle]} onPress={onPress} disabled={disabled}>
       <Text style={[styles.buttonText, textStyle]}>{text}</Text>
 
       {source && (

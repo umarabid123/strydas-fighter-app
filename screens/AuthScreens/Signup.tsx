@@ -13,13 +13,27 @@ export default function SignUp({ onNext }: SignUpProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (error) setError('');
+  };
 
   const handleNext = async () => {
     if (isLoading) return;
+    setError('');
 
     const trimmedEmail = email.trim();
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      alert('Please enter a valid email address');
+
+    if (!trimmedEmail) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -28,10 +42,10 @@ export default function SignUp({ onNext }: SignUpProps) {
     try {
       // Check if user exists first to prevent re-signup
       const profile = await authService.checkUserExists(trimmedEmail);
-      if (profile) {
+      // Only block if the user has actually completed onboarding
+      if (profile && profile.onboarding_completed) {
         setIsLoading(false);
-        alert('User already exists. Please log in instead.');
-        // Optionally redirect to Login: navigation.navigate('Login');
+        setError('An account with this email already exists. Please sign in instead.');
         return;
       }
 
@@ -52,12 +66,12 @@ export default function SignUp({ onNext }: SignUpProps) {
         }
       } else {
         // Show error to user
-        alert(result.error || 'Failed to send verification code. Please try again.');
+        setError(result.error || 'Failed to send verification code. Please try again.');
       }
     } catch (error: any) {
       setIsLoading(false);
       console.error('Error in handleNext:', error);
-      alert('An unexpected error occurred. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -67,10 +81,11 @@ export default function SignUp({ onNext }: SignUpProps) {
         title="Create account."
         subtitle="Unlock the benefits of a digital hub."
         email={email}
-        onEmailChange={setEmail}
+        onEmailChange={handleEmailChange}
         onNext={handleNext}
         showProgressBar
         titleContainerMarginBottom={60}
+        error={error}
       />
       <AppLoader isLoading={isLoading} />
     </>

@@ -1,7 +1,6 @@
+import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { User, Session, AuthError } from '@supabase/supabase-js';
 import { profileService } from './profileService';
-import { UserRoleEnum } from '../lib/types';
 
 /**
  * Authentication Service
@@ -78,19 +77,16 @@ export const authService = {
       // Send OTP to email (this works for both new and existing users)
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
-        options: {
-          // Create profile for new users after verification
-          data: {
-            email: email,
-          },
-        },
       });
 
       if (error) {
-        console.error('Error sending OTP:', error.message);
+        // Only log actual errors, not rate limits which are expected behavior
+        if (!error.message.includes('For security purposes, you can only request this after')) {
+          console.error('Error sending OTP:', error.message);
+        }
         return {
           success: false,
-          error: error.message,
+          error: this.getAuthErrorMessage(error),
           isNewUser: !userExists,
         };
       }
@@ -350,6 +346,9 @@ export const authService = {
       case 'OTP expired':
         return 'This code has expired. Please request a new one.';
       default:
+        if (error.message.includes('For security purposes, you can only request this after')) {
+          return 'Try again later';
+        }
         return error.message || 'An error occurred. Please try again.';
     }
   },

@@ -55,7 +55,7 @@ export default function SocialAuthForm({
   socialButtonHeight = 51,
   socialButtonPadding = Spacing.lg,
   socialButtonTextSize = Typography.fontSize.md,
-  titleContainerMarginBottom = Spacing.xxl,
+  titleContainerMarginBottom = 60,
   error,
 }: SocialAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -138,7 +138,7 @@ export default function SocialAuthForm({
           showsVerticalScrollIndicator={false}
         >
           {/* Title and Description */}
-          <View style={[styles.titleContainer, { marginBottom: titleContainerMarginBottom }]}>
+          <View style={[styles.titleContainer]}>
             <AppText
               text={title}
               fontSize={Typography.fontSize.xxl}
@@ -222,15 +222,17 @@ export default function SocialAuthForm({
               />
             )}
           </View>
+
+          <AppButton
+            text={buttonText}
+            onPress={onNext}
+            btnStyle={[styles.nextButton, { opacity: buttonOpacity }]}
+            textStyle={styles.nextButtonText}
+          />
         </ScrollView>
 
         {/* Next Button - Positioned absolutely at bottom */}
-        <AppButton
-          text={buttonText}
-          onPress={onNext}
-          btnStyle={[styles.nextButton, { opacity: buttonOpacity }]}
-          textStyle={styles.nextButtonText}
-        />
+
       </KeyboardAvoidingView>
     </View >
   );
@@ -282,6 +284,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.sm,
     alignSelf: 'center',
+    paddingTop: Spacing.xxxl,
+    paddingBottom: 60,
   },
   title: {
     width: '100%',
