@@ -36,6 +36,7 @@ interface SocialAuthFormProps {
   socialButtonTextSize?: number;
   titleContainerMarginBottom?: number;
   titleContainerMarginTop?: number;
+  error?: string;
 }
 
 export default function SocialAuthForm({
@@ -55,6 +56,7 @@ export default function SocialAuthForm({
   socialButtonPadding = Spacing.lg,
   socialButtonTextSize = Typography.fontSize.md,
   titleContainerMarginBottom = Spacing.xxl,
+  error,
 }: SocialAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -62,7 +64,7 @@ export default function SocialAuthForm({
     setIsLoading(true);
     try {
       const result = await authService.signInWithGoogle();
-      
+
       if (result.success) {
         console.log('Google auth successful');
         // Note: OAuth flow requires callback handling
@@ -82,7 +84,7 @@ export default function SocialAuthForm({
     setIsLoading(true);
     try {
       const result = await authService.signInWithApple();
-      
+
       if (result.success) {
         console.log('Apple auth successful');
         // Note: OAuth flow requires callback handling
@@ -101,7 +103,7 @@ export default function SocialAuthForm({
     setIsLoading(true);
     try {
       const result = await authService.signInWithFacebook();
-      
+
       if (result.success) {
         console.log('Facebook auth successful');
         // Note: OAuth flow requires callback handling
@@ -211,6 +213,14 @@ export default function SocialAuthForm({
                 editable={!isLoading}
               />
             </View>
+            {error && (
+              <AppText
+                text={error}
+                color={Colors.errorRed}
+                fontSize={Typography.fontSize.sm}
+                style={{ marginTop: 8, marginLeft: 4 }}
+              />
+            )}
           </View>
         </ScrollView>
 
@@ -222,7 +232,7 @@ export default function SocialAuthForm({
           textStyle={styles.nextButtonText}
         />
       </KeyboardAvoidingView>
-    </View>
+    </View >
   );
 }
 
