@@ -13,13 +13,27 @@ export default function Login({ onSignUpPress }: LoginProps) {
   const navigation = useNavigation<NavigationProp<any>>();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (error) setError('');
+  };
 
   const handleNext = async () => {
     if (isLoading) return;
+    setError('');
 
     const trimmedEmail = email.trim();
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      alert('Please enter a valid email address');
+
+    if (!trimmedEmail) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -30,7 +44,7 @@ export default function Login({ onSignUpPress }: LoginProps) {
       const profile = await authService.checkUserExists(trimmedEmail);
       if (!profile) {
         setIsLoading(false);
-        alert('User does not exist. Please create an account.');
+        setError('No account found with this email. Please create an account first.');
         return;
       }
 
@@ -47,12 +61,12 @@ export default function Login({ onSignUpPress }: LoginProps) {
         });
       } else {
         // Show error to user
-        alert(result.error || 'Failed to send verification code. Please try again.');
+        setError(result.error || 'Failed to send verification code. Please try again.');
       }
     } catch (error: any) {
       setIsLoading(false);
       console.error('Error in handleNext:', error);
-      alert('An unexpected error occurred. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -62,8 +76,9 @@ export default function Login({ onSignUpPress }: LoginProps) {
         title="Log In"
         subtitle="Unlock the benefits of a digital hub."
         email={email}
-        onEmailChange={setEmail}
+        onEmailChange={handleEmailChange}
         onNext={handleNext}
+        error={error}
       />
       <AppLoader isLoading={isLoading} />
     </>

@@ -234,7 +234,7 @@ export default function SocialAuthForm({
         {/* Next Button - Positioned absolutely at bottom */}
 
       </KeyboardAvoidingView>
-    </View>
+    </View >
   );
 }
 
