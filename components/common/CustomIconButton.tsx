@@ -19,6 +19,7 @@ export default function CustomIconButton({
   source,
   iconStyle,
   onPress,
+  disabled,
 }: {
   text?: string;
   route?: string;
@@ -27,9 +28,10 @@ export default function CustomIconButton({
   source?: any;
   iconStyle?: any;
   onPress?: () => void;
+  disabled?: boolean;
 }) {
   return (
-    <TouchableOpacity style={[styles.button, btnStyle]} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, btnStyle]} onPress={onPress} disabled={disabled}>
       <Text style={[styles.buttonText, textStyle]}>{text}</Text>
 
       {source && (
