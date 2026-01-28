@@ -80,7 +80,10 @@ export const authService = {
       });
 
       if (error) {
-        console.error('Error sending OTP:', error.message);
+        // Only log actual errors, not rate limits which are expected behavior
+        if (!error.message.includes('For security purposes, you can only request this after')) {
+          console.error('Error sending OTP:', error.message);
+        }
         return {
           success: false,
           error: this.getAuthErrorMessage(error),
