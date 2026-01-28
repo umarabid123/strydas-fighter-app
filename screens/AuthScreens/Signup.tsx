@@ -42,7 +42,8 @@ export default function SignUp({ onNext }: SignUpProps) {
     try {
       // Check if user exists first to prevent re-signup
       const profile = await authService.checkUserExists(trimmedEmail);
-      if (profile) {
+      // Only block if the user has actually completed onboarding
+      if (profile && profile.onboarding_completed) {
         setIsLoading(false);
         setError('An account with this email already exists. Please sign in instead.');
         return;
