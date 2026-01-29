@@ -154,41 +154,13 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
 
       // Save contact info if exists
       if (contactData) {
-        const contactPromises = [];
-
-        if (contactData.fullName) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'name',
-            contact_value: contactData.fullName,
-          }));
-        }
-
-        if (contactData.phone) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'phone',
-            contact_value: contactData.phone,
-          }));
-        }
-
-        if (contactData.email) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'email',
-            contact_value: contactData.email,
-          }));
-        }
-
-        if (contactData.org) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'organization',
-            contact_value: contactData.org,
-          }));
-        }
-
-        await Promise.all(contactPromises);
+        await contactInfoService.addContactInfo({
+          profile_id: user.id,
+          full_name: contactData.fullName,
+          phone: contactData.phone,
+          email: contactData.email || null,
+          organisation: contactData.org || null,
+        });
       }
 
       // Save sports of interest

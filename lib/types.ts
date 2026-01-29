@@ -120,8 +120,10 @@ export interface SocialLink {
 export interface ContactInfo {
   id: string;
   profile_id: string;
-  contact_type: string;
-  contact_value: string;
+  full_name: string;
+  phone: string;
+  email: string | null;
+  organisation: string | null;
   created_at: string;
 }
 

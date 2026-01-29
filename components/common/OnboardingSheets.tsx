@@ -100,7 +100,7 @@ import { MonthNames } from '../../constant';
 
 export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave: (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => void }) => {
     const [date, setDate] = useState('');
-    const [matchDate, setMatchDate] = useState(new Date());
+    const [matchDate, setMatchDate] = useState(new Date(2024, 0, 1));
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [opponent, setOpponent] = useState('');
     const [event, setEvent] = useState('');
