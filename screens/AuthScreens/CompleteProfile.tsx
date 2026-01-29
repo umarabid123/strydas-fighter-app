@@ -56,26 +56,31 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
     { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Calculate progress: Step 1 = 25%, Step 2 = 50%
   const progressPercentage = currentStep === 1 ? 25 : 50;
 
   const handleRemoveSocialLink = (index: number) => {
     setSocialLinks(socialLinks.filter((_, i) => i !== index));
+    if (error) setError('');
   };
 
   const handleSocialSave = (link: { platform: string; url: string }) => {
     setSocialLinks([...socialLinks, link]);
+    if (error) setError('');
   };
 
   const handleSportSave = (sport: string) => {
     if (!sportsOfInterest.includes(sport)) {
       setSportsOfInterest([...sportsOfInterest, sport]);
+      if (error) setError('');
     }
   };
 
   const handleRemoveSport = (sport: string) => {
     setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
+    if (error) setError('');
   };
 
   const handleProfileImagePress = async () => {
@@ -104,6 +109,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
     if (selectedDate) {
       setBirthDate(selectedDate);
       setDateOfBirth(formatDate(selectedDate));
+      if (error) setError('');
     }
   };
 
@@ -182,6 +188,30 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   };
 
   const handleNext = async () => {
+    if (currentStep === 1) {
+      setError('');
+      if (!firstName || !firstName.trim()) {
+        setError('Please enter your First Name.');
+        return;
+      }
+      if (!lastName || !lastName.trim()) {
+        setError('Please enter your Last Name.');
+        return;
+      }
+      if (!dateOfBirth) {
+        setError('Please select your Date of Birth.');
+        return;
+      }
+      if (!gender) {
+        setError('Select a valid option for Gender.');
+        return;
+      }
+      if (!country) {
+        setError('Select a valid option for Country.');
+        return;
+      }
+    }
+
     if (currentStep < TOTAL_STEPS) {
       // Advance to next step
       setCurrentStep(currentStep + 1);
@@ -259,13 +289,20 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
             <ProfileInput
               label="First Name *"
               // value={firstName}
-              onChangeText={setFirstName}
+              // value={firstName}
+              onChangeText={(text) => {
+                setFirstName(text);
+                if (error) setError('');
+              }}
               placeholder="Jonathan"
             />
             <ProfileInput
               label="Last Name *"
               // value={lastName}
-              onChangeText={setLastName}
+              onChangeText={(text) => {
+                setLastName(text);
+                if (error) setError('');
+              }}
               placeholder="Haggerty"
             />
             <ProfileInput
@@ -394,6 +431,15 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
               </TouchableOpacity>
             </View>
 
+            {error ? (
+              <AppText
+                text={error}
+                color={Colors.errorRed}
+                fontSize={Typography.fontSize.sm}
+                style={{ marginBottom: 10, alignSelf: 'center' }}
+              />
+            ) : null}
+
             <AppButton
               text="Next"
               onPress={handleNext}
@@ -515,7 +561,10 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Gender"
         options={GenderOptions}
         selectedValue={gender}
-        onSelect={(val) => setGender(val as GenderEnum)}
+        onSelect={(val) => {
+          setGender(val as GenderEnum);
+          if (error) setError('');
+        }}
       />
 
       {/* Country Picker Modal */}
@@ -525,7 +574,10 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Country"
         options={CountryOptions}
         selectedValue={country}
-        onSelect={(val) => setCountry(val as CountryEnum)}
+        onSelect={(val) => {
+          setCountry(val as CountryEnum);
+          if (error) setError('');
+        }}
       />
 
       {/* Date Picker Modal */}
