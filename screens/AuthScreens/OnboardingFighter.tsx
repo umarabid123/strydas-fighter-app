@@ -193,12 +193,22 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
 
       // Save sports of interest
       if (sportsOfInterest.length > 0) {
-        const sportPromises = sportsOfInterest.map(sport =>
-          sportsOfInterestService.addSportOfInterest({
-            profile_id: user.id,
-            sport_name: sport,
-          })
-        );
+        const sportPromises = sportsOfInterest.map(async (sport) => {
+          try {
+            await sportsOfInterestService.addSportOfInterest({
+              profile_id: user.id,
+              sport_name: sport,
+            });
+          } catch (sportError: any) {
+            // Ignore duplicate key error (23505) if likely already added
+            // Adjust this check based on the actual error object structure you receive (e.g. sportError.code)
+            if (sportError?.code === '23505' || sportError?.message?.includes('duplicate key')) {
+              console.log(`Sport '${sport}' already exists, skipping.`);
+            } else {
+              throw sportError;
+            }
+          }
+        });
         await Promise.all(sportPromises);
       }
 

@@ -119,7 +119,7 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
     };
 
     const handleSave = () => {
-        if (!date || !opponent.trim() || !event.trim() || !sport || !result) {
+        if (!date || !opponent.trim() || !event.trim() || !division || !sport || !result) {
             alert('Please fill in all required fields');
             return;
         }
@@ -227,15 +227,15 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
                             onPress={() => setPickerType('result')}
                         />
                     </View>
+                    <View style={[styles.footer, { paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: 'transparent' }]}>
+                        <AppButton
+                            text="Add match"
+                            onPress={handleSave}
+                            btnStyle={styles.saveButton}
+                            textStyle={styles.saveButtonText}
+                        />
+                    </View>
                 </ScrollView>
-                <View style={[styles.footer, { paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: 'transparent' }]}>
-                    <AppButton
-                        text="Add match"
-                        onPress={handleSave}
-                        btnStyle={styles.saveButton}
-                        textStyle={styles.saveButtonText}
-                    />
-                </View>
             </View>
 
             <SelectPicker
