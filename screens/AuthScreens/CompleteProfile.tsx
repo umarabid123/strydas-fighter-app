@@ -1,6 +1,7 @@
 import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   Dimensions,
@@ -353,8 +354,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
                     gap: 6
                   }}>
                     <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
-                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
-                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)} style={{ opacity: 0.7 }}>
+                      <X size={14} color={Colors.white} />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -410,12 +411,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
                     style={styles.removeButton}
                     onPress={() => handleRemoveSocialLink(index)}
                   >
-                    <AppText
-                      text="×"
-                      fontSize={Typography.fontSize.xxl}
-                      fontName="CircularStd-Medium"
-                      color={Colors.white}
-                    />
+                    <X size={16} color={Colors.white} />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -741,8 +737,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing.sm,
     right: Spacing.sm,
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
