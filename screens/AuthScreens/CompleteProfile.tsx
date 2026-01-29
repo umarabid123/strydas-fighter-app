@@ -1,6 +1,7 @@
 import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import {
   Dimensions,
@@ -43,7 +44,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
-  const [birthDate, setBirthDate] = useState(new Date());
+  // Default picker to year 2000 so users can scroll months freely without hitting "today" limit
+  const [birthDate, setBirthDate] = useState(new Date(2000, 0, 1));
   const [gender, setGender] = useState<GenderEnum | ''>('');
   const [country, setCountry] = useState<CountryEnum | ''>('');
   const [showGenderPicker, setShowGenderPicker] = useState(false);
@@ -52,30 +54,33 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [showSportSheet, setShowSportSheet] = useState(false);
   const [showSocialSheet, setShowSocialSheet] = useState(false);
   const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
-  const [socialLinks, setSocialLinks] = useState<Array<{ platform: string, url: string }>>([
-    { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
-  ]);
+  const [socialLinks, setSocialLinks] = useState<Array<{ platform: string, url: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Calculate progress: Step 1 = 25%, Step 2 = 50%
   const progressPercentage = currentStep === 1 ? 25 : 50;
 
   const handleRemoveSocialLink = (index: number) => {
     setSocialLinks(socialLinks.filter((_, i) => i !== index));
+    if (error) setError('');
   };
 
   const handleSocialSave = (link: { platform: string; url: string }) => {
     setSocialLinks([...socialLinks, link]);
+    if (error) setError('');
   };
 
   const handleSportSave = (sport: string) => {
     if (!sportsOfInterest.includes(sport)) {
       setSportsOfInterest([...sportsOfInterest, sport]);
+      if (error) setError('');
     }
   };
 
   const handleRemoveSport = (sport: string) => {
     setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
+    if (error) setError('');
   };
 
   const handleProfileImagePress = async () => {
@@ -100,16 +105,21 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
     return `${month} ${day}, ${year}`;
   };
 
+  // Create a stable max date (today)
+  const [maxDate] = useState(new Date());
+
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (selectedDate) {
       setBirthDate(selectedDate);
       setDateOfBirth(formatDate(selectedDate));
+      if (error) setError('');
     }
   };
 
   const handleDatePickerPress = () => {
     setShowDatePicker(true);
   };
+
 
 
   const saveProfile = async () => {
@@ -182,6 +192,30 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   };
 
   const handleNext = async () => {
+    if (currentStep === 1) {
+      setError('');
+      if (!firstName || !firstName.trim()) {
+        setError('Please enter your First Name.');
+        return;
+      }
+      if (!lastName || !lastName.trim()) {
+        setError('Please enter your Last Name.');
+        return;
+      }
+      if (!dateOfBirth) {
+        setError('Please select your Date of Birth.');
+        return;
+      }
+      if (!gender) {
+        setError('Select a valid option for Gender.');
+        return;
+      }
+      if (!country) {
+        setError('Select a valid option for Country.');
+        return;
+      }
+    }
+
     if (currentStep < TOTAL_STEPS) {
       // Advance to next step
       setCurrentStep(currentStep + 1);
@@ -258,26 +292,32 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
           <View style={styles.formContainer}>
             <ProfileInput
               label="First Name *"
-              // value={firstName}
-              onChangeText={setFirstName}
+              value={firstName}
+              onChangeText={(text) => {
+                setFirstName(text);
+                if (error) setError('');
+              }}
               placeholder="Jonathan"
             />
             <ProfileInput
               label="Last Name *"
-              // value={lastName}
-              onChangeText={setLastName}
+              value={lastName}
+              onChangeText={(text) => {
+                setLastName(text);
+                if (error) setError('');
+              }}
               placeholder="Haggerty"
             />
             <ProfileInput
               label="Date of birth *"
-              // value={dateOfBirth}
+              value={dateOfBirth}
               placeholder="Mar 03, 2000"
               editable={false}
               onPress={handleDatePickerPress}
             />
             <ProfileInput
               label="Gender *"
-              // value={gender}
+              value={gender}
               placeholder="-"
               editable={false}
               onPress={() => setShowGenderPicker(true)}
@@ -314,8 +354,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
                     gap: 6
                   }}>
                     <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
-                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
-                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)} style={{ opacity: 0.7 }}>
+                      <X size={14} color={Colors.white} />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -371,12 +411,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
                     style={styles.removeButton}
                     onPress={() => handleRemoveSocialLink(index)}
                   >
-                    <AppText
-                      text="×"
-                      fontSize={Typography.fontSize.xxl}
-                      fontName="CircularStd-Medium"
-                      color={Colors.white}
-                    />
+                    <X size={16} color={Colors.white} />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -393,6 +428,15 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
                 />
               </TouchableOpacity>
             </View>
+
+            {error ? (
+              <AppText
+                text={error}
+                color={Colors.errorRed}
+                fontSize={Typography.fontSize.sm}
+                style={{ marginBottom: 10, alignSelf: 'center' }}
+              />
+            ) : null}
 
             <AppButton
               text="Next"
@@ -515,7 +559,10 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Gender"
         options={GenderOptions}
         selectedValue={gender}
-        onSelect={(val) => setGender(val as GenderEnum)}
+        onSelect={(val) => {
+          setGender(val as GenderEnum);
+          if (error) setError('');
+        }}
       />
 
       {/* Country Picker Modal */}
@@ -525,7 +572,10 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Country"
         options={CountryOptions}
         selectedValue={country}
-        onSelect={(val) => setCountry(val as CountryEnum)}
+        onSelect={(val) => {
+          setCountry(val as CountryEnum);
+          if (error) setError('');
+        }}
       />
 
       {/* Date Picker Modal */}
@@ -535,7 +585,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Date of Birth"
         value={birthDate}
         onChange={handleDateChange}
-        maximumDate={new Date()}
+        maximumDate={maxDate}
         minimumDate={new Date(1900, 0, 1)}
       />
       {/* Sports Sheet */}
@@ -687,8 +737,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: Spacing.sm,
     right: Spacing.sm,
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },

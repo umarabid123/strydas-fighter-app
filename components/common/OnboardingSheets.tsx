@@ -392,6 +392,14 @@ export const SocialLinkSheet = ({ visible, onClose, onSave }: { visible: boolean
 
     const handleSave = () => {
         if (platform && url) {
+            // Validation: check if the URL contains the platform name (unless Website or Other)
+            if (platform !== 'Website' && platform !== 'Other') {
+                if (!url.toLowerCase().includes(platform.toLowerCase())) {
+                    alert(`Please enter a valid ${platform} URL.`);
+                    return;
+                }
+            }
+
             onSave({ platform, url });
             setPlatform('');
             setUrl('');
@@ -450,10 +458,12 @@ export const SportsSheet = ({ visible, onClose, onSave }: { visible: boolean; on
     const INTEREST_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing', 'BJJ', 'Wrestling', 'Karate', 'Judo'];
 
     const handleSave = () => {
-        if (sport) {
-            onSave(sport);
+        if (sport && sport.trim()) {
+            onSave(sport.trim());
             setSport('');
             onClose();
+        } else {
+            alert('Please select or enter a sport.');
         }
     };
 
