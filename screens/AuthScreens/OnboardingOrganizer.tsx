@@ -34,8 +34,8 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
   const colors = colorScheme === 'dark' ? Colors.dark : Colors.light;
   const { setIsAuthenticated, user, setHasCompletedOnboarding } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [jobTitle, setJobTitle] = useState('IFMA President');
-  const [organisation, setOrganisation] = useState('Keddles Gym');
+  const [jobTitle, setJobTitle] = useState('');
+  const [organisation, setOrganisation] = useState('');
   const [showContactSheet, setShowContactSheet] = useState(false);
   const [showAddFighterSheet, setShowAddFighterSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,6 +47,7 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
     email: string;
     org: string;
   } | null>(null);
+  const [error, setError] = useState('');
 
   const handleProfileImagePress = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -63,11 +64,37 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
 
   const handleContactSave = (data: { fullName: string; phone: string; email: string; org: string }) => {
     setContactData(data);
+    if (error) setError('');
+  };
+
+  const handleAddFighter = async (fighters: string[]) => {
+    // Logic to handle added fighters - for now just logging or local state if needed
+    // In a real app, you might want to save these relations immediately or store in state to save on 'Complete'
+    console.log('Fighters to add:', fighters);
+    // You could introduce a local state for managedFighters if you want to display them or save them in handleComplete
   };
 
   const handleComplete = async () => {
     if (!user?.id) {
       alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
+    // Validation
+    setError('');
+
+    if (!jobTitle || !jobTitle.trim()) {
+      setError('Please enter your Job Title.');
+      return;
+    }
+
+    if (!organisation || !organisation.trim()) {
+      setError('Please enter your Organisation.');
+      return;
+    }
+
+    if (!contactData) {
+      setError('Add at least one contact method.');
       return;
     }
 
@@ -81,41 +108,13 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
 
       // Save contact info if exists
       if (contactData) {
-        const contactPromises = [];
-
-        if (contactData.fullName) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'name',
-            contact_value: contactData.fullName,
-          }));
-        }
-
-        if (contactData.phone) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'phone',
-            contact_value: contactData.phone,
-          }));
-        }
-
-        if (contactData.email) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'email',
-            contact_value: contactData.email,
-          }));
-        }
-
-        if (contactData.org) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'organization',
-            contact_value: contactData.org,
-          }));
-        }
-
-        await Promise.all(contactPromises);
+        await contactInfoService.addContactInfo({
+          profile_id: user.id,
+          full_name: contactData.fullName,
+          phone: contactData.phone,
+          email: contactData.email || null,
+          organisation: contactData.org || null,
+        });
       }
 
       // TODO: Add managed fighters when AddFighterSheet returns data
@@ -231,8 +230,11 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                 />
               </View>
               <TextInput
-                // value={jobTitle}
-                onChangeText={setJobTitle}
+                value={jobTitle}
+                onChangeText={(text) => {
+                  setJobTitle(text);
+                  if (error) setError('');
+                }}
                 style={{
                   fontFamily: 'CircularStd-Book',
                   fontSize: Typography.fontSize.xl,
@@ -262,8 +264,11 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                 />
               </View>
               <TextInput
-                // value={organisation}
-                onChangeText={setOrganisation}
+                value={organisation}
+                onChangeText={(text) => {
+                  setOrganisation(text);
+                  if (error) setError('');
+                }}
                 style={{
                   fontFamily: 'CircularStd-Book',
                   fontSize: Typography.fontSize.xl,
@@ -304,7 +309,10 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
                 </View>
               )}
 
-              <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
+              <TouchableOpacity style={styles.addButton} onPress={() => {
+                setShowContactSheet(true);
+                if (error) setError('');
+              }}>
                 <AppText
                   text={contactData ? "Edit" : "+"}
                   fontSize={contactData ? Typography.fontSize.sm : Typography.fontSize.xxl}
@@ -344,6 +352,14 @@ export default function OnboardingOrganizer({ onComplete }: OnboardingOrganizerP
 
           {/* Complete Button */}
           <View style={styles.completeButtonContainer}>
+            {error ? (
+              <AppText
+                text={error}
+                color={Colors.errorRed}
+                fontSize={Typography.fontSize.sm}
+                style={{ marginBottom: 10 }}
+              />
+            ) : null}
             <AppButton
               text="That's it, complete"
               onPress={handleComplete}
