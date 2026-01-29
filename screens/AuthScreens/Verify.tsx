@@ -10,7 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   useColorScheme,
-  View
+  View,
 } from 'react-native';
 import AppLoader from '../../components/common/AppLoader';
 import AppText from '../../components/common/AppText';
@@ -41,26 +41,55 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const handleCodeChange = (text: string, index: number) => {
-    // Only allow single digit
-    if (text.length > 1) {
-      text = text.slice(-1);
+    const sanitizedText = text.replace(/[^0-9]/g, '');
+
+    // Handle clear
+    if (sanitizedText.length === 0) {
+      const newCode = [...code];
+      newCode[index] = '';
+      setCode(newCode);
+      return;
     }
 
-    const newCode = [...code];
-    newCode[index] = text;
-    setCode(newCode);
+    // Handle paste (multiple characters)
+    if (sanitizedText.length > 1) {
+      const newCode = [...code];
+      const chars = sanitizedText.split('');
+      let lastUpdatedIndex = index;
 
-    // Auto-focus next input
-    if (text && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
+      for (let i = 0; i < chars.length; i++) {
+        const targetIndex = index + i;
+        if (targetIndex < 6) {
+          newCode[targetIndex] = chars[i];
+          lastUpdatedIndex = targetIndex;
+        }
+      }
 
-    // Auto-verify when all 6 digits are entered
-    if (text && index === 5) {
+      setCode(newCode);
+
       const fullCode = newCode.join('');
       if (fullCode.length === 6) {
         handleVerify(fullCode);
+        inputRefs.current[5]?.blur();
+      } else if (lastUpdatedIndex < 5) {
+        inputRefs.current[lastUpdatedIndex + 1]?.focus();
       }
+      return;
+    }
+
+    // Handle single character
+    const newCode = [...code];
+    newCode[index] = sanitizedText;
+    setCode(newCode);
+
+    // Auto-focus next input
+    if (sanitizedText && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+
+    // Check if complete
+    if (newCode.every(digit => digit !== '')) {
+      handleVerify(newCode.join(''));
     }
   };
 
@@ -207,7 +236,8 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
                       handleKeyPress(nativeEvent.key, index)
                     }
                     keyboardType="number-pad"
-                    maxLength={1}
+                    textContentType="oneTimeCode"
+                    maxLength={6} // Allow pasting long strings
                     selectTextOnFocus
                     secureTextEntry={false}
                   />
@@ -215,6 +245,7 @@ export default function Verify({ onVerifyComplete }: VerifyProps) {
               ))}
             </View>
           </View>
+
           {/* Resend Section */}
           <View style={styles.resendContainer}>
             <AppText
