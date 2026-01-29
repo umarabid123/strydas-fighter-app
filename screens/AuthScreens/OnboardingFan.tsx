@@ -1,6 +1,8 @@
 import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -169,13 +171,37 @@ export default function OnboardingFan({ onComplete }: OnboardingFanProps) {
               label="Allow notifications?"
               subtitle="Get updated with your fighters and events."
               value={notificationsEnabled}
-              onToggle={setNotificationsEnabled}
+              onToggle={async (val) => {
+                if (val) {
+                  const { status } = await Notifications.requestPermissionsAsync();
+                  if (status === 'granted') {
+                    setNotificationsEnabled(true);
+                  } else {
+                    setNotificationsEnabled(false);
+                    alert('You can enable notifications later in settings.');
+                  }
+                } else {
+                  setNotificationsEnabled(false);
+                }
+              }}
             />
             <Toggle
               label="Allow location?"
               subtitle="See relevant events near you"
               value={locationEnabled}
-              onToggle={setLocationEnabled}
+              onToggle={async (val) => {
+                if (val) {
+                  const { status } = await Location.requestForegroundPermissionsAsync();
+                  if (status === 'granted') {
+                    setLocationEnabled(true);
+                  } else {
+                    setLocationEnabled(false);
+                    alert('You can enable location access later in settings.');
+                  }
+                } else {
+                  setLocationEnabled(false);
+                }
+              }}
             />
           </View>
           <View style={styles.completeButtonContainer}>
@@ -309,6 +335,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: (32 / DESIGN_WIDTH) * SCREEN_WIDTH,
     zIndex: 10,
+    marginTop: 20
   },
   completeButton: {
     minWidth: 120,
@@ -321,6 +348,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xxxl,
     paddingVertical: Spacing.lg,
     height: 51,
+
   },
   completeButtonText: {
     fontSize: Typography.fontSize.md,
