@@ -290,13 +290,12 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
             onClose={onClose}
             title="Add fighters"
             contentStyle={styles.sheetContentFull}
-            sheetStyle={{ minHeight: 'auto', maxHeight: '90%' }}
         >
             {/* Search Bar */}
             <View style={styles.searchContainer}>
                 <Search color={"#00000099"} size={24} />
                 <TextInput
-                    style={[styles.searchInput, { color: colors.white }]}
+                    style={styles.searchInput}
                     placeholder="Search"
                     placeholderTextColor={"#00000099"}
                     value={searchQuery}
