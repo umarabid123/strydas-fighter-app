@@ -392,6 +392,14 @@ export const SocialLinkSheet = ({ visible, onClose, onSave }: { visible: boolean
 
     const handleSave = () => {
         if (platform && url) {
+            // Validation: check if the URL contains the platform name (unless Website or Other)
+            if (platform !== 'Website' && platform !== 'Other') {
+                if (!url.toLowerCase().includes(platform.toLowerCase())) {
+                    alert(`Please enter a valid ${platform} URL.`);
+                    return;
+                }
+            }
+
             onSave({ platform, url });
             setPlatform('');
             setUrl('');
