@@ -1,6 +1,7 @@
 import type { NavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import { X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -46,8 +47,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const [showMatchSheet, setShowMatchSheet] = useState(false);
   const [showSportSheet, setShowSportSheet] = useState(false);
   const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
+
   const [fighterRecords, setFighterRecords] = useState<Record<string, { wins: number, losses: number, draws: number }>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // State for contact info
   const [contactData, setContactData] = useState<{
@@ -60,11 +63,13 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
   const handleSportSave = (sport: string) => {
     if (!sportsOfInterest.includes(sport)) {
       setSportsOfInterest([...sportsOfInterest, sport]);
+      if (error) setError('');
     }
   };
 
   const handleRemoveSport = (sport: string) => {
     setSportsOfInterest(sportsOfInterest.filter(s => s !== sport));
+    if (error) setError('');
   };
 
   const handleMatchSave = (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => {
@@ -104,11 +109,35 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
 
   const handleContactSave = (data: { fullName: string; phone: string; email: string; org: string }) => {
     setContactData(data);
+    if (error) setError('');
   };
 
   const handleComplete = async () => {
     if (!user?.id) {
       alert('User not authenticated. Please sign in again.');
+      return;
+    }
+
+    // Validation
+    setError('');
+
+    if (sportsOfInterest.length === 0) {
+      setError('Add at least one sport you compete in.');
+      return;
+    }
+
+    if (!weightDivision || isNaN(parseFloat(weightDivision))) {
+      setError('Please enter a valid Weight Division.');
+      return;
+    }
+
+    if (!weightRange || isNaN(parseFloat(weightRange))) {
+      setError('Please enter a valid Weight Range.');
+      return;
+    }
+
+    if (!contactData) {
+      setError('Add at least one contact method.');
       return;
     }
 
@@ -125,51 +154,33 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
 
       // Save contact info if exists
       if (contactData) {
-        const contactPromises = [];
-
-        if (contactData.fullName) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'name',
-            contact_value: contactData.fullName,
-          }));
-        }
-
-        if (contactData.phone) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'phone',
-            contact_value: contactData.phone,
-          }));
-        }
-
-        if (contactData.email) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'email',
-            contact_value: contactData.email,
-          }));
-        }
-
-        if (contactData.org) {
-          contactPromises.push(contactInfoService.addContactInfo({
-            profile_id: user.id,
-            contact_type: 'organization',
-            contact_value: contactData.org,
-          }));
-        }
-
-        await Promise.all(contactPromises);
+        await contactInfoService.addContactInfo({
+          profile_id: user.id,
+          full_name: contactData.fullName,
+          phone: contactData.phone,
+          email: contactData.email || null,
+          organisation: contactData.org || null,
+        });
       }
 
       // Save sports of interest
       if (sportsOfInterest.length > 0) {
-        const sportPromises = sportsOfInterest.map(sport =>
-          sportsOfInterestService.addSportOfInterest({
-            profile_id: user.id,
-            sport_name: sport,
-          })
-        );
+        const sportPromises = sportsOfInterest.map(async (sport) => {
+          try {
+            await sportsOfInterestService.addSportOfInterest({
+              profile_id: user.id,
+              sport_name: sport,
+            });
+          } catch (sportError: any) {
+            // Ignore duplicate key error (23505) if likely already added
+            // Adjust this check based on the actual error object structure you receive (e.g. sportError.code)
+            if (sportError?.code === '23505' || sportError?.message?.includes('duplicate key')) {
+              console.log(`Sport '${sport}' already exists, skipping.`);
+            } else {
+              throw sportError;
+            }
+          }
+        });
         await Promise.all(sportPromises);
       }
 
@@ -324,14 +335,17 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                     gap: 6
                   }}>
                     <AppText text={sport} fontSize={Typography.fontSize.sm} color={Colors.white} />
-                    <TouchableOpacity onPress={() => handleRemoveSport(sport)}>
-                      <AppText text="×" fontSize={16} color={Colors.white} />
+                    <TouchableOpacity onPress={() => handleRemoveSport(sport)} style={{ opacity: 0.7 }}>
+                      <X size={14} color={Colors.white} />
                     </TouchableOpacity>
                   </View>
                 ))}
               </View>
 
-              <TouchableOpacity style={styles.addButton} onPress={() => setShowSportSheet(true)}>
+              <TouchableOpacity style={styles.addButton} onPress={() => {
+                setShowSportSheet(true);
+                if (error) setError('');
+              }}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -352,8 +366,11 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
               />
               <View style={styles.weightValueContainer}>
                 <TextInput
-                  // value={weightDivision}
-                  onChangeText={setWeightDivision}
+                  value={weightDivision}
+                  onChangeText={(text) => {
+                    setWeightDivision(text);
+                    if (error) setError('');
+                  }}
                   keyboardType="decimal-pad"
                   style={{
                     fontFamily: 'CircularStd-Book',
@@ -393,6 +410,7 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                     low={parseFloat(weightRange || '0')}
                     onValueChanged={(low: number) => {
                       setWeightRange(low.toFixed(1));
+                      if (error) setError('');
                     }}
                     renderThumb={() => <Thumb />}
                     renderRail={() => <Rail />}
@@ -403,7 +421,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 </View>
                 <View style={styles.sliderValueContainer}>
                   <TextInput
-                    onChangeText={setWeightRange}
+                    onChangeText={(text) => {
+                      setWeightRange(text);
+                      if (error) setError('');
+                    }}
                     value={weightRange}
                     keyboardType="decimal-pad"
                     style={{
@@ -437,7 +458,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
               />
               <View style={styles.heightValueContainer}>
                 <TextInput
-                  onChangeText={setHeight}
+                  onChangeText={(text) => {
+                    setHeight(text);
+                    if (error) setError('');
+                  }}
                   keyboardType="decimal-pad"
                   style={{
                     fontFamily: 'CircularStd-Book',
@@ -461,7 +485,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             {/* Gym / Club */}
             <ProfileInput
               label="Gym / Club"
-              onChangeText={setGym}
+              onChangeText={(text) => {
+                setGym(text);
+                if (error) setError('');
+              }}
               placeholder="Keddles Gym"
             />
 
@@ -486,7 +513,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                 </View>
               )}
 
-              <TouchableOpacity style={styles.addButton} onPress={() => setShowContactSheet(true)}>
+              <TouchableOpacity style={styles.addButton} onPress={() => {
+                setShowContactSheet(true);
+                if (error) setError('');
+              }}>
                 <AppText
                   text={contactData ? "Edit" : "+"}
                   fontSize={contactData ? Typography.fontSize.sm : Typography.fontSize.xxl}
@@ -513,7 +543,10 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
                   color="rgba(255, 255, 255, 0.8)"
                 />
               </View>
-              <TouchableOpacity style={styles.addButton} onPress={() => setShowMatchSheet(true)}>
+              <TouchableOpacity style={styles.addButton} onPress={() => {
+                setShowMatchSheet(true);
+                if (error) setError('');
+              }}>
                 <AppText
                   text="+"
                   fontSize={Typography.fontSize.xxl}
@@ -524,6 +557,14 @@ export default function OnboardingFighter({ onComplete }: OnboardingFighterProps
             </View>
           </View>
           <View style={styles.completeButtonContainer}>
+            {error ? (
+              <AppText
+                text={error}
+                color={Colors.errorRed}
+                fontSize={Typography.fontSize.sm}
+                style={{ marginBottom: 10 }}
+              />
+            ) : null}
             <AppButton
               text="That's it, complete"
               onPress={handleComplete}

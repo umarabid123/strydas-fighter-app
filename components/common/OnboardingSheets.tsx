@@ -23,12 +23,17 @@ export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; o
     const [org, setOrg] = useState('');
 
     const handleSave = () => {
+        if (!fullName.trim() || !phone.trim()) {
+            alert('Please enter Full Name and Phone number.');
+            return;
+        }
+
         if (onSave) {
             onSave({
-                fullName,
-                phone,
-                email,
-                org
+                fullName: fullName.trim(),
+                phone: phone.trim(),
+                email: email.trim(),
+                org: org.trim()
             });
         }
         onClose();
@@ -95,7 +100,7 @@ import { MonthNames } from '../../constant';
 
 export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onClose: () => void; onSave: (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => void }) => {
     const [date, setDate] = useState('');
-    const [matchDate, setMatchDate] = useState(new Date());
+    const [matchDate, setMatchDate] = useState(new Date(2024, 0, 1));
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [opponent, setOpponent] = useState('');
     const [event, setEvent] = useState('');
@@ -114,14 +119,14 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
     };
 
     const handleSave = () => {
-        if (!opponent || !event || !sport || !result) {
+        if (!date || !opponent.trim() || !event.trim() || !division || !sport || !result) {
             alert('Please fill in all required fields');
             return;
         }
         onSave({
             date: matchDate,
-            opponent,
-            event,
+            opponent: opponent.trim(),
+            event: event.trim(),
             division,
             sport,
             result
@@ -222,15 +227,15 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
                             onPress={() => setPickerType('result')}
                         />
                     </View>
+                    <View style={[styles.footer, { paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: 'transparent' }]}>
+                        <AppButton
+                            text="Add match"
+                            onPress={handleSave}
+                            btnStyle={styles.saveButton}
+                            textStyle={styles.saveButtonText}
+                        />
+                    </View>
                 </ScrollView>
-                <View style={[styles.footer, { paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: 'transparent' }]}>
-                    <AppButton
-                        text="Add match"
-                        onPress={handleSave}
-                        btnStyle={styles.saveButton}
-                        textStyle={styles.saveButtonText}
-                    />
-                </View>
             </View>
 
             <SelectPicker
@@ -252,6 +257,8 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
                 title="Select Date of Match"
                 value={matchDate}
                 onChange={handleDateChange}
+                maximumDate={new Date()}
+                minimumDate={new Date(1990, 0, 1)}
             />
         </CustomBottomSheet>
     );
