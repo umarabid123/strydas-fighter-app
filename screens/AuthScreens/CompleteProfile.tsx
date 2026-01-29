@@ -43,7 +43,8 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
-  const [birthDate, setBirthDate] = useState(new Date());
+  // Default picker to year 2000 so users can scroll months freely without hitting "today" limit
+  const [birthDate, setBirthDate] = useState(new Date(2000, 0, 1));
   const [gender, setGender] = useState<GenderEnum | ''>('');
   const [country, setCountry] = useState<CountryEnum | ''>('');
   const [showGenderPicker, setShowGenderPicker] = useState(false);
@@ -103,6 +104,9 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
     return `${month} ${day}, ${year}`;
   };
 
+  // Create a stable max date (today)
+  const [maxDate] = useState(new Date());
+
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (selectedDate) {
       setBirthDate(selectedDate);
@@ -114,6 +118,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const handleDatePickerPress = () => {
     setShowDatePicker(true);
   };
+
 
 
   const saveProfile = async () => {
@@ -584,7 +589,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
         title="Select Date of Birth"
         value={birthDate}
         onChange={handleDateChange}
-        maximumDate={new Date()}
+        maximumDate={maxDate}
         minimumDate={new Date(1900, 0, 1)}
       />
       {/* Sports Sheet */}

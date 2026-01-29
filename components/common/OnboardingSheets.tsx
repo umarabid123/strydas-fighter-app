@@ -458,10 +458,12 @@ export const SportsSheet = ({ visible, onClose, onSave }: { visible: boolean; on
     const INTEREST_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing', 'BJJ', 'Wrestling', 'Karate', 'Judo'];
 
     const handleSave = () => {
-        if (sport) {
-            onSave(sport);
+        if (sport && sport.trim()) {
+            onSave(sport.trim());
             setSport('');
             onClose();
+        } else {
+            alert('Please select or enter a sport.');
         }
     };
 
