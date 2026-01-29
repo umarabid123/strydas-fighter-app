@@ -52,9 +52,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
   const [showSportSheet, setShowSportSheet] = useState(false);
   const [showSocialSheet, setShowSocialSheet] = useState(false);
   const [sportsOfInterest, setSportsOfInterest] = useState<string[]>([]);
-  const [socialLinks, setSocialLinks] = useState<Array<{ platform: string, url: string }>>([
-    { platform: 'Instagram', url: 'https://www.instagram.com/laugepetersen' },
-  ]);
+  const [socialLinks, setSocialLinks] = useState<Array<{ platform: string, url: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -288,8 +286,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
           <View style={styles.formContainer}>
             <ProfileInput
               label="First Name *"
-              // value={firstName}
-              // value={firstName}
+              value={firstName}
               onChangeText={(text) => {
                 setFirstName(text);
                 if (error) setError('');
@@ -298,7 +295,7 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
             />
             <ProfileInput
               label="Last Name *"
-              // value={lastName}
+              value={lastName}
               onChangeText={(text) => {
                 setLastName(text);
                 if (error) setError('');
@@ -307,14 +304,14 @@ export default function CompleteProfile({ onComplete }: CompleteProfileProps) {
             />
             <ProfileInput
               label="Date of birth *"
-              // value={dateOfBirth}
+              value={dateOfBirth}
               placeholder="Mar 03, 2000"
               editable={false}
               onPress={handleDatePickerPress}
             />
             <ProfileInput
               label="Gender *"
-              // value={gender}
+              value={gender}
               placeholder="-"
               editable={false}
               onPress={() => setShowGenderPicker(true)}
