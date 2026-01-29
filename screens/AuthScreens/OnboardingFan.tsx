@@ -328,14 +328,11 @@ const styles = StyleSheet.create({
     gap: Spacing.xxl,
   },
   completeButtonContainer: {
-    position: 'absolute',
-    bottom: (46 / DESIGN_HEIGHT) * SCREEN_HEIGHT,
-    left: 0,
-    right: 0,
     alignItems: 'center',
     paddingHorizontal: (32 / DESIGN_WIDTH) * SCREEN_WIDTH,
     zIndex: 10,
-    marginTop: 20
+    marginTop: 60,
+    paddingBottom: 40,
   },
   completeButton: {
     minWidth: 120,
