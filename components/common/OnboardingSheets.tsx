@@ -23,12 +23,17 @@ export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; o
     const [org, setOrg] = useState('');
 
     const handleSave = () => {
+        if (!fullName.trim() || !phone.trim()) {
+            alert('Please enter Full Name and Phone number.');
+            return;
+        }
+
         if (onSave) {
             onSave({
-                fullName,
-                phone,
-                email,
-                org
+                fullName: fullName.trim(),
+                phone: phone.trim(),
+                email: email.trim(),
+                org: org.trim()
             });
         }
         onClose();
@@ -114,14 +119,14 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
     };
 
     const handleSave = () => {
-        if (!opponent || !event || !sport || !result) {
+        if (!date || !opponent.trim() || !event.trim() || !sport || !result) {
             alert('Please fill in all required fields');
             return;
         }
         onSave({
             date: matchDate,
-            opponent,
-            event,
+            opponent: opponent.trim(),
+            event: event.trim(),
             division,
             sport,
             result
@@ -252,6 +257,8 @@ export const MatchSheet = ({ visible, onClose, onSave }: { visible: boolean; onC
                 title="Select Date of Match"
                 value={matchDate}
                 onChange={handleDateChange}
+                maximumDate={new Date()}
+                minimumDate={new Date(1990, 0, 1)}
             />
         </CustomBottomSheet>
     );
@@ -450,10 +457,12 @@ export const SportsSheet = ({ visible, onClose, onSave }: { visible: boolean; on
     const INTEREST_OPTIONS = ['Muay Thai', 'MMA', 'Kickboxing', 'Boxing', 'BJJ', 'Wrestling', 'Karate', 'Judo'];
 
     const handleSave = () => {
-        if (sport) {
-            onSave(sport);
+        if (sport && sport.trim()) {
+            onSave(sport.trim());
             setSport('');
             onClose();
+        } else {
+            alert('Please select or enter a sport.');
         }
     };
 
