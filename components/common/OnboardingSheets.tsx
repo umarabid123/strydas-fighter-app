@@ -45,6 +45,7 @@ export const ContactSheet = ({ visible, onClose, onSave }: { visible: boolean; o
             onClose={onClose}
             title="Contact Person"
             contentStyle={styles.sheetContent}
+            sheetStyle={{ paddingBottom: 0 }}
         >
             <View style={styles.form}>
                 <ProfileInput
@@ -280,9 +281,68 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
         setSelectedFighters(selectedFighters.filter(fighterId => fighterId !== id));
     };
 
-    // Filter available fighters excluding already selected ones
-    const availableList = AVAILABLE_FIGHTERS.filter(f => !selectedFighters.includes(f.id));
+    // Filter by search query first
+    const filteredFighters = AVAILABLE_FIGHTERS.filter(f =>
+        f.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Split into available and selected
+    const availableList = filteredFighters.filter(f => !selectedFighters.includes(f.id));
     const selectedList = AVAILABLE_FIGHTERS.filter(f => selectedFighters.includes(f.id));
+
+    // Combine data for single FlatList
+    const showSeparator = availableList.length > 0 && selectedList.length > 0;
+
+    const flatListData = [
+        ...availableList.map(f => ({ ...f, type: 'available' })),
+        ...(showSeparator ? [{ id: 'separator-line', type: 'separator' } as any] : []),
+        ...selectedList.map(f => ({ ...f, type: 'selected' }))
+    ];
+
+    const renderItem = ({ item }: { item: any }) => {
+        if (item.type === 'separator') {
+            return (
+                <View style={{ paddingVertical: 10 }}>
+                    <View style={styles.separator} />
+                </View>
+            );
+        }
+
+        const isSelected = item.type === 'selected';
+
+        return (
+            <View style={styles.fighterRow}>
+                <View style={styles.fighterInfoLeft}>
+                    <TouchableOpacity
+                        style={isSelected ? styles.removeButtonList : styles.addButtonList}
+                        onPress={() => isSelected ? handleRemoveFighter(item.id) : handleAddFighter(item.id)}
+                    >
+                        {isSelected ? (
+                            <X color={"#E05D58"} size={12} />
+                        ) : (
+                            <AppText text="Add" style={{ fontWeight: 600 }} fontSize={Typography.fontSize.sm} fontName="CircularStd-Bold" color={Colors.black} />
+                        )}
+                    </TouchableOpacity>
+                    <Image source={item.avatar} style={styles.fighterAvatar} />
+                    <View>
+                        <AppText text={item.name} style={{ fontWeight: 600 }} fontSize={Typography.fontSize.xl} fontName="CircularStd-Bold" color={colors.white} />
+                        <View style={styles.fighterMetaRow}>
+                            <View style={styles.tag}>
+                                <AppText text={item.record} fontSize={Typography.fontSize.lg} color={colors.white} />
+                            </View>
+                            <View style={styles.tag}>
+                                <AppText text={item.country} fontSize={Typography.fontSize.lg} color={colors.white} />
+                                <Image source={item.flag} style={styles.flagIcon} />
+                            </View>
+                            <View style={styles.tag}>
+                                <AppText text={item.sport} fontSize={Typography.fontSize.lg} color={colors.white} />
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </View>
+        );
+    };
 
     return (
         <CustomBottomSheet
@@ -303,87 +363,26 @@ export const AddFighterSheet = ({ visible, onClose }: { visible: boolean; onClos
                 />
             </View>
 
-            {/* Available Fighters List (Flex 1 to take remaining space) */}
-            <ScrollView style={styles.listContainer} contentContainerStyle={styles.listContent}>
-                {availableList.map(fighter => (
-                    <View key={fighter.id} style={styles.fighterRow}>
-                        <View style={styles.fighterInfoLeft}>
-                            <TouchableOpacity style={styles.addButtonList} onPress={() => handleAddFighter(fighter.id)}>
-                                <AppText text="Add" style={{ fontWeight: 600 }} fontSize={Typography.fontSize.sm} fontName="CircularStd-Bold" color={Colors.black} />
-                            </TouchableOpacity>
-                            <Image source={fighter.avatar} style={styles.fighterAvatar} />
-                            <View>
-                                <AppText text={fighter.name} style={{ fontWeight: 600 }} fontSize={Typography.fontSize.xl} fontName="CircularStd-Bold" color={colors.white} />
-                                <View style={styles.fighterMetaRow}>
-                                    <View style={styles.tag}>
-                                        <AppText text={fighter.record} fontSize={Typography.fontSize.lg} color={colors.white} />
-                                    </View>
-                                    <View style={styles.tag}>
-                                        <AppText text={fighter.country} fontSize={Typography.fontSize.lg} color={colors.white} />
-                                        <Image source={fighter.flag} style={styles.flagIcon} />
-                                    </View>
-                                    <View style={styles.tag}>
-                                        <AppText text={fighter.sport} fontSize={Typography.fontSize.lg} color={colors.white} />
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                ))}
-            </ScrollView>
-
-            {/* Selected Fighters Section (Bottom) */}
-            {selectedList.length > 0 && (
-                <View>
-                    <View style={styles.separator} />
-                    <View>
-                        <FlatList
-                            data={selectedList}
-                            keyExtractor={(item: { id: string }) => item.id}
-                            contentContainerStyle={{
-                                paddingHorizontal: 20,
-                                paddingTop: 24,
-                                paddingBottom: 10,
-                                gap: 16
-                            }}
-                            renderItem={({ item: fighter }: { item: typeof AVAILABLE_FIGHTERS[0] }) => (
-                                <View style={styles.fighterRow}>
-                                    <View style={styles.fighterInfoLeft}>
-                                        <TouchableOpacity style={styles.removeButtonList} onPress={() => handleRemoveFighter(fighter.id)}>
-                                            <X color={"#E05D58"} size={12} />
-                                        </TouchableOpacity>
-                                        <Image source={fighter.avatar} style={styles.fighterAvatar} />
-                                        <View>
-                                            <AppText text={fighter.name} style={{ fontWeight: 600 }} fontSize={Typography.fontSize.xl} fontName="CircularStd-Bold" color={colors.white} />
-                                            <View style={styles.fighterMetaRow}>
-                                                <View style={styles.tag}>
-                                                    <AppText text={fighter.record} fontSize={Typography.fontSize.lg} color={colors.white} />
-                                                </View>
-                                                <View style={styles.tag}>
-                                                    <AppText text={fighter.country} fontSize={Typography.fontSize.lg} color={colors.white} />
-                                                    <Image source={fighter.flag} style={styles.flagIcon} />
-                                                </View>
-                                                <View style={styles.tag}>
-                                                    <AppText text={fighter.sport} fontSize={Typography.fontSize.lg} color={colors.white} />
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            )}
+            {/* Combined List */}
+            <FlatList
+                style={{ flex: 1 }}
+                data={flatListData}
+                keyExtractor={(item) => item.id}
+                renderItem={renderItem}
+                contentContainerStyle={[styles.listContent, { paddingBottom: 100 }]}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                ListFooterComponent={
+                    <View style={styles.footer}>
+                        <AppButton
+                            text="Save & close"
+                            onPress={onClose}
+                            btnStyle={styles.saveButton}
+                            textStyle={styles.saveButtonText}
                         />
                     </View>
-                </View>
-            )}
-
-            <View style={styles.footer}>
-                <AppButton
-                    text="Save & close"
-                    onPress={onClose}
-                    btnStyle={styles.saveButton}
-                    textStyle={styles.saveButtonText}
-                />
-            </View>
+                }
+            />
         </CustomBottomSheet>
     );
 };
@@ -479,6 +478,7 @@ export const SportsSheet = ({ visible, onClose, onSave }: { visible: boolean; on
             onClose={onClose}
             title="Add Sport"
             contentStyle={styles.sheetContent}
+            sheetStyle={{ paddingBottom:0 }}
         >
             <View style={styles.form}>
                 <ProfileInput
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     },
     form: {
         gap: Spacing.lg,
-        paddingBottom: 40,
+        // paddingBottom: 40,
         paddingHorizontal: 20 // Added padding back since contentStyle removed it
     },
     footer: {
