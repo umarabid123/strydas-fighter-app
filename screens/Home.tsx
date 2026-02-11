@@ -217,62 +217,65 @@ const Home = () => {
             />
           </View>
         ) : (
-          <ScrollView contentContainerStyle={styles.sheetContent}>
-            <View style={{ gap: Spacing.lg, paddingBottom: 40 }}>
-              <ProfileInput
-                label="Select Event *"
-                placeholder="Choose an event"
-                value={userEvents.find(e => e.id === selectedEventId)?.title || ''}
-                editable={false}
-                onPress={() => setShowEventPicker(true)}
+            <>
+              <ScrollView contentContainerStyle={styles.sheetContent}>
+                <View style={{ gap: Spacing.lg, paddingBottom: 40 }}>
+                  <ProfileInput
+                    label="Select Event *"
+                    placeholder="Choose an event"
+                    value={userEvents.find(e => e.id === selectedEventId)?.title || ''}
+                    editable={false}
+                    onPress={() => setShowEventPicker(true)}
+                  />
+                  <ProfileInput
+                    label="Sport Type *"
+                    placeholder="Muay Thai, MMA"
+                    value={matchSport}
+                    onChangeText={setMatchSport}
+                  />
+                  <ProfileInput
+                    label="Match Type *"
+                    placeholder="Amateur, Pro"
+                    value={matchTypeInput}
+                    onChangeText={setMatchTypeInput}
+                  />
+                  <ProfileInput
+                    label="Weight Class"
+                    placeholder="63.5 kg"
+                    value={matchWeight}
+                    onChangeText={setMatchWeight}
+                  />
+                  <ProfileInput
+                    label="Description"
+                    placeholder="Description"
+                    value={matchDesc}
+                    onChangeText={setMatchDesc}
+                    multiline
+                    height={80}
+                  />
+                  <View style={{ marginTop: 20 }}>
+                    <AppButton
+                      text="Create Match"
+                      onPress={handleCreateMatch}
+                      btnStyle={styles.saveButton}
+                      textStyle={styles.saveButtonText}
+                    />
+                  </View>
+                </View>
+              </ScrollView>
+              <SelectPicker
+                visible={showEventPicker}
+                onClose={() => setShowEventPicker(false)}
+                title="Select Event"
+                options={eventOptions}
+                selectedValue={selectedEventId}
+                onSelect={(val) => setSelectedEventId(val)}
               />
-              <ProfileInput
-                label="Sport Type *"
-                placeholder="Muay Thai, MMA"
-                value={matchSport}
-                onChangeText={setMatchSport}
-              />
-              <ProfileInput
-                label="Match Type *"
-                placeholder="Amateur, Pro"
-                value={matchTypeInput}
-                onChangeText={setMatchTypeInput}
-              />
-              <ProfileInput
-                label="Weight Class"
-                placeholder="63.5 kg"
-                value={matchWeight}
-                onChangeText={setMatchWeight}
-              />
-              <ProfileInput
-                label="Description"
-                placeholder="Description"
-                value={matchDesc}
-                onChangeText={setMatchDesc}
-                multiline
-                height={100}
-              />
-              <View style={{ marginTop: 20 }}>
-                <AppButton
-                  text="Create Match"
-                  onPress={handleCreateMatch}
-                  btnStyle={styles.saveButton}
-                  textStyle={styles.saveButtonText}
-                />
-              </View>
-            </View>
-          </ScrollView>
+          </>
         )}
       </CustomBottomSheet>
 
-      <SelectPicker
-        visible={showEventPicker}
-        onClose={() => setShowEventPicker(false)}
-        title="Select Event"
-        options={eventOptions}
-        selectedValue={selectedEventId}
-        onSelect={(val) => setSelectedEventId(val)}
-      />
+
 
       {user?.id && (
         <CreateEventSheet

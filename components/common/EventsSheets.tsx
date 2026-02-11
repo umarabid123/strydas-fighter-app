@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors, CountryOptions, Spacing, Typography } from '../../constant';
 import { CreateMatchInput, CountryEnum, EventType, EventStatus } from '../../lib/types';
 import { createEvent, createMatch } from '../../services/eventService';
@@ -9,6 +8,7 @@ import AppText from './AppText';
 import CustomBottomSheet from './CustomBottomSheet';
 import ProfileInput from './ProfileInput';
 import SelectPicker from './SelectPicker';
+import DatePickerModal from './DatePickerModal';
 import { MatchSheet } from './OnboardingSheets';
 
 const EventTypeOptions = [
@@ -64,30 +64,16 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
     const [isLoading, setIsLoading] = useState(false);
 
     const handleDateChange = (event: any, selectedDate?: Date) => {
-        setShowDatePicker(false);
+        if (Platform.OS === 'android') {
+            setShowDatePicker(false);
+        }
         if (selectedDate) {
             setEventDate(selectedDate);
         }
     };
 
     const handleMatchSave = (match: { date: Date; opponent: string; event: string; division: string; sport: string; result: string }) => {
-        // Transform the Onboarding match format to CreateMatchInput format if needed.
-        // Wait, CreateMatchInput is: { event_id: string; sport_type: string; match_type: string; weight_class?: string; description?: string; }
-        // The MatchSheet returns: { date, opponent, event, division, sport, result }
-        // The user said "separate add match bottom sheet for add match as show in home page".
-        // The CreateEventScreen uses: sport_type, match_type, weight_class, description.
-        // The MatchSheet in Onboarding is for PAST matches (result, opponent).
-        // For CREATING an event, we are adding matches to the schedule.
-        // So I probably need a DIFFERENT MatchSheet for Create Event, or adapt the existing one?
-        // The user said "separate add match bottom sheet for add match".
-        // Let's assume I need a simplified "Add Match to Event" sheet.
-        // Or I can use a new inline form here? No, user said "separate add match bottom sheet".
-        // Let's create an `AddMatchToEventSheet` inside this file for simplicity or use a simplified Match form.
 
-        // Actually, let's look at `CreateEventScreen`'s match fields: Sport Type, Match Type, Weight Class, Description.
-        // The `MatchSheet` in `OnboardingSheets` has: Opponent, EventName, Division, Sport, Result.
-        // These are quite different. Onboarding is "History". Create Event is "Scheduling".
-        // I will create a `ScheduleMatchSheet` for this purpose.
     };
 
     const handleScheduleMatch = (match: Omit<CreateMatchInput, 'event_id'>) => {
@@ -204,30 +190,29 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
 
                 <ProfileInput
                     label="Description"
-                    placeholder="Description"
+                    placeholder="Brief description of the event"
                     value={description}
                     onChangeText={setDescription}
                     multiline
-                    height={100}
+                    height={80}
                 />
 
                 <View>
-                    {/* Date Picker Trigger (using ProfileInput style) */}
                     <ProfileInput
                         label="Date *"
-                        placeholder={eventDate.toLocaleDateString()}
+                        placeholder="Select Date"
                         value={eventDate.toLocaleDateString()}
                         editable={false}
                         onPress={() => setShowDatePicker(true)}
                     />
-                    {showDatePicker && (
-                        <DateTimePicker
-                            value={eventDate}
-                            mode="date"
-                            display="default"
-                            onChange={handleDateChange}
-                        />
-                    )}
+                    <DatePickerModal
+                        visible={showDatePicker}
+                        onClose={() => setShowDatePicker(false)}
+                        title="Select Date"
+                        value={eventDate}
+                        onChange={handleDateChange}
+                        minimumDate={new Date()}
+                    />
                 </View>
 
                 <ProfileInput
@@ -287,8 +272,6 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
                     onChangeText={setImageUrl}
                 />
 
-            </ScrollView>
-
             <View style={styles.footer}>
                 <AppButton
                     text="Create Event"
@@ -297,6 +280,8 @@ export const CreateEventSheet = ({ visible, onClose, userId, onEventCreated }: C
                     textStyle={styles.saveButtonText}
                 />
             </View>
+            </ScrollView>
+
 
             <SelectPicker
                 visible={showCountryPicker}

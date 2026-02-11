@@ -1,4 +1,4 @@
-import { DrawerActions, useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   Dimensions,
   Image,
@@ -77,13 +77,7 @@ export default function Header({
             if (onMenuPress) {
               onMenuPress();
             } else {
-              // Professional toggle behavior: if on Menu screen, go back, otherwise navigate to Menu
-              const currentRoute = route.name;
-              if (currentRoute === 'Menu') {
-                navigation.goBack();
-              } else {
-                navigation.navigate('Menu');
-              }
+              navigation.navigate('Menu');
             }
           }}>
             <View style={styles.hamburgerIcon}>
