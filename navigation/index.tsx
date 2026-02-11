@@ -35,6 +35,7 @@ const RootNavigator = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const colorScheme = useColorScheme();
 
   const baseTheme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
@@ -49,17 +50,35 @@ const RootNavigator = () => {
   useEffect(() => {
     // Check initial session on app load
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user || null);
-      
-      if (session?.user) {
-        console.log('User already logged in:', session.user.email);
-        setIsAuthenticated(true);
-        
-        // Check if user has completed onboarding
-        const onboardingComplete = await checkOnboardingStatus(session.user.id);
-        setHasCompletedOnboarding(onboardingComplete);
+      console.log('LOG: initializeAuth started');
+      try {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('LOG: Error fetching session:', error);
+        }
+
+        const session = data?.session;
+        console.log('LOG: Session retrieved:', session ? 'Session found' : 'No session');
+
+        setSession(session);
+        setUser(session?.user || null);
+
+        if (session?.user) {
+          console.log('LOG: User already logged in:', session.user.email);
+          setIsAuthenticated(true);
+
+          // Check if user has completed onboarding
+          const onboardingComplete = await checkOnboardingStatus(session.user.id);
+          console.log('LOG: Onboarding status:', onboardingComplete);
+          setHasCompletedOnboarding(onboardingComplete);
+        } else {
+          console.log('LOG: No active user session on init');
+        }
+      } catch (err) {
+        console.error('LOG: initializeAuth threw error:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -90,6 +109,15 @@ const RootNavigator = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#000' }}>
+        <MeshGradientBackground />
+        {/* Optionally Add AppLoader or Splash Screen logic here */}
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>

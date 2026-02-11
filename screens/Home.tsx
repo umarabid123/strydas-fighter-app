@@ -15,6 +15,7 @@ import { CreateEventSheet } from '../components/common/EventsSheets';
 import ProfileInput from '../components/common/ProfileInput';
 import SelectPicker from '../components/common/SelectPicker';
 import { createMatch } from '../services/eventService';
+import { authService } from '../services/authService';
 
 const Home = () => {
   const navigation = useNavigation<any>();
@@ -107,9 +108,17 @@ const Home = () => {
 
   const eventOptions = userEvents.map(e => ({ label: e.title, value: e.id }));
 
+  const handleLogout = async () => {
+    try {
+      await authService.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <View style={[styles.container]}>
-      <Header title='Home' />
+      <Header title='Home' onNotificationPress={handleLogout} />
 
       {/* My Matches Section */}
       {myMatches.length === 0 ? (

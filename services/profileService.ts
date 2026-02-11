@@ -159,6 +159,21 @@ export const profileService = {
   // Mark onboarding as complete
   async completeOnboarding(id: string) {
     return this.updateProfile(id, { onboarding_completed: true });
+  },
+
+  // Get only onboarding status (lightweight)
+  async getOnboardingStatus(id: string): Promise<boolean> {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching onboarding status:', error);
+      return false;
+    }
+    return data?.onboarding_completed ?? false;
   }
 };
 

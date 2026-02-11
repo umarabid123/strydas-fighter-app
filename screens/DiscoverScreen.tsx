@@ -235,7 +235,7 @@ export default function DiscoverScreen() {
         data={finalFighters}
         showsVerticalScrollIndicator={false}
         keyExtractor={item => item.id}
-        ListHeaderComponent={renderHeader}
+        ListHeaderComponent={renderHeader()}
         contentContainerStyle={{
           paddingTop: 0,
           paddingBottom: 20

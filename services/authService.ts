@@ -434,8 +434,7 @@ export const checkOnboardingStatus = async (
   if (!userId) return false;
 
   try {
-    const profile = await profileService.getProfileById(userId);
-    return profile?.onboarding_completed ?? false;
+    return await profileService.getOnboardingStatus(userId);
   } catch (error) {
     console.error('Error checking onboarding status:', error);
     return false;

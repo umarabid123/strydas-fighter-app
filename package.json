@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/drawer": "^7.7.9",
@@ -20,6 +21,7 @@
     "@react-navigation/native-stack": "^7.2.0",
     "@react-navigation/stack": "^7.6.13",
     "@supabase/supabase-js": "^2.90.1",
+    "react-native-url-polyfill": "^2.0.0",
     "expo": "~54.0.27",
     "expo-clipboard": "~8.0.8",
     "expo-constants": "~18.0.11",
