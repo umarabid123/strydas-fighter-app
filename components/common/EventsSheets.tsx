@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { Image, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Colors, CountryOptions, Spacing, Typography } from '../../constant';
-import { CreateMatchInput, CountryEnum, EventType, EventStatus } from '../../lib/types';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Colors, CountryOptions, Spacing } from '../../constant';
+import { CreateMatchInput, EventType } from '../../lib/types';
 import { createEvent, createMatch } from '../../services/eventService';
 import AppButton from './AppButton';
-import AppText from './AppText';
 import CustomBottomSheet from './CustomBottomSheet';
+import DatePickerModal from './DatePickerModal';
 import ProfileInput from './ProfileInput';
 import SelectPicker from './SelectPicker';
-import DatePickerModal from './DatePickerModal';
-import { MatchSheet } from './OnboardingSheets';
 
 const EventTypeOptions = [
     { label: 'Fight Night', value: 'fight_night' },
